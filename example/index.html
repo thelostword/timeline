@@ -1,10 +1,10 @@
 <!--
  * @Author: losting
  * @Date: 2022-04-01 17:16:54
- * @LastEditTime: 2022-04-01 17:34:11
+ * @LastEditTime: 2022-05-07 18:54:29
  * @LastEditors: losting
  * @Description: 
- * @FilePath: \rollup-template\example\index.html
+ * @FilePath: \timeline\example\index.html
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +15,32 @@
   <title>Document</title>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="../lib/moe.esm.js"></script>
+  <div id="root">
+    <canvas id="timeline" width="1000px" height="70px" style="margin: 100px auto;background-color: rgba(0, 0, 0, .5);padding: 10px;"></canvas>
+  </div>
+  <script type="module">
+    import MoeTimeline from '../lib/moe-timeline.esm.js';
+
+    const timeline = new MoeTimeline('timeline');
+
+    timeline.create({
+      startTime: 1651823833000,
+      endTime: 1651910233000,
+      currentTime: 1651829533000,
+      area: [{
+        startTime: 1651827433000,
+        endTime: 1651829413000,
+        bgColor: '#ffffff88'
+      },{
+        startTime: 1651829533000,
+        endTime: 1651832533000,
+        bgColor: '#ffffff88'
+      }],
+    });
+
+    timeline.on('click', (e) => {
+      console.log(e, 'click');
+    })
+  </script>
 </body>
 </html>

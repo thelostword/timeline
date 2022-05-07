@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@rollup/plugin-alias': ^3.1.9
   '@rollup/plugin-commonjs': ^21.1.0
   '@rollup/plugin-node-resolve': ^13.2.1
   '@rollup/plugin-replace': ^4.0.0
@@ -13,8 +14,10 @@ specifiers:
   ts-jest: ^27.1.4
   tslib: ^2.3.1
   typescript: ^4.6.3
+  znu-event: ^0.0.10
 
 dependencies:
+  '@rollup/plugin-alias': 3.1.9_rollup@2.70.2
   '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
   '@rollup/plugin-node-resolve': 13.2.1_rollup@2.70.2
   '@rollup/plugin-replace': 4.0.0_rollup@2.70.2
@@ -27,6 +30,7 @@ dependencies:
   ts-jest: 27.1.4_9985e1834e803358b7be1e6ce5ca0eea
   tslib: 2.3.1
   typescript: 4.6.3
+  znu-event: 0.0.10
 
 packages:
 
@@ -573,6 +577,16 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.0.5
       '@jridgewell/sourcemap-codec': 1.4.11
+    dev: false
+
+  /@rollup/plugin-alias/3.1.9_rollup@2.70.2:
+    resolution: {integrity: sha512-QI5fsEvm9bDzt32k39wpOwZhVzRcL5ydcffUHMyLVaVaLeC70I8TJZ17F1z1eMoLu4E/UOcH9BWVkKpIKdrfiw==}
+    engines: {node: '>=8.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0
+    dependencies:
+      rollup: 2.70.2
+      slash: 3.0.0
     dev: false
 
   /@rollup/plugin-commonjs/21.1.0_rollup@2.70.2:
@@ -2905,4 +2919,8 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 20.2.9
+    dev: false
+
+  /znu-event/0.0.10:
+    resolution: {integrity: sha512-KAHJWR6YCMOXVah8q91ba9pD+NPUZBp/y1yBWPFIeQC8InRhl5BL0sBNDAzVeMn3/6HcvTxS+7afOn7wzcr65w==}
     dev: false

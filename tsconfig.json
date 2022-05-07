@@ -13,7 +13,11 @@
     "outDir": "lib",
     "declarationDir": ".",
     "declaration": true,
-    "lib": ["es6", "DOM"]
+    "lib": ["es6", "DOM"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+    }
   },
   "include": ["src/index.ts"],
   "exclude": ["lib"]

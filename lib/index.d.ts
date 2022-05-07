@@ -1,16 +1,28 @@
-declare type Avatar = {
-    mini?: string;
-    small?: string;
-    medium?: string;
-    large?: string;
+declare type AreaItemType = {
+    startTime: number;
+    endTime: number;
+    bgColor?: string;
 };
-declare type Person = {
-    name: string;
-    age?: number;
-    sex?: number;
-    email: string;
-    avatar: Avatar;
+declare type createType = {
+    startTime?: number;
+    endTime?: number;
+    currentTime?: number;
+    area?: AreaItemType[];
 };
-export declare const getPerson: (id: string) => Person | undefined;
-export declare const fibonaci: (i: number) => number;
-export default fibonaci;
+declare class MoeTimeLine {
+    startTime: number;
+    endTime: number;
+    currentTime: number;
+    area?: AreaItemType[];
+    $canvas: HTMLCanvasElement;
+    canvasContext: CanvasRenderingContext2D;
+    event: any;
+    constructor(id: string);
+    create({ startTime, endTime, currentTime, area }: createType): void;
+    drawLine(x: number, y: number): void;
+    drawArea(startTime: number, endTime: number, bgColor?: string): void;
+    on(name: any, listener: any): void;
+    off(name: any, listener: any): void;
+    emit(...args: any[]): void;
+}
+export default MoeTimeLine;
