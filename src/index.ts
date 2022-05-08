@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-08 13:41:03
+ * @LastEditTime: 2022-05-08 22:44:53
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -199,8 +199,22 @@ class MoeTimeLine {
     this.$canvas.addEventListener('wheel', (e) => {
       if (e.deltaY > 0) {
         console.log('向上, 缩小')
+        this.spacing -= 0.1
+        this.create({
+          startTime: this.startTime,
+          endTime: this.endTime,
+          currentTime: this.currentTime,
+          area: this.area,
+        });
       } else {
         console.log('向下， 放大')
+        this.spacing += 0.1
+        this.create({
+          startTime: this.startTime,
+          endTime: this.endTime,
+          currentTime: this.currentTime,
+          area: this.area,
+        });
       }
     }, false)
   }
