@@ -1,30 +1,16 @@
 /*
  * @Author: losting
  * @Date: 2022-05-07 16:05:57
- * @LastEditTime: 2022-05-07 16:18:02
+ * @LastEditTime: 2022-05-08 12:38:03
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\utils\times.ts
  */
+import dayjs from 'dayjs';
 // 时间戳转时间
-export function getTime(timestamp) {
-  var date = new Date(timestamp);
-  var Y = date.getFullYear() + '-';
-  var M =
-    (date.getMonth() + 1 < 10
-      ? '0' + (date.getMonth() + 1)
-      : date.getMonth() + 1) + '-';
-  var D =
-    date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-  var h =
-    date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-  var m =
-    date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-  var s =
-    date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-  return Y + M + D + ' ' + h + ':' + m + ':' + s;
+export const dateTime = (time: number, format: string = 'MM/DD HH:mm:ss') => {
+  return dayjs(time).format(format);
 }
-
 
 // 今日开始时间戳
 export function getTodayStartTime(): number {

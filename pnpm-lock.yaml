@@ -7,6 +7,7 @@ specifiers:
   '@rollup/plugin-replace': ^4.0.0
   '@rollup/plugin-typescript': ^8.3.2
   '@types/jest': ^27.4.1
+  dayjs: ^1.11.2
   jest: ^27.5.1
   rollup: ^2.70.2
   rollup-plugin-sourcemaps: ^0.6.3
@@ -23,6 +24,7 @@ dependencies:
   '@rollup/plugin-replace': 4.0.0_rollup@2.70.2
   '@rollup/plugin-typescript': 8.3.2_eaab4980cb5a437133211ecd98513266
   '@types/jest': 27.4.1
+  dayjs: 1.11.2
   jest: 27.5.1
   rollup: 2.70.2
   rollup-plugin-sourcemaps: 0.6.3_rollup@2.70.2
@@ -1132,6 +1134,10 @@ packages:
       abab: 2.0.6
       whatwg-mimetype: 2.3.0
       whatwg-url: 8.7.0
+    dev: false
+
+  /dayjs/1.11.2:
+    resolution: {integrity: sha512-F4LXf1OeU9hrSYRPTTj/6FbO4HTjPKXvEIC1P2kcnFurViINCVk3ZV0xAS3XVx9MkMsXbbqlK6hjseaYbgKEHw==}
     dev: false
 
   /debug/4.3.4:
