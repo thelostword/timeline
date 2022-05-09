@@ -3,32 +3,36 @@ declare type AreaItemType = {
     endTime: number;
     bgColor?: string;
 };
-declare type createType = {
+declare type CreateType = {
     startTime: number;
     endTime: number;
-    currentTime: number;
+    currentTime?: number;
+    zoom?: number;
     areas?: AreaItemType[];
 };
-declare class MoeTimeLine {
-    startTime: number;
-    endTime: number;
-    currentTime: number;
-    areas?: AreaItemType[];
+declare class TimeLine {
     $canvas: HTMLCanvasElement;
     canvasContext: CanvasRenderingContext2D;
+    private event;
+    private startTime;
+    private endTime;
+    private currentTime;
+    private areas?;
+    private timeSpacingMap;
+    private timeSpacing;
     spacing: number;
-    timeSpacing: number;
-    event: any;
-    constructor(id: string);
-    create({ startTime, endTime, currentTime, areas }: createType): void;
-    _onDrag(event: any): void;
-    _onZoom(e: any): void;
-    clear(): void;
-    drawLine(x: number, y: number, width?: number, color?: string): void;
-    drawText(x: number, y: number, text: string, color?: string): void;
-    drawArea(startTime: number, endTime: number, bgColor?: string): void;
+    private pointHeight;
+    centerTimePointWidth: number;
+    constructor(id: string, fill?: boolean);
+    draw({ startTime, endTime, currentTime, areas }: CreateType): void;
+    private _onDrag;
+    private _onZoom;
+    private clear;
+    private drawLine;
+    private drawText;
+    private drawArea;
     on(name: any, listener: any): void;
     off(name: any, listener: any): void;
-    emit(...args: any[]): void;
+    private emit;
 }
-export default MoeTimeLine;
+export default TimeLine;

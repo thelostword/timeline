@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-09 14:04:43
+ * @LastEditTime: 2022-05-09 19:40:31
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -13,185 +13,506 @@ type AreaItemType = {
   bgColor?: string;
 }
 
-type createType = {
+type CreateType = {
   startTime: number;
   endTime: number;
-  currentTime: number;
+  currentTime?: number;
+  zoom?: number;
   areas?: AreaItemType[];
+}
+
+type PointHeightType = {
+  hour1: number;
+  minute30: number;
+  minute10: number;
+  minute1: number;
+  second10: number;
+  second5: number;
 }
 
 import Event from 'znu-event'
 import throttle from 'lodash.throttle'
 
-import {
-  getTodayStartTime,
-  getTodayEndTime,
-  dateTime,
-} from '@/utils/times';
+import { dateTime } from '@/utils/time';
 
-class MoeTimeLine {
-  startTime: number; // 时间轴开始时间
-  endTime: number; // 时间轴结束时间
-  currentTime: number; // 当前时间
-  areas?: AreaItemType[]; // 阴影区域
+class TimeLine {
   $canvas: HTMLCanvasElement; // canvas 元素
-  canvasContext: CanvasRenderingContext2D; // canvas context
-  spacing: number; // 间距
-  timeSpacing: number; // 时间间距
-  event: any;
+  canvasContext: CanvasRenderingContext2D; // canvas context,
+
+  private event: any;
+
+  private startTime: number; // 时间轴开始时间
+  private endTime: number; // 时间轴结束时间
+  private currentTime: number; // 当前时间
+  private areas?: AreaItemType[]; // 阴影区域
+
+  private timeSpacingMap: number[]; // 5 10 30 60 120 300 取值范围
+  private timeSpacing: number; // 5 10 30 60 120 300 取值范围
+  spacing: number; // 每timeSpacing所占距离
+
+  // 刻度高度
+  private pointHeight: PointHeightType;
+  // 当前时间指针宽度
+  centerTimePointWidth: number;
 
 
-  constructor(id: string) {
+  constructor(id: string, fill: boolean = false) {
     if (!id) {
       throw new Error('canvas id is required!');
     }
     this.$canvas = document.getElementById(id) as HTMLCanvasElement;
     this.canvasContext = this.$canvas.getContext('2d') as CanvasRenderingContext2D;
-
-    this.startTime = getTodayStartTime();
-    this.endTime = getTodayEndTime();
-    this.currentTime = this.startTime;
-    this.areas = [];
-    this.spacing = 5;
-    this.timeSpacing = 1000 * 5;
+    // 使用父元素宽高
+    if (fill) {
+      this.$canvas.width = (this.$canvas.parentNode  as HTMLElement)?.clientWidth;
+      this.$canvas.height = (this.$canvas.parentNode  as HTMLElement)?.clientHeight;
+    }
 
     this.event = new Event();
+
+    this.startTime = 0;
+    this.endTime = 0;
+    this.currentTime = 0;
+
+    this.timeSpacingMap = [5, 10, 30, 60, 120, 300];
+    this.timeSpacing = 30; // 时间间距默认30秒  => 5s  10s  30s  1m  2m  5m
+    this.spacing = 5; // 默认刻度间距5px
+
+    // 刻度高度
+    this.pointHeight = {
+      hour1: this.$canvas.height / 2, // 1小时刻度高度
+      minute30: this.$canvas.height / 3, // 30分钟刻度高度
+      minute10: this.$canvas.height / 4, // 10分钟刻度高度
+      minute1: this.$canvas.height / 5, // 1分钟刻度高度
+      second10: this.$canvas.height / 8, // 10秒刻度高度
+      second5: this.$canvas.height / 10, // 5秒刻度高度
+    }
+
+    // 当前时间指针宽度
+    this.centerTimePointWidth = 3;
   }
 
-  // 创建时间轴
-  create({startTime, endTime, currentTime, areas}: createType) {
+  // 绘制时间轴
+  draw({startTime, endTime, currentTime, areas}: CreateType): void {
+    // 清空画布及事件
     this.clear();
-    if (!startTime || !endTime || !currentTime) {
-      return
+    if (!startTime || !endTime) {
+      throw new Error('startTime and endTime is required!');
     }
-    // 时间范围
+    // 获取参数
     this.startTime = startTime;
     this.endTime = endTime;
-    this.currentTime = currentTime;
-    
-    
-    if (areas?.length) {
-      this.areas = areas;
+    this.currentTime = currentTime || this.startTime;
+    this.areas = areas || [];
+
+    // 绘制阴影区域
+    this.areas.forEach(item => {
+      this.drawArea(item.startTime, item.endTime, item.bgColor);
+    });
+
+
+    const beforePointCount = Math.ceil((this.currentTime - this.startTime) / this.timeSpacing); // 当前时间之前刻度数量
+    const afterPointCount = Math.ceil((this.endTime - this.currentTime) / this.timeSpacing); // 当时间之后刻度数量
+
+    const centerTimePoint = this.$canvas.width / 2 - this.centerTimePointWidth / 2; // 当前时间指针位置
+
+    // x轴位置偏移量
+    const xOffset = this.currentTime % this.spacing;
+    // 时间偏移量
+    const timeOffset = this.currentTime % this.timeSpacing;
+
+    // 密度为5s时
+    if (this.timeSpacing === 5) {
+      for(let i = 0; i < beforePointCount; i++) {
+        const x = centerTimePoint - i * this.spacing - xOffset;
+        const time = this.currentTime - i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 1分钟刻度
+        if (time % 60 === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 5秒刻度
+        if (time % 5 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+      }
+      for(let i = 0; i < afterPointCount; i++) {
+        const x = centerTimePoint + i * this.spacing - xOffset;
+        const time = this.currentTime + i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 1分钟刻度
+        if (time % 60 === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 5秒刻度
+        if (time % 5 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+      }
     }
 
-    if (this.areas?.length) {
-      this.areas.forEach(item => {
-        this.drawArea(item.startTime, item.endTime, item.bgColor);
-      });
-    }
-
-    // 刻度高度
-    const hour1Height = this.$canvas.height / 2;
-    const minute30Height = this.$canvas.height / 3;
-    const minute15Height = this.$canvas.height / 4;
-    const minute1Height = this.$canvas.height / 6;
-    const secondHeight = this.$canvas.height / 10;
-
-    // #00AEEC
-
-    // 刻度高度
-    const timeLineCount = (this.endTime - this.startTime) / this.timeSpacing;
-    const beforLineCount = Math.floor((this.currentTime - this.startTime) / this.timeSpacing);
-    const afterLineCount = Math.floor((this.endTime - this.currentTime) / this.timeSpacing);
-    const centerPoint = this.$canvas.width / 2 - 1.5;
-    const xOffset = (this.currentTime % (1000 * 5)) / 1000
-    const timeOffset = this.currentTime % (1000 * 5)
-
-    for(let i = 0; i < beforLineCount; i++) {
-      const x = (centerPoint - xOffset) - i * this.spacing;
-      const time = (this.currentTime - timeOffset) - i * this.timeSpacing;
-
-      if(time % (3600 * 1000) === 0) {
-        this.drawLine(x, hour1Height);
-        this.drawText(x - 35, hour1Height - 20, `${dateTime(time)}`);
-        continue;
-      }
-      if (time % ((3600 * 1000) / 2) === 0) {
-        this.drawLine(x, minute30Height);
-        if (this.spacing > 0.3) {
-          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+    // 密度为10s时
+    if (this.timeSpacing === 10) {
+      for(let i = 0; i < beforePointCount; i++) {
+        const x = centerTimePoint - i * this.spacing - xOffset;
+        const time = this.currentTime - i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
         }
-        continue;
-      }
-      if (time % ((3600 * 1000) / 6) === 0) {
-        this.drawLine(x, minute15Height);
-        if (this.spacing >= 0.7) {
-          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
         }
-        continue;
-      }
-      if (time % (1000 * 60) === 0) {
-        if (this.spacing >= 0.3) {
-          this.drawLine(x, time % (1000 * 60 *5) === 0 ? minute15Height : minute1Height);
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
         }
-        if (this.spacing >= 0.6) {
-          if (this.spacing >= 2.5) {
-            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
-          } else if (time % (1000 * 60 *5) === 0) {
-            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        // 1分钟刻度
+        if (time % 60 === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          if (time % (60 * 2) === 0) {
+            this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
           }
+          continue;
         }
-        continue;
+        // 10秒刻度
+        if (time % 10 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
       }
-      if (time % (1000 * 30) === 0 && this.spacing >= 0.5) {
-        this.drawLine(x, secondHeight);
-        continue;
-      }
-      if (time % (1000 * 5) === 0 && this.spacing >= 2.5) {
-        this.drawLine(x, secondHeight);
-        continue;
+      for(let i = 0; i < afterPointCount; i++) {
+        const x = centerTimePoint + i * this.spacing - xOffset;
+        const time = this.currentTime + i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 1分钟刻度
+        if (time % 60 === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          if (time % (60 * 2) === 0) {
+            this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          }
+          continue;
+        }
+        // 10秒刻度
+        if (time % 10 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
       }
     }
 
-    for(let i = 0; i < afterLineCount; i++) {
-      const x = (centerPoint - xOffset) + i * this.spacing;
-      const time = (this.currentTime - timeOffset) + i * this.timeSpacing;
+    // 密度为30s时
+    if (this.timeSpacing === 30) {
+      for(let i = 0; i < beforePointCount; i++) {
+        const x = centerTimePoint - i * this.spacing - xOffset;
+        const time = this.currentTime - i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 2分钟刻度
+        if (time % (60 * 2) === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          continue;
+        }
+        // 30秒刻度
+        if (time % 30 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+      }
+      for(let i = 0; i < afterPointCount; i++) {
+        const x = centerTimePoint + i * this.spacing - xOffset;
+        const time = this.currentTime + i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 2分钟刻度
+        if (time % (60 * 2) === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          continue;
+        }
+        // 30秒刻度
+        if (time % 30 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+      }
+    }
 
-      if(time % (3600 * 1000) === 0) {
-        this.drawLine(x, hour1Height);
-        this.drawText(x - 35, hour1Height - 20, `${dateTime(time)}`);
-        continue;
-      }
-      if (time % ((3600 * 1000) / 2) === 0) {
-        this.drawLine(x, minute30Height);
-        if (this.spacing > 0.3) {
-          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+    // 密度为1min时
+    if (this.timeSpacing === 60) {
+      for(let i = 0; i < beforePointCount; i++) {
+        const x = centerTimePoint - i * this.spacing - xOffset;
+        const time = this.currentTime - i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
         }
-        continue;
-      }
-      if (time % ((3600 * 1000) / 6) === 0) {
-        this.drawLine(x, minute15Height);
-        if (this.spacing >= 0.7) {
-          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
         }
-        continue;
-      }
-      if (time % (1000 * 60) === 0) {
-        if (this.spacing >= 0.3) {
-          this.drawLine(x, time % (1000 * 60 *5) === 0 ? minute15Height : minute1Height);
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
         }
-        if (this.spacing >= 0.6) {
-          if (this.spacing >= 2.5) {
-            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
-          } else if (time % (1000 * 60 *5) === 0) {
-            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
-          }
+        // 5分钟刻度
+        if (time % (60 * 5) === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          continue;
         }
-        
-        continue;
+        // 1分钟刻度
+        if (time % 60 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
       }
-      if (time % (1000 * 30) === 0 && this.spacing >= 0.5) {
-        this.drawLine(x, secondHeight);
-        continue;
+      for(let i = 0; i < afterPointCount; i++) {
+        const x = centerTimePoint + i * this.spacing - xOffset;
+        const time = this.currentTime + i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 5分钟刻度
+        if (time % (60 * 5) === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          continue;
+        }
+        // 1分钟刻度
+        if (time % 60 === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
       }
-      if (time % (1000 * 5) === 0 && this.spacing >= 2.5) {
-        this.drawLine(x, secondHeight);
-        continue;
+    }
+
+    // 密度为2min时
+    if (this.timeSpacing === 120) {
+      for(let i = 0; i < beforePointCount; i++) {
+        const x = centerTimePoint - i * this.spacing - xOffset;
+        const time = this.currentTime - i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          continue;
+        }
+        // 2分钟刻度
+        if (time % (60 * 2) === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+      }
+      for(let i = 0; i < afterPointCount; i++) {
+        const x = centerTimePoint + i * this.spacing - xOffset;
+        const time = this.currentTime + i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute30);
+          this.drawText(x - 30, 20, `${dateTime(time)}`);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.minute1);
+          continue;
+        }
+        // 2分钟刻度
+        if (time % (60 * 2) === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+      }
+    }
+
+    // 密度为5min时
+    if (this.timeSpacing === 300) {
+      for(let i = 0; i < beforePointCount; i++) {
+        const x = centerTimePoint - i * this.spacing - xOffset;
+        const time = this.currentTime - i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+        // 5分钟刻度
+        if (time % (60 * 5) === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+      }
+      for(let i = 0; i < afterPointCount; i++) {
+        const x = centerTimePoint + i * this.spacing - xOffset;
+        const time = this.currentTime + i * this.timeSpacing - timeOffset;
+        // 小时刻度
+        if (time % (60 * 60) === 0) {
+          this.drawLine(x, this.pointHeight.hour1);
+          this.drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          continue;
+        }
+        // 30分钟刻度
+        if (time % (60 * 30) === 0) {
+          this.drawLine(x, this.pointHeight.minute10);
+          continue;
+        }
+        // 10分钟刻度
+        if (time % (60 * 10) === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
+        // 5分钟刻度
+        if (time % (60 * 5) === 0) {
+          this.drawLine(x, this.pointHeight.second5);
+          continue;
+        }
       }
     }
 
     // 绘制当前时间指针
-    this.drawLine(centerPoint, this.$canvas.height, 3, '#00AEEC');
+    this.drawLine(centerTimePoint, this.$canvas.height, this.centerTimePointWidth, '#00AEEC');
 
     // 鼠标滚轮事件
     this.$canvas.onwheel = this._onZoom.bind(this);
@@ -200,9 +521,9 @@ class MoeTimeLine {
   }
 
   // 拖拽
-  _onDrag(event) {
+  private _onDrag(event) {
     event = event || window.event;
-    const x = event.clientX
+    const x = event.clientX;
     
     let prexOffset = 0;
     document.onmousemove = throttle((event) => {
@@ -212,37 +533,39 @@ class MoeTimeLine {
         return;
       }
       if (curxOffset > 0 && this.currentTime <= this.startTime) {
-        return
+        return;
       }
       const currentTime = this.currentTime - this.timeSpacing / this.spacing * (curxOffset - prexOffset);
       prexOffset = curxOffset;
 
-      this.create({
+      this.draw({
         startTime: this.startTime,
         endTime: this.endTime,
         currentTime: Math.floor(currentTime),
         areas: this.areas,
       });
-    }, 150)
+    }, 80); // 渲染时间平均在30ms左右，设置80ms大概12帧。看起来时连贯的
     document.onmouseup = () => {
       document.onmousemove = null;
       document.onmouseup = null;
-      this.emit('change', this.currentTime)
+      this.emit('change', this.currentTime);
     };
   }
   // 缩放
-  _onZoom(e) {
-    if (e.deltaY > 0 && this.spacing > 0.2) {
-      this.spacing -= 0.05
-      this.create({
+  private _onZoom(e) {
+    e.preventDefault();
+    const currentIndex = this.timeSpacingMap.findIndex(item => item === this.timeSpacing);
+    if (e.deltaY < 0 && currentIndex > 0) {
+      this.timeSpacing = this.timeSpacingMap[currentIndex - 1];
+      this.draw({
         startTime: this.startTime,
         endTime: this.endTime,
         currentTime: this.currentTime,
         areas: this.areas,
       });
-    } else if (e.deltaY < 0 && this.spacing < 5) {
-      this.spacing += 0.05
-      this.create({
+    } else if (e.deltaY > 0 && currentIndex < this.timeSpacingMap.length - 1) {
+      this.timeSpacing = this.timeSpacingMap[currentIndex + 1];
+      this.draw({
         startTime: this.startTime,
         endTime: this.endTime,
         currentTime: this.currentTime,
@@ -251,18 +574,19 @@ class MoeTimeLine {
     }
   }
 
-  // 注销/清空画布
-  clear() {
-    // 清空画布
+  // 清空画布
+  private clear() {
     if(this.canvasContext) {
       this.canvasContext.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
     }
-    this.$canvas.onwheel = null;
-    this.$canvas.onmousedown = null;
+    if (this.$canvas) {
+      this.$canvas.onwheel = null;
+      this.$canvas.onmousedown = null;
+    }
   }
 
   // 绘制线条
-  drawLine(x: number, y: number, width: number = 1, color: string = '#ffffff'): void {
+  private drawLine(x: number, y: number, width: number = 1, color: string = '#ffffff'): void {
     this.canvasContext.beginPath();
     this.canvasContext.moveTo(x, this.$canvas.height);
     this.canvasContext.lineTo(x, this.$canvas.height - y);
@@ -274,7 +598,7 @@ class MoeTimeLine {
   }
 
   // 绘制文字
-  drawText(x: number, y: number, text: string, color: string = '#ffffff'): void {
+  private drawText(x: number, y: number, text: string, color: string = '#ffffff'): void {
     this.canvasContext.beginPath();
     this.canvasContext.fillStyle = color;
     this.canvasContext.fillText(text, x, y);
@@ -282,11 +606,14 @@ class MoeTimeLine {
   }
 
   // 绘制区域
-  drawArea(startTime: number, endTime: number, bgColor?: string) {
-    const xOffset = (this.currentTime % (1000 * 5)) / 1000
-    const centerPoint = this.$canvas.width / 2 - 1.5;
-    const startX = (centerPoint - xOffset) + (Math.floor((startTime - this.currentTime) / this.timeSpacing)) * this.spacing;
-    const endX = (centerPoint + xOffset) + (Math.floor((endTime - this.currentTime) / this.timeSpacing)) * this.spacing;
+  private drawArea(startTime: number, endTime: number, bgColor?: string) {
+    // 当前时间指针位置
+    const centerTimePoint = this.$canvas.width / 2 - this.centerTimePointWidth / 2;
+    // x轴位置偏移量
+    const xOffset = this.currentTime % this.spacing;
+
+    const startX = (centerTimePoint - xOffset) + Math.floor((startTime - this.currentTime) / this.timeSpacing) * this.spacing;
+    const endX = (centerTimePoint - xOffset) + Math.floor((endTime - this.currentTime) / this.timeSpacing) * this.spacing;
 
     this.canvasContext.beginPath();
     this.canvasContext.rect(startX, 0, endX - startX, this.$canvas.height);
@@ -296,17 +623,17 @@ class MoeTimeLine {
   }
 
   on(name, listener) {
-		this.event.on(name, listener)
+		this.event.on(name, listener);
 	}
 
   off(name, listener) {
-		this.event.off(name, listener)
+		this.event.off(name, listener);
 	}
 
-	emit(...args) {
-		this.event.emit(...args)
+	private emit(...args) {
+		this.event.emit(...args);
 	}
 }
 
 
-export default MoeTimeLine
+export default TimeLine

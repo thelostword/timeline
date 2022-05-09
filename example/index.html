@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-04-01 17:16:54
- * @LastEditTime: 2022-05-09 14:04:20
+ * @LastEditTime: 2022-05-09 19:40:52
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\example\index.html
@@ -15,25 +15,27 @@
   <title>Document</title>
 </head>
 <body>
-  <div id="root">
-    <canvas id="timeline" width="1000px" height="70px" style="margin: 100px auto;background-color: rgba(0, 0, 0, .5);"></canvas>
+  <div id="root" style="width: 100%;height: 70px;">
+    <canvas id="timeline" style="background-color: rgba(0, 0, 0, .5);"></canvas>
   </div>
   <script type="module">
     import MoeTimeline from '../lib/moe-timeline.esm.js';
 
-    const timeline = new MoeTimeline('timeline');
+    const timeline = new MoeTimeline('timeline', {
+      fill: true,
+    });
 
-    timeline.create({
-      startTime: 1651823833000,
-      endTime: 1651910233000,
-      currentTime: 1651829532000,
+    timeline.draw({
+      startTime: 1651823833,
+      endTime: 1651910233,
+      currentTime: 1651827817,
       areas: [{
-        startTime: 1651827433000,
-        endTime: 1651829413000,
+        startTime: 1651827433,
+        endTime: 1651829413,
         bgColor: '#00AEEC55'
       },{
-        startTime: 1651829533000,
-        endTime: 1651832533000,
+        startTime: 1651829533,
+        endTime: 1651832533,
         bgColor: '#00AEEC55'
       }],
     });

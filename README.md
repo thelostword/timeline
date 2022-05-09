@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-09 14:04:08
+ * @LastEditTime: 2022-05-09 19:31:45
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
@@ -18,20 +18,22 @@ npm install @moe/timeline
 ```
 
 ``` JavaScript
-import MoeTimeline from '@moe/timeline';
+import MoeTimeline from '@losting/timeline';
 
-const timeline = new MoeTimeline('timeline');
-timeline.create({
-  startTime: 1651823833000,
-  endTime: 1651910233000,
-  currentTime: 1651829532000,
-  area: [{
-    startTime: 1651827433000,
-    endTime: 1651829413000,
+const timeline = new MoeTimeline('timeline', {
+  fill: true, // 使用父元素宽高
+});
+timeline.draw({
+  startTime: 1651823833,
+  endTime: 1651910233,
+  currentTime: 1651829532,
+  areas: [{
+    startTime: 1651827433,
+    endTime: 1651829413,
     bgColor: '#00AEEC55'
   },{
-    startTime: 1651829533000,
-    endTime: 1651832533000,
+    startTime: 1651829533,
+    endTime: 1651832533,
     bgColor: '#00AEEC55'
   }],
 });
