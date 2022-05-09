@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-09 12:30:36
+ * @LastEditTime: 2022-05-09 14:04:43
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -17,7 +17,7 @@ type createType = {
   startTime: number;
   endTime: number;
   currentTime: number;
-  area?: AreaItemType[];
+  areas?: AreaItemType[];
 }
 
 import Event from 'znu-event'
@@ -33,7 +33,7 @@ class MoeTimeLine {
   startTime: number; // 时间轴开始时间
   endTime: number; // 时间轴结束时间
   currentTime: number; // 当前时间
-  area?: AreaItemType[]; // 阴影区域
+  areas?: AreaItemType[]; // 阴影区域
   $canvas: HTMLCanvasElement; // canvas 元素
   canvasContext: CanvasRenderingContext2D; // canvas context
   spacing: number; // 间距
@@ -51,7 +51,7 @@ class MoeTimeLine {
     this.startTime = getTodayStartTime();
     this.endTime = getTodayEndTime();
     this.currentTime = this.startTime;
-    this.area = [];
+    this.areas = [];
     this.spacing = 5;
     this.timeSpacing = 1000 * 5;
 
@@ -59,7 +59,7 @@ class MoeTimeLine {
   }
 
   // 创建时间轴
-  create({startTime, endTime, currentTime, area}: createType) {
+  create({startTime, endTime, currentTime, areas}: createType) {
     this.clear();
     if (!startTime || !endTime || !currentTime) {
       return
@@ -70,12 +70,12 @@ class MoeTimeLine {
     this.currentTime = currentTime;
     
     
-    if (area?.length) {
-      this.area = area;
+    if (areas?.length) {
+      this.areas = areas;
     }
 
-    if (this.area?.length) {
-      this.area.forEach(item => {
+    if (this.areas?.length) {
+      this.areas.forEach(item => {
         this.drawArea(item.startTime, item.endTime, item.bgColor);
       });
     }
@@ -221,7 +221,7 @@ class MoeTimeLine {
         startTime: this.startTime,
         endTime: this.endTime,
         currentTime: Math.floor(currentTime),
-        area: this.area,
+        areas: this.areas,
       });
     }, 150)
     document.onmouseup = () => {
@@ -238,7 +238,7 @@ class MoeTimeLine {
         startTime: this.startTime,
         endTime: this.endTime,
         currentTime: this.currentTime,
-        area: this.area,
+        areas: this.areas,
       });
     } else if (e.deltaY < 0 && this.spacing < 5) {
       this.spacing += 0.05
@@ -246,7 +246,7 @@ class MoeTimeLine {
         startTime: this.startTime,
         endTime: this.endTime,
         currentTime: this.currentTime,
-        area: this.area,
+        areas: this.areas,
       });
     }
   }

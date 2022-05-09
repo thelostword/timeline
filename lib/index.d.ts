@@ -7,20 +7,20 @@ declare type createType = {
     startTime: number;
     endTime: number;
     currentTime: number;
-    area?: AreaItemType[];
+    areas?: AreaItemType[];
 };
 declare class MoeTimeLine {
     startTime: number;
     endTime: number;
     currentTime: number;
-    area?: AreaItemType[];
+    areas?: AreaItemType[];
     $canvas: HTMLCanvasElement;
     canvasContext: CanvasRenderingContext2D;
     spacing: number;
     timeSpacing: number;
     event: any;
     constructor(id: string);
-    create({ startTime, endTime, currentTime, area }: createType): void;
+    create({ startTime, endTime, currentTime, areas }: createType): void;
     _onDrag(event: any): void;
     _onZoom(e: any): void;
     clear(): void;
