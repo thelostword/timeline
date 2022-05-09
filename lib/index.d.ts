@@ -4,9 +4,9 @@ declare type AreaItemType = {
     bgColor?: string;
 };
 declare type createType = {
-    startTime?: number;
-    endTime?: number;
-    currentTime?: number;
+    startTime: number;
+    endTime: number;
+    currentTime: number;
     area?: AreaItemType[];
 };
 declare class MoeTimeLine {
@@ -21,6 +21,9 @@ declare class MoeTimeLine {
     event: any;
     constructor(id: string);
     create({ startTime, endTime, currentTime, area }: createType): void;
+    _onDrag(event: any): void;
+    _onZoom(e: any): void;
+    clear(): void;
     drawLine(x: number, y: number, width?: number, color?: string): void;
     drawText(x: number, y: number, text: string, color?: string): void;
     drawArea(startTime: number, endTime: number, bgColor?: string): void;

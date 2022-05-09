@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-08 22:44:53
+ * @LastEditTime: 2022-05-09 12:20:54
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -14,13 +14,14 @@ type AreaItemType = {
 }
 
 type createType = {
-  startTime?: number;
-  endTime?: number;
-  currentTime?: number;
+  startTime: number;
+  endTime: number;
+  currentTime: number;
   area?: AreaItemType[];
 }
 
 import Event from 'znu-event'
+import throttle from 'lodash.throttle'
 
 import {
   getTodayStartTime,
@@ -61,24 +62,19 @@ class MoeTimeLine {
   // 创建时间轴
   create({startTime, endTime, currentTime, area}: createType) {
     console.time('createTime');
-    // 时间范围
-    if (startTime && endTime) {
-      this.startTime = startTime;
-      this.endTime = endTime;
-      if (!currentTime) {
-        this.currentTime = this.startTime;
-        return
-      }
-      this.currentTime = currentTime;
+    this.clear();
+    if (!startTime || !endTime || !currentTime) {
+      return
     }
+    // 时间范围
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.currentTime = currentTime;
     
     
     if (area?.length) {
       this.area = area;
     }
-
-    // 清空画布
-    this.canvasContext.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
 
     if (this.area?.length) {
       this.area.forEach(item => {
@@ -97,15 +93,14 @@ class MoeTimeLine {
 
     // 刻度高度
     const timeLineCount = (this.endTime - this.startTime) / this.timeSpacing;
-    const beforLineCount = (this.currentTime - this.startTime) / this.timeSpacing;
-    const afterLineCount = (this.endTime - this.currentTime) / this.timeSpacing;
+    const beforLineCount = Math.floor((this.currentTime - this.startTime) / this.timeSpacing);
+    const afterLineCount = Math.floor((this.endTime - this.currentTime) / this.timeSpacing);
     const centerPoint = this.$canvas.width / 2 - 1.5;
+    const xOffset = (this.currentTime % (1000 * 5)) / 1000
+    const timeOffset = this.currentTime % (1000 * 5)
 
     for(let i = 0; i < beforLineCount; i++) {
-      const xOffset = (this.currentTime % (1000 * 5)) / 1000
       const x = (centerPoint - xOffset) - i * this.spacing;
-
-      const timeOffset = this.startTime % (1000 * 5)
       const time = (this.currentTime - timeOffset) - i * this.timeSpacing;
 
       if(time % (3600 * 1000) === 0) {
@@ -115,34 +110,43 @@ class MoeTimeLine {
       }
       if (time % ((3600 * 1000) / 2) === 0) {
         this.drawLine(x, minute30Height);
-        this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        if (this.spacing > 0.3) {
+          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        }
         continue;
       }
-      if (time % ((3600 * 1000) / 4) === 0) {
+      if (time % ((3600 * 1000) / 6) === 0) {
         this.drawLine(x, minute15Height);
-        this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        if (this.spacing >= 0.7) {
+          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        }
         continue;
       }
       if (time % (1000 * 60) === 0) {
-        this.drawLine(x, minute1Height);
-        this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        if (this.spacing >= 0.3) {
+          this.drawLine(x, time % (1000 * 60 *5) === 0 ? minute15Height : minute1Height);
+        }
+        if (this.spacing >= 0.6) {
+          if (this.spacing >= 2.5) {
+            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+          } else if (time % (1000 * 60 *5) === 0) {
+            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+          }
+        }
         continue;
       }
-      if (time % (1000 * 30) === 0) {
+      if (time % (1000 * 30) === 0 && this.spacing >= 0.5) {
         this.drawLine(x, secondHeight);
         continue;
       }
-      if (time % (1000 * 5) === 0) {
+      if (time % (1000 * 5) === 0 && this.spacing >= 2.5) {
         this.drawLine(x, secondHeight);
         continue;
       }
     }
 
     for(let i = 0; i < afterLineCount; i++) {
-      const xOffset = (this.currentTime % (1000 * 5)) / 1000
       const x = (centerPoint - xOffset) + i * this.spacing;
-
-      const timeOffset = this.startTime % (1000 * 5)
       const time = (this.currentTime - timeOffset) + i * this.timeSpacing;
 
       if(time % (3600 * 1000) === 0) {
@@ -152,71 +156,113 @@ class MoeTimeLine {
       }
       if (time % ((3600 * 1000) / 2) === 0) {
         this.drawLine(x, minute30Height);
-        this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        if (this.spacing > 0.3) {
+          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        }
         continue;
       }
-      if (time % ((3600 * 1000) / 4) === 0) {
+      if (time % ((3600 * 1000) / 6) === 0) {
         this.drawLine(x, minute15Height);
-        this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        if (this.spacing >= 0.7) {
+          this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        }
         continue;
       }
       if (time % (1000 * 60) === 0) {
-        this.drawLine(x, minute1Height);
-        this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+        if (this.spacing >= 0.3) {
+          this.drawLine(x, time % (1000 * 60 *5) === 0 ? minute15Height : minute1Height);
+        }
+        if (this.spacing >= 0.6) {
+          if (this.spacing >= 2.5) {
+            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+          } else if (time % (1000 * 60 *5) === 0) {
+            this.drawText(x - 15, hour1Height - 20, `${dateTime(time, 'HH:mm')}`);
+          }
+        }
+        
         continue;
       }
-      if (time % (1000 * 30) === 0) {
+      if (time % (1000 * 30) === 0 && this.spacing >= 0.5) {
         this.drawLine(x, secondHeight);
         continue;
       }
-      if (time % (1000 * 5) === 0) {
+      if (time % (1000 * 5) === 0 && this.spacing >= 2.5) {
         this.drawLine(x, secondHeight);
         continue;
       }
     }
 
     // 绘制当前时间指针
-    // this.drawLine(centerPoint, this.$canvas.height, 3, '#00AEEC');
+    this.drawLine(centerPoint, this.$canvas.height, 3, '#00AEEC');
     
     console.timeEnd('createTime');
 
-    // 点击事件
-    this.$canvas.addEventListener('click', (e) => {
-      const computedStyle = getComputedStyle(this.$canvas);
-      
-      const paddingTop = parseInt(computedStyle.paddingTop);
-      const paddingBottom = parseInt(computedStyle.paddingBottom);
-      const paddingLeft = parseInt(computedStyle.paddingLeft);
-      const paddingRight = parseInt(computedStyle.paddingRight);
-
-      const x = e.pageX - this.$canvas.getBoundingClientRect().left - paddingLeft;
-      const y = e.pageY - this.$canvas.getBoundingClientRect().top - paddingTop;
-
-      this.emit('click', {x, y})
-    }, false)
-
     // 鼠标滚轮事件
-    this.$canvas.addEventListener('wheel', (e) => {
-      if (e.deltaY > 0) {
-        console.log('向上, 缩小')
-        this.spacing -= 0.1
-        this.create({
-          startTime: this.startTime,
-          endTime: this.endTime,
-          currentTime: this.currentTime,
-          area: this.area,
-        });
-      } else {
-        console.log('向下， 放大')
-        this.spacing += 0.1
-        this.create({
-          startTime: this.startTime,
-          endTime: this.endTime,
-          currentTime: this.currentTime,
-          area: this.area,
-        });
+    this.$canvas.onwheel = this._onZoom.bind(this);
+    // 拖拽事件
+    this.$canvas.onmousedown = this._onDrag.bind(this);
+  }
+
+  // 拖拽
+  _onDrag(event) {
+    event = event || window.event;
+    const x = event.clientX
+    
+    let prexOffset = 0;
+    document.onmousemove = throttle((event) => {
+      event = event || window.event;
+      const curxOffset = event.clientX - x;
+      if (curxOffset < 0 && this.currentTime >= this.endTime) {
+        return;
       }
-    }, false)
+      if (curxOffset > 0 && this.currentTime <= this.startTime) {
+        return
+      }
+      const currentTime = this.currentTime - this.timeSpacing / this.spacing * (curxOffset - prexOffset);
+      prexOffset = curxOffset;
+
+      this.create({
+        startTime: this.startTime,
+        endTime: this.endTime,
+        currentTime: Math.floor(currentTime),
+        area: this.area,
+      });
+    }, 150)
+    document.onmouseup = () => {
+      document.onmousemove = null;
+      document.onmouseup = null;
+      this.emit('change', this.currentTime)
+    };
+  }
+  // 缩放
+  _onZoom(e) {
+    if (e.deltaY > 0 && this.spacing > 0.2) {
+      this.spacing -= 0.05
+      this.create({
+        startTime: this.startTime,
+        endTime: this.endTime,
+        currentTime: this.currentTime,
+        area: this.area,
+      });
+    } else if (e.deltaY < 0 && this.spacing < 5) {
+      this.spacing += 0.05
+      this.create({
+        startTime: this.startTime,
+        endTime: this.endTime,
+        currentTime: this.currentTime,
+        area: this.area,
+      });
+    }
+  }
+
+  // 注销/清空画布
+  clear() {
+    // 清空画布
+    if(this.canvasContext) {
+      this.canvasContext.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
+    }
+    this.$canvas.onwheel = null;
+    this.$canvas.onmousedown = null;
   }
 
   // 绘制线条
@@ -243,8 +289,10 @@ class MoeTimeLine {
 
   // 绘制区域
   drawArea(startTime: number, endTime: number, bgColor?: string) {
-    const startX = (startTime - this.startTime) / (this.endTime - this.startTime) * this.$canvas.width;
-    const endX = (endTime - this.startTime) / (this.endTime - this.startTime) * this.$canvas.width;
+    const xOffset = (this.currentTime % (1000 * 5)) / 1000
+    const centerPoint = this.$canvas.width / 2 - 1.5;
+    const startX = (centerPoint - xOffset) + (Math.floor((startTime - this.currentTime) / this.timeSpacing)) * this.spacing;
+    const endX = (centerPoint + xOffset) + (Math.floor((endTime - this.currentTime) / this.timeSpacing)) * this.spacing;
 
     this.canvasContext.beginPath();
     this.canvasContext.rect(startX, 0, endX - startX, this.$canvas.height);
