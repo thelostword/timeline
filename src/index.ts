@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-09 12:20:54
+ * @LastEditTime: 2022-05-09 12:30:36
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -42,7 +42,6 @@ class MoeTimeLine {
 
 
   constructor(id: string) {
-    console.log('MoeTimeLine');
     if (!id) {
       throw new Error('canvas id is required!');
     }
@@ -61,7 +60,6 @@ class MoeTimeLine {
 
   // 创建时间轴
   create({startTime, endTime, currentTime, area}: createType) {
-    console.time('createTime');
     this.clear();
     if (!startTime || !endTime || !currentTime) {
       return
@@ -194,8 +192,6 @@ class MoeTimeLine {
 
     // 绘制当前时间指针
     this.drawLine(centerPoint, this.$canvas.height, 3, '#00AEEC');
-    
-    console.timeEnd('createTime');
 
     // 鼠标滚轮事件
     this.$canvas.onwheel = this._onZoom.bind(this);
@@ -267,7 +263,6 @@ class MoeTimeLine {
 
   // 绘制线条
   drawLine(x: number, y: number, width: number = 1, color: string = '#ffffff'): void {
-    // console.log('drawLine');
     this.canvasContext.beginPath();
     this.canvasContext.moveTo(x, this.$canvas.height);
     this.canvasContext.lineTo(x, this.$canvas.height - y);
@@ -280,7 +275,6 @@ class MoeTimeLine {
 
   // 绘制文字
   drawText(x: number, y: number, text: string, color: string = '#ffffff'): void {
-    // console.log('drawText');
     this.canvasContext.beginPath();
     this.canvasContext.fillStyle = color;
     this.canvasContext.fillText(text, x, y);
