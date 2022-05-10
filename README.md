@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-10 12:29:03
+ * @LastEditTime: 2022-05-10 12:43:18
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
@@ -62,7 +62,7 @@ timeline.on('timeUpdate', (time) => {
 | draw | 生成时间轴，参数：object，返回值：无 |
 | on | 事件监听。参数：timeUpdate, 返回值：当前指向时间 |
 
-#### draw方法参数
+#### draw(object)
 | 参数 | 类型 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
 | startTime | number | 是 | 时间轴起始时间 |
@@ -70,7 +70,7 @@ timeline.on('timeUpdate', (time) => {
 | currentTime | number | 否 | 当前所在时间，默认为起始时间 |
 | areas | array | 否 | 阴影区域 |
 
-#### areas参数
+#### areas
 | 参数 | 类型 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
 | startTime | number | 是 | 阴影区域开始时间 |
