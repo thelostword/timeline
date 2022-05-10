@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-10 14:06:36
+ * @LastEditTime: 2022-05-10 14:48:27
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
@@ -24,8 +24,9 @@ npm install @losting/timeline
 ``` JavaScript
 import MoeTimeline from '@losting/timeline';
 
+// new MoeTimeline(canvasId, options)
 const timeline = new MoeTimeline('timeline', {
-  fill: true, // 默认为false
+  fill: true,
 });
 timeline.draw({
   startTime: 1651823833,
@@ -47,7 +48,7 @@ timeline.on('timeUpdate', (time) => {
 })
 ```
 
-### TimeLine 实例属性
+### TimeLine options
 | 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | textColor | string | #ffffff | 文字颜色 |
@@ -55,6 +56,8 @@ timeline.on('timeUpdate', (time) => {
 | centerTimePointColor | string | #00aeec | 当前时间指针颜色 |
 | centerTimePointWidth | number | 3 | 当前时间指针宽度 |
 | spacing | number | 5 | 刻度间距 |
+| fill | boolean | false | 是否适应父容器宽高 |
+
 
 ### 事件
 

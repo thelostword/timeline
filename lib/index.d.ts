@@ -11,6 +11,14 @@ declare type DrawType = {
     areas?: AreaItemType[];
     _privateFlag?: boolean;
 };
+declare type OptionsType = {
+    fill?: boolean;
+    textColor?: string;
+    pointColor?: string;
+    centerTimePointColor?: string;
+    centerTimePointWidth?: number;
+    spacing?: number;
+};
 declare class TimeLine {
     #private;
     $canvas: HTMLCanvasElement;
@@ -25,7 +33,7 @@ declare class TimeLine {
     textColor: string;
     pointColor: string;
     areaColor: string;
-    constructor(id: string, fill?: boolean);
+    constructor(id: string, { fill, textColor, pointColor, centerTimePointColor, centerTimePointWidth, spacing, }: OptionsType);
     draw({ startTime, endTime, currentTime, areas, _privateFlag }: DrawType): void;
     private _onDrag;
     private _onZoom;

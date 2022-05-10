@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-10 12:37:40
+ * @LastEditTime: 2022-05-10 14:41:32
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -29,6 +29,15 @@ type PointHeightType = {
   minute1: number;
   second10: number;
   second5: number;
+}
+
+type OptionsType = {
+  fill?: boolean;
+  textColor?: string;
+  pointColor?: string;
+  centerTimePointColor?: string;
+  centerTimePointWidth?: number;
+  spacing?: number;
 }
 
 import Event from 'znu-event'
@@ -68,7 +77,7 @@ class TimeLine {
   // 是否在拖拽中
   #isDraging: boolean;
 
-  constructor(id: string, fill: boolean = false) {
+  constructor(id: string, { fill = false, textColor = '#ffffff', pointColor = '#ffffff', centerTimePointColor = '#00aeec', centerTimePointWidth = 3, spacing = 5, }: OptionsType) {
     if (!id) {
       throw new Error('canvas id is required!');
     }
@@ -97,7 +106,7 @@ class TimeLine {
 
     this.#timeSpacingMap = [5, 10, 30, 60, 120, 300];
     this.#timeSpacing = 30; // 时间间距默认30秒  => 5s  10s  30s  1m  2m  5m
-    this.spacing = 5; // 默认刻度间距5px
+    this.spacing = spacing; // 默认刻度间距5px
 
     // 刻度高度
     this.#pointHeight = {
@@ -110,13 +119,13 @@ class TimeLine {
     }
 
     // 当前时间指针宽度
-    this.centerTimePointWidth = 3;
+    this.centerTimePointWidth = centerTimePointWidth;
     // 当前指针颜色
-    this.centerTimePointColor = '#00aeec';
+    this.centerTimePointColor = centerTimePointColor;
     // 文字颜色
-    this.textColor = '#ffffff';
+    this.textColor = textColor;
     // 刻度颜色
-    this.pointColor = '#ffffff';
+    this.pointColor = pointColor;
     // 阴影区颜色
     this.areaColor = '#ffffff55'
   }
