@@ -11,22 +11,21 @@ declare type CreateType = {
     areas?: AreaItemType[];
 };
 declare class TimeLine {
+    #private;
     $canvas: HTMLCanvasElement;
     canvasContext: CanvasRenderingContext2D;
-    private event;
+    $canvasParent?: HTMLElement;
     private startTime;
     private endTime;
     private currentTime;
     private areas?;
-    private timeSpacingMap;
-    private timeSpacing;
     spacing: number;
-    private pointHeight;
     centerTimePointWidth: number;
     constructor(id: string, fill?: boolean);
     draw({ startTime, endTime, currentTime, areas }: CreateType): void;
     private _onDrag;
     private _onZoom;
+    private _onParentResize;
     private clear;
     private drawLine;
     private drawText;

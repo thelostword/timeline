@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-04-01 17:16:54
- * @LastEditTime: 2022-05-09 19:40:52
+ * @LastEditTime: 2022-05-10 10:13:44
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\example\index.html
@@ -32,17 +32,18 @@
       areas: [{
         startTime: 1651827433,
         endTime: 1651829413,
-        bgColor: '#00AEEC55'
+        bgColor: '#00AEEC'
       },{
         startTime: 1651829533,
         endTime: 1651832533,
-        bgColor: '#00AEEC55'
+        bgColor: '#00AEEC'
       }],
     });
 
-    timeline.on('change', (e) => {
+    timeline.on('timeUpdate', (e) => {
       console.log(e, 'currentTime change');
     })
+    console.log(timeline);
   </script>
 </body>
 </html>

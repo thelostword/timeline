@@ -1,27 +1,30 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-09 19:31:45
+ * @LastEditTime: 2022-05-10 10:13:30
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
 -->
 # timeline
-canvas 时间轴
+canvas 时间轴，支持缩放、拖拽
 
 ### 使用
 ``` shell
-npm install @moe/timeline
+npm install @losting/timeline
 ```
 ``` html
-<canvas id="timeline" width="1000px" height="70px" style="background-color: rgba(0, 0, 0, .5);"></canvas>
+<!-- fill为 false 时，canvas元素属性width、height必须设置，不能使用style和css -->
+<div id="root" style="width: 100%;height: 70px;">
+  <canvas id="timeline" style="background-color: rgba(0, 0, 0, .5);"></canvas>
+</div>
 ```
 
 ``` JavaScript
 import MoeTimeline from '@losting/timeline';
 
 const timeline = new MoeTimeline('timeline', {
-  fill: true, // 使用父元素宽高
+  fill: true, // 默认为false
 });
 timeline.draw({
   startTime: 1651823833,
@@ -38,25 +41,30 @@ timeline.draw({
   }],
 });
 
-timeline.on('change', (time) => {
+timeline.on('timeUpdate', (time) => {
   console.log('selected time:', time);
 })
 ```
 
-### 方法
+### 事件
 
-| 属性 | 说明 |
+| 方法名 | 说明 |
 | --- | --- |
-| create | 创建timeline |
-| on | 事件监听，change: 当前选择时间改变触发，返回值当前选择时间 |
+| draw | 生成时间轴，参数：object，返回值：无 |
+| on | 事件监听。参数：timeUpdate, 返回值：当前指向时间 |
 
-##### create方法参数 Object
-
+#### draw方法参数
 | 参数 | 类型 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
 | startTime | number | 是 | 时间轴起始时间 |
 | endTime | number | 是 | 时间轴终止时间 |
-| currentTime | number | 是 | 当前所在时间 |
-| areas | array | 否 | 阴影区域。参数：startTime(阴影区域开始时间点)， endTime(阴影区域结束时间点)，bgColor(背景颜色，需要透明背景色) |
+| currentTime | number | 否 | 当前所在时间，默认为起始时间 |
+| areas | array | 否 | 阴影区域 |
 
+#### areas参数
+| 参数 | 类型 | 是否必填 | 说明 |
+| --- | --- | --- | --- |
+| startTime | number | 是 | 阴影区域开始时间 |
+| endTime | number | 是 | 阴影区域结束时间点 |
+| bgColor | string | 否 | 背景颜色, 默认值：#ffffff55 |
 
