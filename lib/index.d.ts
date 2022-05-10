@@ -21,6 +21,10 @@ declare class TimeLine {
     private areas?;
     spacing: number;
     centerTimePointWidth: number;
+    centerTimePointColor: string;
+    textColor: string;
+    pointColor: string;
+    areaColor: string;
     constructor(id: string, fill?: boolean);
     draw({ startTime, endTime, currentTime, areas, _privateFlag }: DrawType): void;
     private _onDrag;

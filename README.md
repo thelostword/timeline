@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-10 10:13:30
+ * @LastEditTime: 2022-05-10 12:29:03
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
@@ -45,6 +45,15 @@ timeline.on('timeUpdate', (time) => {
   console.log('selected time:', time);
 })
 ```
+
+### TimeLine 实例属性
+| 属性 | 类型 | 默认值 | 说明 |
+| --- | --- | --- |
+| textColor | string | #ffffff | 文字颜色 |
+| pointColor | string | #ffffff | 刻度颜色 |
+| centerTimePointColor | string | #00aeec | 当前时间指针颜色 |
+| centerTimePointWidth | number | 3 | 当前时间指针宽度 |
+| spacing | number | 5 | 刻度间距 |
 
 ### 事件
 

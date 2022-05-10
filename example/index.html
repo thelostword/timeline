@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-04-01 17:16:54
- * @LastEditTime: 2022-05-10 10:13:44
+ * @LastEditTime: 2022-05-10 12:32:24
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\example\index.html
@@ -24,6 +24,11 @@
     const timeline = new MoeTimeline('timeline', {
       fill: true,
     });
+    // timeline.textColor = '#000'
+    // timeline.pointColor = '#000'
+    // timeline.centerTimePointColor = '#000'
+    // timeline.centerTimePointWidth = 5
+    // timeline.spacing = 10
 
     timeline.draw({
       startTime: 1651823833,
@@ -36,7 +41,7 @@
       },{
         startTime: 1651829533,
         endTime: 1651832533,
-        bgColor: '#00AEEC'
+        // bgColor: '#00AEEC'
       }],
     });
 
