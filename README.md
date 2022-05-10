@@ -1,13 +1,14 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-10 12:46:07
+ * @LastEditTime: 2022-05-10 14:06:36
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
 -->
 # timeline
 canvas 时间轴，支持缩放、拖拽
+![preview](./example/demo.png)
 
 ### 使用
 ``` shell
