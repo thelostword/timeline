@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-10 10:54:01
+ * @LastEditTime: 2022-05-10 11:12:36
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -106,7 +106,7 @@ class TimeLine {
 
   // 绘制时间轴
   draw({startTime, endTime, currentTime, areas, _privateFlag}: DrawType): void {
-    // console.time('draw');
+    console.time('draw');
     if (!startTime || !endTime) {
       throw new Error('startTime and endTime is required!');
     }
@@ -127,10 +127,17 @@ class TimeLine {
       this.drawArea(item.startTime, item.endTime, item.bgColor);
     });
 
+    // 半屏可绘制的刻度数
+    const halfScreenPointCount = Math.ceil(this.$canvas.width / this.spacing / 2);
+
     // 当前时间之前刻度数量
-    const beforePointCount = Math.ceil((this.currentTime - this.startTime) / this.#timeSpacing);
+    const _beforePointCount = Math.ceil((this.currentTime - this.startTime) / this.#timeSpacing);
     // 当时间之后刻度数量
-    const afterPointCount = Math.ceil((this.endTime - this.currentTime) / this.#timeSpacing);
+    const _afterPointCount = Math.ceil((this.endTime - this.currentTime) / this.#timeSpacing);
+
+    // 实际需要绘制的数量，已优化绘制时间
+    const beforePointCount = _beforePointCount < halfScreenPointCount ? _beforePointCount : halfScreenPointCount;
+    const afterPointCount = _afterPointCount < halfScreenPointCount ? _afterPointCount : halfScreenPointCount;
     // 当前时间指针位置
     const centerTimePoint = this.$canvas.width / 2 - this.centerTimePointWidth / 2;
 
@@ -536,7 +543,7 @@ class TimeLine {
     this.$canvas.onwheel = this._onZoom.bind(this);
     // 拖拽事件
     this.$canvas.onmousedown = this._onDrag.bind(this);
-    // console.timeEnd('draw');
+    console.timeEnd('draw');
   }
 
   // 拖拽
@@ -561,7 +568,7 @@ class TimeLine {
         areas: this.areas,
         _privateFlag: true,
       });
-    }, 80); // 渲染时间平均在30ms左右，设置80ms大概12帧。看起来时连贯的
+    }, 40); // 24fps
     document.onmouseup = () => {
       document.onmousemove = null;
       document.onmouseup = null;
