@@ -3,18 +3,18 @@ declare type AreaItemType = {
     endTime: number;
     bgColor?: string;
 };
-declare type CreateType = {
+declare type DrawType = {
     startTime: number;
     endTime: number;
     currentTime?: number;
     zoom?: number;
     areas?: AreaItemType[];
+    _privateFlag?: boolean;
 };
 declare class TimeLine {
     #private;
     $canvas: HTMLCanvasElement;
     canvasContext: CanvasRenderingContext2D;
-    $canvasParent?: HTMLElement;
     private startTime;
     private endTime;
     private currentTime;
@@ -22,7 +22,7 @@ declare class TimeLine {
     spacing: number;
     centerTimePointWidth: number;
     constructor(id: string, fill?: boolean);
-    draw({ startTime, endTime, currentTime, areas }: CreateType): void;
+    draw({ startTime, endTime, currentTime, areas, _privateFlag }: DrawType): void;
     private _onDrag;
     private _onZoom;
     private _onParentResize;

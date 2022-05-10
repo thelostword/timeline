@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-10 10:27:34
+ * @LastEditTime: 2022-05-10 10:54:01
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -13,12 +13,13 @@ type AreaItemType = {
   bgColor?: string;
 }
 
-type CreateType = {
+type DrawType = {
   startTime: number;
   endTime: number;
   currentTime?: number;
   zoom?: number;
   areas?: AreaItemType[];
+  _privateFlag?: boolean;
 }
 
 type PointHeightType = {
@@ -38,7 +39,6 @@ import { dateTime } from '@/utils/time';
 class TimeLine {
   $canvas: HTMLCanvasElement; // canvas 元素
   canvasContext: CanvasRenderingContext2D; // canvas context,
-  $canvasParent?: HTMLElement;
 
   #event: any;
 
@@ -56,6 +56,9 @@ class TimeLine {
   // 当前时间指针宽度
   centerTimePointWidth: number;
 
+  // 是否在拖拽中
+  #isDraging: boolean;
+
   constructor(id: string, fill: boolean = false) {
     if (!id) {
       throw new Error('canvas id is required!');
@@ -65,16 +68,18 @@ class TimeLine {
     // 使用父元素宽高
     if (fill) {
       // 获取父元素
-      this.$canvasParent = this.$canvas.parentElement as HTMLElement;
+      const $canvasParent = this.$canvas.parentElement as HTMLElement;
       // 将canvas 宽高设为父元素宽高
-      this.$canvas.width = (this.$canvas.parentNode  as HTMLElement)?.clientWidth;
-      this.$canvas.height = (this.$canvas.parentNode  as HTMLElement)?.clientHeight;
-      // resize observer
-      const parentResizeObserver = new ResizeObserver(throttle(this._onParentResize.bind(this), 200));
-      // 监听父元素resize
-      parentResizeObserver.observe(this.$canvasParent);
+      if ($canvasParent) {
+        this.$canvas.width = $canvasParent.clientWidth;
+        this.$canvas.height = $canvasParent.clientHeight;
+        // resize observer
+        const parentResizeObserver = new ResizeObserver(throttle(this._onParentResize.bind(this), 200));
+        // 监听父元素resize
+        parentResizeObserver.observe($canvasParent);
+      }
     }
-
+    this.#isDraging = false;
     this.#event = new Event();
 
     this.startTime = 0;
@@ -100,10 +105,14 @@ class TimeLine {
   }
 
   // 绘制时间轴
-  draw({startTime, endTime, currentTime, areas}: CreateType): void {
+  draw({startTime, endTime, currentTime, areas, _privateFlag}: DrawType): void {
     // console.time('draw');
     if (!startTime || !endTime) {
       throw new Error('startTime and endTime is required!');
+    }
+    // 拖拽中禁止外部调用,防止冲突
+    if (this.#isDraging && !_privateFlag) {
+      return;
     }
     // 清空画布及事件
     this.clear();
@@ -531,12 +540,11 @@ class TimeLine {
   }
 
   // 拖拽
-  private _onDrag(event) {
-    const x = event.clientX;
-    
+  private _onDrag({clientX}) {
+    this.#isDraging = true;
     let prexOffset = 0;
     document.onmousemove = throttle((emoveEvent) => {
-      const curxOffset = emoveEvent.clientX - x;
+      const curxOffset = emoveEvent.clientX - clientX;
       if (curxOffset < 0 && this.currentTime >= this.endTime) {
         return;
       }
@@ -551,11 +559,13 @@ class TimeLine {
         endTime: this.endTime,
         currentTime: Math.floor(currentTime),
         areas: this.areas,
+        _privateFlag: true,
       });
     }, 80); // 渲染时间平均在30ms左右，设置80ms大概12帧。看起来时连贯的
     document.onmouseup = () => {
       document.onmousemove = null;
       document.onmouseup = null;
+      this.#isDraging = false;
       this.emit('timeUpdate', this.currentTime);
     };
   }
@@ -570,6 +580,7 @@ class TimeLine {
         endTime: this.endTime,
         currentTime: this.currentTime,
         areas: this.areas,
+        _privateFlag: true,
       });
     } else if (e.deltaY > 0 && currentIndex < this.#timeSpacingMap.length - 1) {
       this.#timeSpacing = this.#timeSpacingMap[currentIndex + 1];
@@ -578,6 +589,7 @@ class TimeLine {
         endTime: this.endTime,
         currentTime: this.currentTime,
         areas: this.areas,
+        _privateFlag: true,
       });
     }
   }
