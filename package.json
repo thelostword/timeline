@@ -19,8 +19,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thelostword/timeline.git"
+    "url": "git+https://github.com/thelostword/timeline.git"
   },
+  "bugs": {
+    "url": "https://github.com/thelostword/timeline/issues"
+  },
+  "homepage": "https://github.com/thelostword/timeline#readme",
   "dependencies": {
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-commonjs": "^21.1.0",
