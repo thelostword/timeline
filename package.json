@@ -25,7 +25,7 @@
     "url": "https://github.com/thelostword/timeline/issues"
   },
   "homepage": "https://github.com/thelostword/timeline#readme",
-  "dependencies": {
+  "devDependencies": {
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-node-resolve": "^13.2.1",

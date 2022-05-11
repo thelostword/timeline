@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-10 14:48:27
+ * @LastEditTime: 2022-05-11 12:24:38
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
@@ -53,6 +53,7 @@ timeline.on('timeUpdate', (time) => {
 | --- | --- | --- | --- |
 | textColor | string | #ffffff | 文字颜色 |
 | pointColor | string | #ffffff | 刻度颜色 |
+| areaColor | string | #ffffff55 | 阴影区域背景颜色 |
 | centerTimePointColor | string | #00aeec | 当前时间指针颜色 |
 | centerTimePointWidth | number | 3 | 当前时间指针宽度 |
 | spacing | number | 5 | 刻度间距 |
@@ -66,7 +67,7 @@ timeline.on('timeUpdate', (time) => {
 | draw | 生成时间轴，参数：object，返回值：无 |
 | on | 事件监听。参数：timeUpdate, 返回值：当前指向时间 |
 
-#### draw(object)
+#### draw方法
 | 参数 | 类型 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
 | startTime | number | 是 | 时间轴起始时间 |

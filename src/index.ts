@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-10 14:41:32
+ * @LastEditTime: 2022-05-11 12:27:02
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -35,6 +35,7 @@ type OptionsType = {
   fill?: boolean;
   textColor?: string;
   pointColor?: string;
+  areaColor?: string;
   centerTimePointColor?: string;
   centerTimePointWidth?: number;
   spacing?: number;
@@ -77,7 +78,15 @@ class TimeLine {
   // 是否在拖拽中
   #isDraging: boolean;
 
-  constructor(id: string, { fill = false, textColor = '#ffffff', pointColor = '#ffffff', centerTimePointColor = '#00aeec', centerTimePointWidth = 3, spacing = 5, }: OptionsType) {
+  constructor(id: string, {
+    fill = false,
+    textColor = '#ffffff',
+    pointColor = '#ffffff',
+    areaColor = '#ffffff55',
+    centerTimePointColor = '#00aeec',
+    centerTimePointWidth = 3,
+    spacing = 5,
+  }: OptionsType) {
     if (!id) {
       throw new Error('canvas id is required!');
     }
@@ -127,7 +136,7 @@ class TimeLine {
     // 刻度颜色
     this.pointColor = pointColor;
     // 阴影区颜色
-    this.areaColor = '#ffffff55'
+    this.areaColor = areaColor;
   }
 
   // 绘制时间轴
@@ -196,7 +205,7 @@ class TimeLine {
     this.$canvas.onmousedown = this._onDrag.bind(this);
     // console.timeEnd('draw');
   }
-
+  
   // 拖拽
   private _onDrag({clientX}) {
     this.#isDraging = true;

@@ -15,6 +15,7 @@ declare type OptionsType = {
     fill?: boolean;
     textColor?: string;
     pointColor?: string;
+    areaColor?: string;
     centerTimePointColor?: string;
     centerTimePointWidth?: number;
     spacing?: number;
@@ -33,7 +34,7 @@ declare class TimeLine {
     textColor: string;
     pointColor: string;
     areaColor: string;
-    constructor(id: string, { fill, textColor, pointColor, centerTimePointColor, centerTimePointWidth, spacing, }: OptionsType);
+    constructor(id: string, { fill, textColor, pointColor, areaColor, centerTimePointColor, centerTimePointWidth, spacing, }: OptionsType);
     draw({ startTime, endTime, currentTime, areas, _privateFlag }: DrawType): void;
     private _onDrag;
     private _onZoom;
