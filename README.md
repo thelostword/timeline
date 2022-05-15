@@ -1,13 +1,13 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-11 12:24:38
+ * @LastEditTime: 2022-05-15 11:14:12
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
 -->
 # timeline
-canvas 时间轴，支持缩放、拖拽
+canvas 时间轴，支持缩放、拖拽、无限滚动
 ![preview](./example/demo.png)
 
 ### 使用
@@ -15,22 +15,20 @@ canvas 时间轴，支持缩放、拖拽
 npm install @losting/timeline
 ```
 ``` html
-<!-- fill为 false 时，canvas元素属性width、height必须设置，不能使用style和css -->
 <div id="root" style="width: 100%;height: 70px;">
-  <canvas id="timeline" style="background-color: rgba(0, 0, 0, .5);"></canvas>
+  <canvas id="timeline"></canvas>
 </div>
 ```
 
 ``` JavaScript
-import MoeTimeline from '@losting/timeline';
+import Timeline from '@losting/timeline';
 
-// new MoeTimeline(canvasId, options)
-const timeline = new MoeTimeline('timeline', {
+// new Timeline(canvasId, options)
+const timeline = new Timeline('timeline', {
   fill: true,
 });
+
 timeline.draw({
-  startTime: 1651823833,
-  endTime: 1651910233,
   currentTime: 1651829532,
   areas: [{
     startTime: 1651827433,

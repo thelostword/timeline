@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-04-01 17:16:54
- * @LastEditTime: 2022-05-11 12:26:12
+ * @LastEditTime: 2022-05-15 14:47:38
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\example\index.html
@@ -16,18 +16,21 @@
 </head>
 <body>
   <div id="root" style="width: 100%;height: 70px;">
-    <canvas id="timeline" style="background-color: rgba(0, 0, 0, .5);"></canvas>
+    <canvas id="timeline"></canvas>
   </div>
   <script type="module">
     import MoeTimeline from '../lib/timeline.esm.min.js';
 
     const timeline = new MoeTimeline('timeline', {
-      fill: true,
+      fill: false,
+      width: 1000,
+      height: 70,
+      bgColor: 'rgba(0,0,0,0.5)',
       // textColor: '#000',
       // pointColor: '#000',
       // centerTimePointColor: '#000',
       // centerTimePointWidth: 5,
-      // spacing: 10,
+      scaleSpacing: 10,
     });
     
     timeline.draw({
@@ -47,6 +50,8 @@
 
     timeline.on('timeUpdate', (e) => {
       console.log(e, 'currentTime change');
+      const _date = new Date(e * 1000)
+      console.log(_date)
     })
     console.log(timeline);
   </script>

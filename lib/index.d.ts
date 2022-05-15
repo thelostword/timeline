@@ -1,41 +1,41 @@
-declare type AreaItemType = {
+declare type AreaItemState = {
     startTime: number;
     endTime: number;
     bgColor?: string;
 };
-declare type DrawType = {
-    startTime: number;
-    endTime: number;
+declare type DrawState = {
     currentTime?: number;
     zoom?: number;
-    areas?: AreaItemType[];
+    areas?: AreaItemState[];
     _privateFlag?: boolean;
 };
-declare type OptionsType = {
+declare type TimeLineOptionState = {
     fill?: boolean;
+    width?: number;
+    height?: number;
+    bgColor?: string;
     textColor?: string;
+    scaleColor?: string;
+    scaleSpacing?: number;
+    areaBgColor?: string;
     pointColor?: string;
-    areaColor?: string;
-    centerTimePointColor?: string;
-    centerTimePointWidth?: number;
-    spacing?: number;
+    pointWidth?: number;
 };
 declare class TimeLine {
     #private;
     $canvas: HTMLCanvasElement;
     canvasContext: CanvasRenderingContext2D;
-    private startTime;
-    private endTime;
     private currentTime;
     private areas?;
-    spacing: number;
-    centerTimePointWidth: number;
-    centerTimePointColor: string;
-    textColor: string;
+    scaleSpacing: number;
+    bgColor: string;
+    pointWidth: number;
     pointColor: string;
-    areaColor: string;
-    constructor(id: string, { fill, textColor, pointColor, areaColor, centerTimePointColor, centerTimePointWidth, spacing, }: OptionsType);
-    draw({ startTime, endTime, currentTime, areas, _privateFlag }: DrawType): void;
+    textColor: string;
+    scaleColor: string;
+    areaBgColor: string;
+    constructor(id: string, { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, }: TimeLineOptionState);
+    draw({ currentTime, areas, _privateFlag }: DrawState): void;
     private _onDrag;
     private _onZoom;
     private _onParentResize;
