@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-15 16:31:23
+ * @LastEditTime: 2022-05-16 16:37:08
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -119,7 +119,7 @@ class TimeLine {
     this.currentTime = 0;
 
     this.#timeSpacingMap = [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
-    this.#timeSpacing = 1; // 时间间距默认30秒  => 5s  10s  30s  1m  2m  5m
+    this.#timeSpacing = 30; // 时间间距默认30秒  => 5s  10s  30s  1m  2m  5m
     this.scaleSpacing = scaleSpacing; // 默认刻度间距5px
 
     // 刻度高度
@@ -191,6 +191,8 @@ class TimeLine {
     // 时间偏移量
     const timeOffset = this.currentTime % this.#timeSpacing;
 
+    console.log(xOffset, '----', timeOffset);
+
     // 绘制刻度
     drawHelper.bind(this)({
       scaleHeight: this.#scaleHeight,
@@ -199,6 +201,7 @@ class TimeLine {
       screenScaleCount,
       xOffset,
       startTime,
+      endTime,
       timeOffset,
       drawLine: this.drawLine.bind(this),
       drawText: this.drawText.bind(this),

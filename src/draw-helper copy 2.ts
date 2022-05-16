@@ -1,7 +1,15 @@
 /*
  * @Author: losting
+ * @Date: 2022-05-16 16:34:16
+ * @LastEditTime: 2022-05-16 16:34:18
+ * @LastEditors: losting
+ * @Description: 
+ * @FilePath: \timeline\src\draw-helper copy 2.ts
+ */
+/*
+ * @Author: losting
  * @Date: 2022-05-10 11:30:36
- * @LastEditTime: 2022-05-16 16:55:50
+ * @LastEditTime: 2022-05-16 16:30:03
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\draw-helper.ts
@@ -15,7 +23,6 @@ export function drawHelper({
   scaleSpacing,
   scaleHeight,
   startTime,
-  endTime,
   timeOffset,
   drawLine,
   drawText,
@@ -67,14 +74,10 @@ export function drawHelper({
 
   // 密度为30s时
   if (timeSpacing === 30) {
-    console.log(startTime, dateTime(startTime, 'YYYY/MM/DD HH:mm:ss'), 'startTime')
-    const startTimeStr = dateTime(startTime, 'HH:mm:ss');
-    // const timeOffset
     for(let i = 0; i < screenScaleCount; i++) {
       const x = i * scaleSpacing + xOffset;
-      // const time = Math.floor(startTime + i * timeSpacing + timeOffset);
-      // console.log(x, 'x', time, dateTime(time, 'YYYY/MM/DD HH:mm:ss'))
-      // console.log(startTime, dateTime(startTime, 'YYYY/MM/DD HH:mm:ss'), 'startTime')
+      const time = Math.floor(startTime + i * timeSpacing + timeOffset);
+      console.log(x, 'x', time, dateTime(time, 'YYYY/MM/DD HH:mm:ss'))
       // 2分钟刻度
       // if (time % (60 * 5) === 0) {
       //   drawLine(x, scaleHeight.height4);
@@ -86,8 +89,7 @@ export function drawHelper({
       //   drawLine(x, scaleHeight.height1);
       //   continue;
       // }
-      console.log(screenScaleCount, 'screenScaleCount')
-      // drawLine(x, scaleHeight.height1);
+      drawLine(x, scaleHeight.height1);
     }
     return;
   }
