@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-05-10 11:30:36
- * @LastEditTime: 2022-05-17 16:58:20
+ * @LastEditTime: 2022-05-17 18:26:46
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\draw-helper.ts
@@ -19,7 +19,11 @@ export function drawHelper({
   startTime,
   drawLine,
   drawText,
+  drawTimelineScale,
 }) {
+  // 绘制比例尺
+  drawTimelineScale(timeSpacing)
+  
   // 密度为1s时
   if (timeSpacing === 1) {
     for(let i = 0; i < screenScaleCount; i++) {
@@ -28,7 +32,7 @@ export function drawHelper({
       // 10s刻度
       if (time % 10 === 0) {
         drawLine(x, scaleHeight.height5);
-        drawText(x - 15, 20, `${dateTime(time, 'HH:mm:ss')}`);
+        drawText(x - 15, 40, `${dateTime(time, 'HH:mm:ss')}`);
         continue;
       }
       // 5s 刻度
@@ -56,7 +60,7 @@ export function drawHelper({
       // 1分钟刻度
       if (time % 60 === 0) {
         drawLine(x, scaleHeight.height4);
-        drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+        drawText(x - 15, 40, `${dateTime(time, 'HH:mm')}`);
         continue;
       }
       // 10秒刻度
@@ -79,7 +83,7 @@ export function drawHelper({
       // 5分钟刻度
       if (time % (60 * 5) === 0) {
         drawLine(x, scaleHeight.height4);
-        drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+        drawText(x - 15, 40, `${dateTime(time, 'HH:mm')}`);
         continue;
       }
       // 30秒刻度
@@ -102,14 +106,14 @@ export function drawHelper({
       // 小时刻度
       if (time % (60 * 60) === 0) {
         drawLine(x, scaleHeight.height5);
-        drawText(x - 30, 20, `${dateTime(time)}`);
+        drawText(x - 30, 40, `${dateTime(time)}`);
         continue;
       }
       // 5分钟刻度
       if (time % (60 * 5) === 0) {
         drawLine(x, scaleHeight.height3);
         if (time % (60 * 10) === 0) {
-          drawText(x - 15, 20, `${dateTime(time, 'HH:mm')}`);
+          drawText(x - 15, 40, `${dateTime(time, 'HH:mm')}`);
         }
         continue;
       }
@@ -135,7 +139,7 @@ export function drawHelper({
       // 30分钟刻度
       if (time % (60 * 30) === 0) {
         drawLine(x, scaleHeight.height5);
-        drawText(x - 30, 20, `${dateTime(time)}`);
+        drawText(x - 30, 40, `${dateTime(time)}`);
         continue;
       }
       // 10分钟刻度
@@ -165,7 +169,7 @@ export function drawHelper({
       // 小时刻度
       if (time % (60 * 60) === 0) {
         drawLine(x, scaleHeight.height5);
-        drawText(x - 30, 20, `${dateTime(time)}`);
+        drawText(x - 30, 40, `${dateTime(time)}`);
         continue;
       }
       // 30分钟刻度
@@ -194,7 +198,7 @@ export function drawHelper({
       // 每日刻度
       if (time % (3600 * 24) === 0) {
         drawLine(x, scaleHeight.height5);
-        drawText(x - 30, 20, `${dateTime(time, 'MM/DD HH:mm')}`);
+        drawText(x - 30, 40, `${dateTime(time, 'MM/DD HH:mm')}`);
         continue;
       }
       // 12小时刻度
@@ -223,7 +227,7 @@ export function drawHelper({
       // 每月1号刻度
       if (dateTime(time, 'D') === '1') {
         drawLine(x, scaleHeight.height5);
-        drawText(x - 30, 20, `${dateTime(time, 'YYYY/MM/DD')}`);
+        drawText(x - 30, 40, `${dateTime(time, 'YYYY/MM/DD')}`);
         continue;
       }
       // 每日刻度
@@ -257,7 +261,7 @@ export function drawHelper({
       if (dayjs(time * 1000).month() === 0 && (dayjs(time * 1000).date() > 0 || dayjs(time * 1000).date() <= 31) && canDrawYearScale(i)) {
         yearText[i] = true;
         drawLine(x, scaleHeight.height5);
-        drawText(x - 30, 20, `${dateTime(time, 'YYYY/MM/DD')}`);
+        drawText(x - 30, 40, `${dateTime(time, 'YYYY/MM/DD')}`);
         continue;
       }
       if (dayjs(time * 1000).day() === 0) {

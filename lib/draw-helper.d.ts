@@ -1,4 +1,4 @@
-export declare function drawHelper({ pointWidth, timePerPixel, timeSpacing, screenScaleCount, scaleSpacing, scaleHeight, startTime, drawLine, drawText, }: {
+export declare function drawHelper({ pointWidth, timePerPixel, timeSpacing, screenScaleCount, scaleSpacing, scaleHeight, startTime, drawLine, drawText, drawTimelineScale, }: {
     pointWidth: any;
     timePerPixel: any;
     timeSpacing: any;
@@ -8,4 +8,5 @@ export declare function drawHelper({ pointWidth, timePerPixel, timeSpacing, scre
     startTime: any;
     drawLine: any;
     drawText: any;
+    drawTimelineScale: any;
 }): void;

@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-17 17:57:40
+ * @LastEditTime: 2022-05-17 19:01:42
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -115,7 +115,7 @@ class TimeLine {
       throw new Error('zoom must be 1 ~ 9, and must be an integer');
     }
     
-    // 使用父元素宽高
+    // 判断使用父元素宽高
     if (fill) {
       // 获取父元素
       const $canvasParent = this.$canvas.parentElement as HTMLElement;
@@ -154,7 +154,6 @@ class TimeLine {
 
     // canvas 背景颜色
     this.bgColor = bgColor;
-
     // 当前时间指针宽度
     this.pointWidth = pointWidth;
     // 当前指针颜色
@@ -222,12 +221,13 @@ class TimeLine {
       startTime,
       drawLine: this.drawLine.bind(this),
       drawText: this.drawText.bind(this),
+      drawTimelineScale: this.drawTimelineScale.bind(this),
     });
 
     // 绘制当前时间指针
     this.drawLine(xCenterPoint - this.pointWidth / 2, this.$canvas.height, this.pointWidth, this.pointColor);
-    this.drawArea(xCenterPoint - 55, this.$canvas.height / 2 - 10, xCenterPoint + 55, this.$canvas.height / 2 + 10, this.pointColor);
-    this.drawText(xCenterPoint - 50, this.$canvas.height / 2 + 4, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`);
+    this.drawArea(xCenterPoint - 52, 5, xCenterPoint + 52, 25, this.pointColor);
+    this.drawText(xCenterPoint - 50, 20, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`);
 
 
     // 鼠标滚轮事件
@@ -315,6 +315,80 @@ class TimeLine {
       this.$canvas.onmousedown = null;
     }
   }
+  // 绘制比例尺
+  private drawTimelineScale(timespacing) {
+    // [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
+    switch (timespacing) {
+      case 1:
+        this.drawText(25, 12, `1s`);
+        break;
+      case 10:
+        this.drawText(25, 12, `10s`);
+        break;
+      case 30:
+        this.drawText(25, 12, `30s`);
+        break;
+      case 60:
+        this.drawText(25, 12, `1min`);
+        break;
+      case 120:
+        this.drawText(25, 12, `2min`);
+        break;
+      case 300:
+        this.drawText(25, 12, `5min`);
+        break;
+      case 7200:
+        this.drawText(25, 12, `1hour`);
+        break;
+      case 86400:
+        this.drawText(25, 12, `1day`);
+        break;
+      case 604800:
+        this.drawText(25, 12, `1week`);
+        break;
+      default:
+        break;
+    }
+
+    this.drawLine(0, 0)
+    this.canvasContext.beginPath();
+    this.canvasContext.moveTo(5, 5);
+    this.canvasContext.lineTo(5, 10);
+    this.canvasContext.stroke();
+    this.canvasContext.strokeStyle = this.scaleColor;
+    this.canvasContext.lineWidth = 1;
+    this.canvasContext.stroke();
+    this.canvasContext.closePath();
+
+    this.canvasContext.beginPath();
+    this.canvasContext.moveTo(4, 10);
+    this.canvasContext.lineTo(20, 10);
+    this.canvasContext.stroke();
+    this.canvasContext.strokeStyle = this.scaleColor;
+    this.canvasContext.lineWidth = 1;
+    this.canvasContext.stroke();
+    this.canvasContext.closePath()
+
+    this.canvasContext.beginPath();
+    this.canvasContext.moveTo(20, 11);
+    this.canvasContext.lineTo(20, 5);
+    this.canvasContext.stroke();
+    this.canvasContext.strokeStyle = this.scaleColor;
+    this.canvasContext.lineWidth = 1;
+    this.canvasContext.stroke();
+    this.canvasContext.closePath()
+
+    // this.canvasContext.beginPath();
+    // this.canvasContext.moveTo(5, 5);
+    // this.canvasContext.lineTo(5, 10);
+    // this.canvasContext.lineTo(20, 10);
+    // this.canvasContext.lineTo(20, 5);
+    // this.canvasContext.stroke();
+    // this.canvasContext.strokeStyle = this.scaleColor;
+    // this.canvasContext.lineWidth = 1;
+    // this.canvasContext.stroke();
+    // this.canvasContext.closePath();
+  }
 
   // 绘制线条
   private drawLine(x: number, y: number, width: number = 1, color: string = this.scaleColor): void {
@@ -332,6 +406,7 @@ class TimeLine {
   private drawText(x: number, y: number, text: string, color: string = this.textColor): void {
     this.canvasContext.beginPath();
     this.canvasContext.fillStyle = color;
+    this.canvasContext.font = '12px';
     this.canvasContext.fillText(text, x, y);
     this.canvasContext.closePath();
   }

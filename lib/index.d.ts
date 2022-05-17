@@ -43,6 +43,7 @@ declare class TimeLine {
     private _onZoom;
     private _onParentResize;
     private clear;
+    private drawTimelineScale;
     private drawLine;
     private drawText;
     private drawArea;
