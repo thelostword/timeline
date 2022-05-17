@@ -20,6 +20,8 @@ declare type TimeLineOptionState = {
     areaBgColor?: string;
     pointColor?: string;
     pointWidth?: number;
+    fps?: number;
+    zoom?: number;
 };
 declare class TimeLine {
     #private;
@@ -34,7 +36,8 @@ declare class TimeLine {
     textColor: string;
     scaleColor: string;
     areaBgColor: string;
-    constructor(id: string, { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, }: TimeLineOptionState);
+    fps: number;
+    constructor(id: string, options: TimeLineOptionState);
     draw({ currentTime, areas, _privateFlag }: DrawState): void;
     private _onDrag;
     private _onZoom;

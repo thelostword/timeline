@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-16 16:37:08
+ * @LastEditTime: 2022-05-17 17:57:40
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -40,6 +40,8 @@ type TimeLineOptionState = {
   areaBgColor?: string;
   pointColor?: string;
   pointWidth?: number;
+  fps?: number;
+  zoom?: number;
 }
 
 import Event from 'znu-event'
@@ -48,6 +50,21 @@ import { dateTime } from '@/utils/time';
 
 
 import { drawHelper } from './draw-helper';
+
+
+// 默认配置
+const defaultOptions = {
+  fill:false,
+  bgColor: 'rgba(0,0,0,0.5)',
+  textColor: '#ffffff',
+  scaleColor: '#ffffff',
+  areaBgColor: '#ffffff55',
+  pointColor: '#00aeec',
+  pointWidth: 3,
+  scaleSpacing: 7,
+  fps: 60,
+  zoom: 2
+}
 
 class TimeLine {
   $canvas: HTMLCanvasElement; // canvas 元素
@@ -80,23 +97,24 @@ class TimeLine {
   // 是否在拖拽中
   #isDraging: boolean;
 
-  constructor(id: string, {
-    fill = false,
-    width,
-    height,
-    bgColor = 'rgba(0,0,0,0.5)',
-    textColor = '#ffffff',
-    scaleColor = '#ffffff',
-    areaBgColor = '#ffffff55',
-    pointColor = '#00aeec',
-    pointWidth = 3,
-    scaleSpacing = 5,
-  }: TimeLineOptionState) {
+  // fps
+  fps: number;
+
+  constructor(id: string, options: TimeLineOptionState) {
     if (!id) {
       throw new Error('canvas id is required!');
     }
     this.$canvas = document.getElementById(id) as HTMLCanvasElement;
     this.canvasContext = this.$canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    // 获取配置项
+    const { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, fps, zoom } = { ...defaultOptions, ...options };
+
+    // 检查zoom参数是否合法
+    if (zoom < 1 || zoom > 9 || zoom % 1 !== 0) {
+      throw new Error('zoom must be 1 ~ 9, and must be an integer');
+    }
+    
     // 使用父元素宽高
     if (fill) {
       // 获取父元素
@@ -119,8 +137,10 @@ class TimeLine {
     this.currentTime = 0;
 
     this.#timeSpacingMap = [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
-    this.#timeSpacing = 30; // 时间间距默认30秒  => 5s  10s  30s  1m  2m  5m
+    // this.#timeSpacing = 60; // 时间间距
+    this.#timeSpacing = this.#timeSpacingMap[zoom - 1];
     this.scaleSpacing = scaleSpacing; // 默认刻度间距5px
+    
 
     // 刻度高度
     this.#scaleHeight = {
@@ -145,33 +165,21 @@ class TimeLine {
     this.scaleColor = scaleColor;
     // 阴影区颜色
     this.areaBgColor = areaBgColor;
+    // fps
+    this.fps = fps;
   }
 
   // 绘制时间轴
-  draw({currentTime = Math.floor(Date.now() / 1000), areas, _privateFlag}: DrawState): void {
-    console.time('draw');
+  draw({currentTime, areas, _privateFlag}: DrawState): void {
+    // console.time('draw');
     // 拖拽中禁止外部调用,防止冲突
     if (this.#isDraging && !_privateFlag) {
       return;
     }
-    // 获取参数
-    this.currentTime = currentTime;
-    this.areas = areas || [];
-
-    // 清空画布及事件
-    this.clear();
     
-    // 填充canvas背景
-    this.canvasContext.beginPath();
-    this.canvasContext.rect(0, 0, this.$canvas.width, this.$canvas.height);
-    this.canvasContext.fillStyle = this.bgColor;
-    this.canvasContext.fill();
-    this.canvasContext.closePath();
-
-    // 绘制阴影区域
-    // this.areas.forEach(item => {
-    //   this.drawArea(item.startTime, item.endTime, item.bgColor);
-    // });
+    // 获取参数
+    this.currentTime = currentTime || Math.floor(Date.now() / 1000);
+    this.areas = areas || [];
 
     // 当前屏可绘制刻度数量
     const screenScaleCount = Math.ceil(this.$canvas.width / this.scaleSpacing);
@@ -186,35 +194,39 @@ class TimeLine {
     // canvas X轴中心点（当前时间指示刻度）
     const xCenterPoint = this.$canvas.width / 2;
 
-    // x轴位置偏移量
-    const xOffset = xCenterPoint % this.scaleSpacing;
-    // 时间偏移量
-    const timeOffset = this.currentTime % this.#timeSpacing;
+    // 每1px所占时间单位（秒）
+    const timePerPixel = screenSecondCount / this.$canvas.width;
 
-    console.log(xOffset, '----', timeOffset);
+
+    // 清空画布及事件
+    this.clear();
+
+    // 填充背景
+    this.drawArea(0, 0, this.$canvas.width, this.$canvas.height, this.bgColor);
+
+    // 绘制阴影区域
+    this.areas.forEach(item => {
+      const startX = item.startTime < startTime ? 0 : Math.floor((item.startTime - startTime) / timePerPixel);
+      const endX = item.endTime > endTime ? this.$canvas.width : Math.floor((item.endTime - startTime) / timePerPixel);
+      this.drawArea(startX, 0, endX, this.$canvas.height, item.bgColor || this.areaBgColor);
+    });
 
     // 绘制刻度
     drawHelper.bind(this)({
+      pointWidth: this.pointWidth,
+      timePerPixel,
       scaleHeight: this.#scaleHeight,
       scaleSpacing: this.scaleSpacing,
       timeSpacing: this.#timeSpacing,
       screenScaleCount,
-      xOffset,
       startTime,
-      endTime,
-      timeOffset,
       drawLine: this.drawLine.bind(this),
       drawText: this.drawText.bind(this),
     });
 
     // 绘制当前时间指针
-    
     this.drawLine(xCenterPoint - this.pointWidth / 2, this.$canvas.height, this.pointWidth, this.pointColor);
-    this.canvasContext.beginPath();
-    this.canvasContext.rect(xCenterPoint - 55, this.$canvas.height / 2 - 10, 110, 20);
-    this.canvasContext.fillStyle = this.pointColor;
-    this.canvasContext.fill();
-    this.canvasContext.closePath();
+    this.drawArea(xCenterPoint - 55, this.$canvas.height / 2 - 10, xCenterPoint + 55, this.$canvas.height / 2 + 10, this.pointColor);
     this.drawText(xCenterPoint - 50, this.$canvas.height / 2 + 4, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`);
 
 
@@ -222,7 +234,7 @@ class TimeLine {
     this.$canvas.onwheel = this._onZoom.bind(this);
     // 拖拽事件
     this.$canvas.onmousedown = this._onDrag.bind(this);
-    console.timeEnd('draw');
+    // console.timeEnd('draw');
   }
   
   // 拖拽
@@ -240,7 +252,8 @@ class TimeLine {
         areas: this.areas,
         _privateFlag: true,
       });
-    }, 35); // 28fps
+    }, this.#timeSpacing === 1 ? 100 : 1000 / this.fps);
+
     document.onmouseup = () => {
       document.onmousemove = null;
       document.onmouseup = null;
@@ -324,18 +337,10 @@ class TimeLine {
   }
 
   // 绘制区域
-  private drawArea(startTime: number, endTime: number, bgColor?: string) {
-    // 当前时间指针位置
-    const centerTimePoint = this.$canvas.width / 2 - this.pointWidth / 2;
-    // x轴位置偏移量
-    const xOffset = this.currentTime % this.scaleSpacing;
-
-    const startX = (centerTimePoint - xOffset) + Math.floor((startTime - this.currentTime) / this.#timeSpacing) * this.scaleSpacing;
-    const endX = (centerTimePoint - xOffset) + Math.floor((endTime - this.currentTime) / this.#timeSpacing) * this.scaleSpacing;
-
+  private drawArea(startX: number, startY: number, endX: number, endY: number, bgColor: string) {
     this.canvasContext.beginPath();
-    this.canvasContext.rect(startX, 0, endX - startX, this.$canvas.height);
-    this.canvasContext.fillStyle = bgColor || this.areaBgColor;
+    this.canvasContext.rect(startX, startY, endX - startX, endY - startY);
+    this.canvasContext.fillStyle = bgColor;
     this.canvasContext.fill();
     this.canvasContext.closePath();
   }

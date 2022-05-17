@@ -7,6 +7,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "dev": "rollup -c -w",
+    "demo-server": "http-server -p 8080 -o example -c-1",
     "build": "rollup -c",
     "test": "jest --no-cache"
   },
@@ -33,6 +34,7 @@
     "@rollup/plugin-typescript": "^8.3.2",
     "@types/jest": "^27.4.1",
     "dayjs": "^1.11.2",
+    "http-server": "^14.1.0",
     "jest": "^27.5.1",
     "lodash.throttle": "^4.1.1",
     "rollup": "^2.70.2",
