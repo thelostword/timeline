@@ -14,7 +14,9 @@
   "keywords": [
     "timeline",
     "media timeline",
-    "video timeline"
+    "video timeline",
+    "canvas timeline",
+    "时间轴"
   ],
   "author": "losting",
   "license": "MIT",
