@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-15 11:14:12
+ * @LastEditTime: 2022-05-17 19:16:16
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
@@ -49,13 +49,18 @@ timeline.on('timeUpdate', (time) => {
 ### TimeLine options
 | 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
+| width | number | 无 | canvas宽度 |
+| width | number | 无 | canvas高度 |
+| fill | boolean | false | 是否适应父容器宽高,若为false则需要手动设定canvas宽高 |
+| bgColor | string | rgba(0,0,0,0.5) | canvas背景色 |
 | textColor | string | #ffffff | 文字颜色 |
-| pointColor | string | #ffffff | 刻度颜色 |
-| areaColor | string | #ffffff55 | 阴影区域背景颜色 |
-| centerTimePointColor | string | #00aeec | 当前时间指针颜色 |
-| centerTimePointWidth | number | 3 | 当前时间指针宽度 |
-| spacing | number | 5 | 刻度间距 |
-| fill | boolean | false | 是否适应父容器宽高 |
+| scaleColor | string | #ffffff | 刻度颜色 |
+| scaleSpacing | number | 7 | 刻度间距 |
+| areaBgColor | string | #ffffff55 | 阴影区域背景颜色 |
+| pointColor | string | #00aeec | 当前时间指针颜色 |
+| pointWidth | number | 3 | 当前时间指针宽度 |
+| fps | number | 60 | 绘制帧率。数字越大越流畅，建议不要大于90 |
+| zoom | number | 2 | 缩放比，1~9之间的正整数 |
 
 
 ### 事件
@@ -68,9 +73,7 @@ timeline.on('timeUpdate', (time) => {
 #### draw方法
 | 参数 | 类型 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
-| startTime | number | 是 | 时间轴起始时间 |
-| endTime | number | 是 | 时间轴终止时间 |
-| currentTime | number | 否 | 当前所在时间，默认为起始时间 |
+| currentTime | number | 否 | 当前所在时间，默认为当前时间 |
 | areas | array | 否 | 阴影区域 |
 
 #### areas

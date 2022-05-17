@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-17 19:01:42
+ * @LastEditTime: 2022-05-17 19:23:11
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -169,7 +169,7 @@ class TimeLine {
   }
 
   // 绘制时间轴
-  draw({currentTime, areas, _privateFlag}: DrawState): void {
+  draw({currentTime = 0, areas, _privateFlag}: DrawState = {}): void {
     // console.time('draw');
     // 拖拽中禁止外部调用,防止冲突
     if (this.#isDraging && !_privateFlag) {

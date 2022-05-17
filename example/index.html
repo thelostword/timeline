@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-04-01 17:16:54
- * @LastEditTime: 2022-05-17 14:02:03
+ * @LastEditTime: 2022-05-17 19:23:09
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\example\index.html
@@ -33,20 +33,22 @@
       scaleSpacing: 7,
     });
     
-    timeline.draw({
-      startTime: 1651823833,
-      endTime: 1651910233,
-      currentTime: 1651827817,
-      areas: [{
-        startTime: 1651827433,
-        endTime: 1651829413,
-        bgColor: '#00AEEC'
-      },{
-        startTime: 1651829533,
-        endTime: 1651832533,
-        // bgColor: '#00AEEC'
-      }],
-    });
+    // timeline.draw({
+    //   // currentTime: 1651827817,
+    //   areas: [{
+    //     startTime: 1651827433,
+    //     endTime: 1651829413,
+    //     bgColor: '#00AEEC'
+    //   },{
+    //     startTime: 1651829533,
+    //     endTime: 1651832533,
+    //     // bgColor: '#00AEEC'
+    //   }],
+    // });
+
+    setInterval(() => {
+      timeline.draw()
+    }, 1000);
 
     timeline.on('timeUpdate', (e) => {
       console.log(e, 'currentTime change');

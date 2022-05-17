@@ -38,7 +38,7 @@ declare class TimeLine {
     areaBgColor: string;
     fps: number;
     constructor(id: string, options: TimeLineOptionState);
-    draw({ currentTime, areas, _privateFlag }: DrawState): void;
+    draw({ currentTime, areas, _privateFlag }?: DrawState): void;
     private _onDrag;
     private _onZoom;
     private _onParentResize;
