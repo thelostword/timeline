@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-17 19:23:11
+ * @LastEditTime: 2022-05-18 08:59:52
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -221,8 +221,10 @@ class TimeLine {
       startTime,
       drawLine: this.drawLine.bind(this),
       drawText: this.drawText.bind(this),
-      drawTimelineScale: this.drawTimelineScale.bind(this),
     });
+
+    // 绘制比例尺
+    this.drawTimelineScale(this.#timeSpacing);
 
     // 绘制当前时间指针
     this.drawLine(xCenterPoint - this.pointWidth / 2, this.$canvas.height, this.pointWidth, this.pointColor);

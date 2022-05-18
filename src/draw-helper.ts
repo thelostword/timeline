@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-05-10 11:30:36
- * @LastEditTime: 2022-05-17 18:26:46
+ * @LastEditTime: 2022-05-18 08:59:05
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\draw-helper.ts
@@ -19,11 +19,7 @@ export function drawHelper({
   startTime,
   drawLine,
   drawText,
-  drawTimelineScale,
 }) {
-  // 绘制比例尺
-  drawTimelineScale(timeSpacing)
-  
   // 密度为1s时
   if (timeSpacing === 1) {
     for(let i = 0; i < screenScaleCount; i++) {
