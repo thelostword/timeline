@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-18 08:59:52
+ * @LastEditTime: 2022-05-18 12:40:25
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -42,6 +42,8 @@ type TimeLineOptionState = {
   pointWidth?: number;
   fps?: number;
   zoom?: number;
+  maxZoom: number,
+  minZoom: number,
 }
 
 import Event from 'znu-event'
@@ -63,7 +65,9 @@ const defaultOptions = {
   pointWidth: 3,
   scaleSpacing: 7,
   fps: 60,
-  zoom: 2
+  zoom: 2,
+  maxZoom: 9,
+  minZoom: 1,
 }
 
 class TimeLine {
@@ -108,11 +112,20 @@ class TimeLine {
     this.canvasContext = this.$canvas.getContext('2d') as CanvasRenderingContext2D;
 
     // 获取配置项
-    const { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, fps, zoom } = { ...defaultOptions, ...options };
+    const { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, fps, zoom, maxZoom, minZoom } = { ...defaultOptions, ...options };
 
     // 检查zoom参数是否合法
     if (zoom < 1 || zoom > 9 || zoom % 1 !== 0) {
       throw new Error('zoom must be 1 ~ 9, and must be an integer');
+    }
+    if (maxZoom < 1 || maxZoom > 9 || maxZoom % 1 !== 0) {
+      throw new Error('maxZoom must be 1 ~ 9, and must be an integer');
+    }
+    if (minZoom < 1 || minZoom > 9 || minZoom % 1 !== 0) {
+      throw new Error('minZoom must be 1 ~ 9, and must be an integer');
+    }
+    if (maxZoom < minZoom) {
+      throw new Error('maxZoom must be greater than minZoom');
     }
     
     // 判断使用父元素宽高
@@ -135,11 +148,15 @@ class TimeLine {
     this.#event = new Event();
 
     this.currentTime = 0;
-
-    this.#timeSpacingMap = [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
+    
+    const timeSpacingMap = [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
+    this.#timeSpacingMap = [];
+    for (let i = minZoom - 1; i < maxZoom; i++) {
+      this.#timeSpacingMap.push(timeSpacingMap[i]);
+    }
     // this.#timeSpacing = 60; // 时间间距
     this.#timeSpacing = this.#timeSpacingMap[zoom - 1];
-    this.scaleSpacing = scaleSpacing; // 默认刻度间距5px
+    this.scaleSpacing = scaleSpacing; // 默认刻度间距7px
     
 
     // 刻度高度

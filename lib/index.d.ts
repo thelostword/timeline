@@ -22,6 +22,8 @@ declare type TimeLineOptionState = {
     pointWidth?: number;
     fps?: number;
     zoom?: number;
+    maxZoom: number;
+    minZoom: number;
 };
 declare class TimeLine {
     #private;
