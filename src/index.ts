@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-18 14:15:38
+ * @LastEditTime: 2022-05-18 19:01:59
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -336,76 +336,49 @@ class TimeLine {
   // 绘制比例尺
   private drawTimelineScale(timespacing) {
     // [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
+    let text = '';
     switch (timespacing) {
       case 1:
-        this.drawText(25, 12, `1s`);
+        text = '1s';
         break;
       case 10:
+        text = '10s';
         this.drawText(25, 12, `10s`);
         break;
       case 30:
-        this.drawText(25, 12, `30s`);
+        text = '30s';
         break;
       case 60:
-        this.drawText(25, 12, `1min`);
+        text = '1min';
         break;
       case 120:
-        this.drawText(25, 12, `2min`);
+        text = '2min';
         break;
       case 300:
-        this.drawText(25, 12, `5min`);
+        text = '5min';
         break;
       case 7200:
-        this.drawText(25, 12, `1hour`);
+        text = '2hour';
         break;
       case 86400:
-        this.drawText(25, 12, `1day`);
+        text = '1day';
         break;
       case 604800:
-        this.drawText(25, 12, `1week`);
+        text = '1week';
         break;
       default:
         break;
     }
+    this.drawText(this.scaleSpacing + 12, 12, `${text}`);
 
-    this.drawLine(0, 0)
     this.canvasContext.beginPath();
     this.canvasContext.moveTo(5, 5);
     this.canvasContext.lineTo(5, 10);
-    this.canvasContext.stroke();
+    this.canvasContext.lineTo(this.scaleSpacing + 7, 10);
+    this.canvasContext.lineTo(this.scaleSpacing + 7, 5);
     this.canvasContext.strokeStyle = this.scaleColor;
-    this.canvasContext.lineWidth = 1;
+    this.canvasContext.lineWidth = 2;
     this.canvasContext.stroke();
-    this.canvasContext.closePath();
-
-    this.canvasContext.beginPath();
-    this.canvasContext.moveTo(4, 10);
-    this.canvasContext.lineTo(20, 10);
-    this.canvasContext.stroke();
-    this.canvasContext.strokeStyle = this.scaleColor;
-    this.canvasContext.lineWidth = 1;
-    this.canvasContext.stroke();
-    this.canvasContext.closePath()
-
-    this.canvasContext.beginPath();
-    this.canvasContext.moveTo(20, 11);
-    this.canvasContext.lineTo(20, 5);
-    this.canvasContext.stroke();
-    this.canvasContext.strokeStyle = this.scaleColor;
-    this.canvasContext.lineWidth = 1;
-    this.canvasContext.stroke();
-    this.canvasContext.closePath()
-
-    // this.canvasContext.beginPath();
-    // this.canvasContext.moveTo(5, 5);
-    // this.canvasContext.lineTo(5, 10);
-    // this.canvasContext.lineTo(20, 10);
-    // this.canvasContext.lineTo(20, 5);
-    // this.canvasContext.stroke();
-    // this.canvasContext.strokeStyle = this.scaleColor;
-    // this.canvasContext.lineWidth = 1;
-    // this.canvasContext.stroke();
-    // this.canvasContext.closePath();
   }
 
   // 绘制线条
@@ -413,11 +386,9 @@ class TimeLine {
     this.canvasContext.beginPath();
     this.canvasContext.moveTo(x, this.$canvas.height);
     this.canvasContext.lineTo(x, this.$canvas.height - y);
-    this.canvasContext.stroke();
     this.canvasContext.strokeStyle = color;
     this.canvasContext.lineWidth = width;
     this.canvasContext.stroke();
-    this.canvasContext.closePath();
   }
 
   // 绘制文字
