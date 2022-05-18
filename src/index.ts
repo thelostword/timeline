@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-18 12:40:25
+ * @LastEditTime: 2022-05-18 14:15:38
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -245,9 +245,8 @@ class TimeLine {
 
     // 绘制当前时间指针
     this.drawLine(xCenterPoint - this.pointWidth / 2, this.$canvas.height, this.pointWidth, this.pointColor);
-    this.drawArea(xCenterPoint - 52, 5, xCenterPoint + 52, 25, this.pointColor);
-    this.drawText(xCenterPoint - 50, 20, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`);
-
+    this.drawArea(xCenterPoint - 52, 3, xCenterPoint + 52, 18, this.pointColor);
+    this.drawText(xCenterPoint - 50, 15, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`);
 
     // 鼠标滚轮事件
     this.$canvas.onwheel = this._onZoom.bind(this);

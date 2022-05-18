@@ -1,7 +1,7 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-05-17 19:16:16
+ * @LastEditTime: 2022-05-18 14:26:46
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\README.md
@@ -33,11 +33,11 @@ timeline.draw({
   areas: [{
     startTime: 1651827433,
     endTime: 1651829413,
-    bgColor: '#00AEEC55'
+    // bgColor: '#00AEEC55'
   },{
     startTime: 1651829533,
     endTime: 1651832533,
-    bgColor: '#00AEEC55'
+    // bgColor: '#00AEEC55'
   }],
 });
 
@@ -50,7 +50,7 @@ timeline.on('timeUpdate', (time) => {
 | 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | width | number | 无 | canvas宽度 |
-| width | number | 无 | canvas高度 |
+| height | number | 无 | canvas高度 |
 | fill | boolean | false | 是否适应父容器宽高,若为false则需要手动设定canvas宽高 |
 | bgColor | string | rgba(0,0,0,0.5) | canvas背景色 |
 | textColor | string | #ffffff | 文字颜色 |
@@ -59,8 +59,10 @@ timeline.on('timeUpdate', (time) => {
 | areaBgColor | string | #ffffff55 | 阴影区域背景颜色 |
 | pointColor | string | #00aeec | 当前时间指针颜色 |
 | pointWidth | number | 3 | 当前时间指针宽度 |
-| fps | number | 60 | 绘制帧率。数字越大越流畅，建议不要大于90 |
+| fps | number | 60 | 绘制帧率。数字越大越流畅 |
 | zoom | number | 2 | 缩放比，1~9之间的正整数 |
+| maxZoom | number | 9 | 最大缩放限制，1~9之间的正整数 |
+| minZoom | number | 1 | 最小缩放限制，1~9之间的正整数 |
 
 
 ### 事件
