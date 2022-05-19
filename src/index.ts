@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-18 19:01:59
+ * @LastEditTime: 2022-05-19 18:18:30
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -245,8 +245,8 @@ class TimeLine {
 
     // 绘制当前时间指针
     this.drawLine(xCenterPoint - this.pointWidth / 2, this.$canvas.height, this.pointWidth, this.pointColor);
-    this.drawArea(xCenterPoint - 52, 3, xCenterPoint + 52, 18, this.pointColor);
-    this.drawText(xCenterPoint - 50, 15, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`);
+    this.drawArea(xCenterPoint - 54, 4, xCenterPoint + 54, 18, this.pointColor);
+    this.drawText(xCenterPoint, 6, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`, this.textColor, 'center', 'top');
 
     // 鼠标滚轮事件
     this.$canvas.onwheel = this._onZoom.bind(this);
@@ -343,7 +343,6 @@ class TimeLine {
         break;
       case 10:
         text = '10s';
-        this.drawText(25, 12, `10s`);
         break;
       case 30:
         text = '30s';
@@ -369,15 +368,15 @@ class TimeLine {
       default:
         break;
     }
-    this.drawText(this.scaleSpacing + 12, 12, `${text}`);
+    this.drawText(this.scaleSpacing + 12, 9, `${text}`, this.textColor, 'left', 'middle');
 
     this.canvasContext.beginPath();
-    this.canvasContext.moveTo(5, 5);
+    this.canvasContext.moveTo(5, 6);
     this.canvasContext.lineTo(5, 10);
     this.canvasContext.lineTo(this.scaleSpacing + 7, 10);
-    this.canvasContext.lineTo(this.scaleSpacing + 7, 5);
+    this.canvasContext.lineTo(this.scaleSpacing + 7, 6);
     this.canvasContext.strokeStyle = this.scaleColor;
-    this.canvasContext.lineWidth = 2;
+    this.canvasContext.lineWidth = 1.5;
     this.canvasContext.stroke();
   }
 
@@ -386,18 +385,20 @@ class TimeLine {
     this.canvasContext.beginPath();
     this.canvasContext.moveTo(x, this.$canvas.height);
     this.canvasContext.lineTo(x, this.$canvas.height - y);
+    this.canvasContext.closePath();
     this.canvasContext.strokeStyle = color;
     this.canvasContext.lineWidth = width;
     this.canvasContext.stroke();
   }
 
   // 绘制文字
-  private drawText(x: number, y: number, text: string, color: string = this.textColor): void {
+  private drawText(x: number, y: number, text: string, color: string = this.textColor, align: CanvasTextAlign = 'center', baseLine: CanvasTextBaseline ='alphabetic'): void {
     this.canvasContext.beginPath();
+    this.canvasContext.font = '11px Arial';
     this.canvasContext.fillStyle = color;
-    this.canvasContext.font = '12px';
+    this.canvasContext.textAlign = align;
+    this.canvasContext.textBaseline = baseLine;
     this.canvasContext.fillText(text, x, y);
-    this.canvasContext.closePath();
   }
 
   // 绘制区域
@@ -406,7 +407,6 @@ class TimeLine {
     this.canvasContext.rect(startX, startY, endX - startX, endY - startY);
     this.canvasContext.fillStyle = bgColor;
     this.canvasContext.fill();
-    this.canvasContext.closePath();
   }
   
   on(name, listener) {

@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:04:32
- * @LastEditTime: 2022-05-11 12:29:03
+ * @LastEditTime: 2022-05-19 16:38:29
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\rollup.config.js
@@ -34,8 +34,8 @@ export default {
     }),
   ],
   output: [
-    { format: "cjs", file: "lib/timeline.cjs.js" },
-    { format: "esm", file: "lib/timeline.esm.js" },
+    // { format: "cjs", file: "lib/timeline.cjs.js" },
+    // { format: "esm", file: "lib/timeline.esm.js" },
     { format: "cjs", file: pkg.main, sourcemap: true, plugins: [terser()] },
     { format: "esm", file: pkg.module, sourcemap: true, plugins: [terser()] },
   ],
