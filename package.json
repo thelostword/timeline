@@ -1,6 +1,6 @@
 {
   "name": "@losting/timeline",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "canvas timeline",
   "main": "lib/timeline.cjs.min.js",
   "module": "lib/timeline.esm.min.js",
