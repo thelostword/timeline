@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-19 18:18:30
+ * @LastEditTime: 2022-08-25 22:12:40
  * @LastEditors: losting
  * @Description: 
  * @FilePath: \timeline\src\index.ts
@@ -154,8 +154,9 @@ class TimeLine {
     for (let i = minZoom - 1; i < maxZoom; i++) {
       this.#timeSpacingMap.push(timeSpacingMap[i]);
     }
+    
     // this.#timeSpacing = 60; // 时间间距
-    this.#timeSpacing = this.#timeSpacingMap[zoom - 1];
+    this.#timeSpacing = timeSpacingMap[zoom - 1];
     this.scaleSpacing = scaleSpacing; // 默认刻度间距7px
     
 
