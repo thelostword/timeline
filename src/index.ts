@@ -1,50 +1,18 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-05-19 18:18:30
- * @LastEditors: losting
+ * @LastEditTime: 2022-09-05 12:30:48
+ * @LastEditors: thelostword
  * @Description: 
  * @FilePath: \timeline\src\index.ts
  */
 
-type AreaItemState = {
-  startTime: number;
-  endTime: number;
-  bgColor?: string;
-}
-
-type DrawState = {
-  currentTime?: number;
-  zoom?: number;
-  areas?: AreaItemState[];
-  _privateFlag?: boolean;
-}
-
-type ScaleHeightState = {
-  height6: number;
-  height5: number;
-  height4: number;
-  height3: number;
-  height2: number;
-  height1: number;
-}
-
-type TimeLineOptionState = {
-  fill?: boolean;
-  width?: number;
-  height?: number;
-  bgColor?: string;
-  textColor?: string;
-  scaleColor?: string;
-  scaleSpacing?: number;
-  areaBgColor?: string;
-  pointColor?: string;
-  pointWidth?: number;
-  fps?: number;
-  zoom?: number;
-  maxZoom: number,
-  minZoom: number,
-}
+import {
+  AreaItemState,
+  DrawState,
+  ScaleHeightState,
+  TimeLineOptionState
+} from './index.d'
 
 import Event from 'znu-event'
 import throttle from 'lodash.throttle'
