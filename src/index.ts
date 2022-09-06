@@ -1,13 +1,8 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
-<<<<<<< HEAD
- * @LastEditTime: 2022-08-25 22:12:40
- * @LastEditors: losting
-=======
- * @LastEditTime: 2022-09-06 11:49:47
+ * @LastEditTime: 2022-09-06 12:06:45
  * @LastEditors: thelostword
->>>>>>> rec
  * @Description: 
  * @FilePath: \timeline\src\index.ts
  */
@@ -17,11 +12,10 @@ import type {
   DrawArgs,
   ScaleHeight,
   TimeLineOption
-} from './types'
+} from './types';
 
-// import Event from 'znu-event'
 import mitt from 'mitt';
-import throttle from 'lodash.throttle'
+import throttle from 'lodash.throttle';
 import { dateTime } from '@/utils/time';
 import { drawHelper } from './draw-helper';
 
@@ -88,7 +82,7 @@ class TimeLine {
 
     // 检查zoom参数是否合法
     if (zoom < minZoom || zoom > maxZoom || zoom % 1 !== 0) {
-      throw new Error(`zoom must be minZoom ~ maxZoom(${minZoom} ~ ${maxZoom}), and must be an integer`);
+      throw new Error(`zoom must be minZoom ~ maxZoom(${minZoom} ~1 ${maxZoom}), and must be an integer`);
     }
     if (maxZoom < 1 || maxZoom > 9 || maxZoom % 1 !== 0) {
       throw new Error('maxZoom must be 1 ~ 9, and must be an integer');
