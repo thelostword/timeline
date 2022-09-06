@@ -1,7 +1,7 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:04:32
- * @LastEditTime: 2022-09-05 12:01:41
+ * @LastEditTime: 2022-09-06 11:41:11
  * @LastEditors: thelostword
  * @Description: 
  * @FilePath: \timeline\rollup.config.js
@@ -19,10 +19,10 @@ export default [
   {
     input: "./src/index.ts",
     output: [
-      { format: "cjs", file: pkg.main, },
-      { format: "esm", file: pkg.module, },
-      // { format: "cjs", file: pkg.main, sourcemap: true, plugins: [terser()] },
-      // { format: "esm", file: pkg.module, sourcemap: true, plugins: [terser()] },
+      // { format: "cjs", file: pkg.main, },
+      // { format: "esm", file: pkg.module, },
+      { format: "cjs", file: pkg.main, sourcemap: true, plugins: [terser()] },
+      { format: "esm", file: pkg.module, sourcemap: true, plugins: [terser()] },
     ],
     plugins: [
       resolve(),
@@ -32,7 +32,7 @@ export default [
     ],
   },
   {
-    input: "./src/index.d.ts",
+    input: "./src/types/index.ts",
     output: [{ file: "lib/timeline.d.ts", format: "es" }],
     plugins: [dts()],
   },
