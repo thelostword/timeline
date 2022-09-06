@@ -11,8 +11,6 @@
     "sourceMap": true,
     "downlevelIteration": true,
     "outDir": "lib",
-    "declarationDir": ".",
-    "declaration": true,
     "lib": ["es6", "DOM"],
     "baseUrl": ".",
     "paths": {

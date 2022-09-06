@@ -1,56 +1,28 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
+<<<<<<< HEAD
  * @LastEditTime: 2022-08-25 22:12:40
  * @LastEditors: losting
+=======
+ * @LastEditTime: 2022-09-06 11:49:47
+ * @LastEditors: thelostword
+>>>>>>> rec
  * @Description: 
  * @FilePath: \timeline\src\index.ts
  */
 
-type AreaItemState = {
-  startTime: number;
-  endTime: number;
-  bgColor?: string;
-}
+import type {
+  Area,
+  DrawArgs,
+  ScaleHeight,
+  TimeLineOption
+} from './types'
 
-type DrawState = {
-  currentTime?: number;
-  zoom?: number;
-  areas?: AreaItemState[];
-  _privateFlag?: boolean;
-}
-
-type ScaleHeightState = {
-  height6: number;
-  height5: number;
-  height4: number;
-  height3: number;
-  height2: number;
-  height1: number;
-}
-
-type TimeLineOptionState = {
-  fill?: boolean;
-  width?: number;
-  height?: number;
-  bgColor?: string;
-  textColor?: string;
-  scaleColor?: string;
-  scaleSpacing?: number;
-  areaBgColor?: string;
-  pointColor?: string;
-  pointWidth?: number;
-  fps?: number;
-  zoom?: number;
-  maxZoom: number,
-  minZoom: number,
-}
-
-import Event from 'znu-event'
+// import Event from 'znu-event'
+import mitt from 'mitt';
 import throttle from 'lodash.throttle'
 import { dateTime } from '@/utils/time';
-
-
 import { drawHelper } from './draw-helper';
 
 
@@ -74,10 +46,10 @@ class TimeLine {
   $canvas: HTMLCanvasElement; // canvas 元素
   canvasContext: CanvasRenderingContext2D; // canvas context,
 
-  #event: any;
+  #emitter: any;
 
   private currentTime: number; // 当前时间
-  private areas?: AreaItemState[]; // 阴影区域
+  private areas?: Area; // 阴影区域
 
   #timeSpacingMap: number[]; // 5 10 30 60 120 300 取值范围
   #timeSpacing: number; // 5 10 30 60 120 300 取值范围
@@ -86,7 +58,7 @@ class TimeLine {
   bgColor: string;
 
   // 刻度高度
-  #scaleHeight: ScaleHeightState;
+  #scaleHeight: ScaleHeight;
   // 当前时间指针宽度
   pointWidth: number;
   // 当前指针颜色
@@ -104,7 +76,7 @@ class TimeLine {
   // fps
   fps: number;
 
-  constructor(id: string, options: TimeLineOptionState) {
+  constructor(id: string, options: TimeLineOption) {
     if (!id) {
       throw new Error('canvas id is required!');
     }
@@ -115,8 +87,8 @@ class TimeLine {
     const { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, fps, zoom, maxZoom, minZoom } = { ...defaultOptions, ...options };
 
     // 检查zoom参数是否合法
-    if (zoom < 1 || zoom > 9 || zoom % 1 !== 0) {
-      throw new Error('zoom must be 1 ~ 9, and must be an integer');
+    if (zoom < minZoom || zoom > maxZoom || zoom % 1 !== 0) {
+      throw new Error(`zoom must be minZoom ~ maxZoom(${minZoom} ~ ${maxZoom}), and must be an integer`);
     }
     if (maxZoom < 1 || maxZoom > 9 || maxZoom % 1 !== 0) {
       throw new Error('maxZoom must be 1 ~ 9, and must be an integer');
@@ -145,7 +117,7 @@ class TimeLine {
     }
 
     this.#isDraging = false;
-    this.#event = new Event();
+    this.#emitter = mitt();
 
     this.currentTime = 0;
     
@@ -187,7 +159,7 @@ class TimeLine {
   }
 
   // 绘制时间轴
-  draw({currentTime = 0, areas, _privateFlag}: DrawState = {}): void {
+  draw ({currentTime, areas, _privateFlag}: DrawArgs = {}): void {
     // console.time('draw');
     // 拖拽中禁止外部调用,防止冲突
     if (this.#isDraging && !_privateFlag) {
@@ -411,15 +383,15 @@ class TimeLine {
   }
   
   on(name, listener) {
-		this.#event.on(name, listener);
+		this.#emitter.on(name, listener);
 	}
 
   off(name, listener) {
-		this.#event.off(name, listener);
+		this.#emitter.off(name, listener);
 	}
 
 	private emit(...args) {
-		this.#event.emit(...args);
+		this.#emitter.emit(...args);
 	}
 }
 
