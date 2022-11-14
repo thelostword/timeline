@@ -1,7 +1,0 @@
-/node_modules
-/example
-/src
-/test
-jest.config.js
-rollup.config.js
-tsconfig.json

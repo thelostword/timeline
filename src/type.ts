@@ -1,9 +1,9 @@
 /*
  * @Author: thelostword
- * @Date: 2022-09-06 10:43:38
+ * @Date: 2022-11-14 17:18:59
  * @LastEditors: thelostword
- * @LastEditTime: 2022-09-06 11:34:35
- * @FilePath: \timeline\src\types\index.ts
+ * @LastEditTime: 2022-11-14 17:28:13
+ * @FilePath: \timeline\src\type.ts
  */
 export type AreaItem = {
   startTime: number;
@@ -11,7 +11,6 @@ export type AreaItem = {
   bgColor?: string;
 }
 export type Area = AreaItem[];
-
 
 export type DrawArgs = {
   currentTime?: number;
@@ -44,6 +43,19 @@ export type TimeLineOption = {
   pointWidth?: number;
   fps?: number;
   zoom?: number;
-  maxZoom?: number,
-  minZoom?: number,
+  maxZoom?: number;
+  minZoom?: number;
 }
+
+export type DrawHelperOption = {
+  pointWidth: number;
+  timePerPixel: number;
+  scaleHeight: ScaleHeight;
+  scaleSpacing: number;
+  timeSpacing: number;
+  screenScaleCount: number;
+  startTime: number;
+  drawLine: Function;
+  drawText: Function;
+}
+export type DrawHelper = (option: DrawHelperOption) => void;

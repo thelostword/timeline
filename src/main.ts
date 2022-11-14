@@ -1,10 +1,10 @@
 /*
  * @Author: losting
  * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-09-06 12:06:45
+ * @LastEditTime: 2022-11-14 17:19:27
  * @LastEditors: thelostword
  * @Description: 
- * @FilePath: \timeline\src\index.ts
+ * @FilePath: \timeline\src\main.ts
  */
 
 import type {
@@ -12,11 +12,10 @@ import type {
   DrawArgs,
   ScaleHeight,
   TimeLineOption
-} from './types';
-
+} from './type';
 import mitt from 'mitt';
 import throttle from 'lodash.throttle';
-import { dateTime } from '@/utils/time';
+import { dateTime } from './utils/time';
 import { drawHelper } from './draw-helper';
 
 
@@ -223,7 +222,7 @@ class TimeLine {
   }
   
   // 拖拽
-  private _onDrag({clientX}) {
+  private _onDrag({ clientX }: MouseEvent) {
     this.#isDraging = true;
     let prexOffset = 0;
     document.onmousemove = throttle((moveEvent) => {
@@ -247,7 +246,7 @@ class TimeLine {
     };
   }
   // 缩放
-  private _onZoom(e) {
+  private _onZoom(e: WheelEvent) {
     e.preventDefault();
     const currentIndex = this.#timeSpacingMap.findIndex(item => item === this.#timeSpacing);
     if (e.deltaY < 0 && currentIndex > 0) {
@@ -301,7 +300,7 @@ class TimeLine {
     }
   }
   // 绘制比例尺
-  private drawTimelineScale(timespacing) {
+  private drawTimelineScale(timespacing: number) {
     // [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
     let text = '';
     switch (timespacing) {
@@ -376,15 +375,15 @@ class TimeLine {
     this.canvasContext.fill();
   }
   
-  on(name, listener) {
+  on(name: 'timeUpdate', listener: Function) {
 		this.#emitter.on(name, listener);
 	}
 
-  off(name, listener) {
+  off(name: 'timeUpdate', listener: Function) {
 		this.#emitter.off(name, listener);
 	}
 
-	private emit(...args) {
+	private emit(...args: unknown[]) {
 		this.#emitter.emit(...args);
 	}
 }

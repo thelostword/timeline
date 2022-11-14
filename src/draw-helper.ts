@@ -1,12 +1,13 @@
 /*
  * @Author: losting
  * @Date: 2022-05-10 11:30:36
- * @LastEditTime: 2022-05-19 18:19:51
- * @LastEditors: losting
+ * @LastEditTime: 2022-11-14 17:26:11
+ * @LastEditors: thelostword
  * @Description: 
  * @FilePath: \timeline\src\draw-helper.ts
  */
-import { dateTime, getWeekStartDate } from '@/utils/time';
+import type { DrawHelperOption } from './type'
+import { dateTime, getWeekStartDate } from './utils/time';
 import dayjs from 'dayjs';
 
 export function drawHelper({
@@ -19,7 +20,7 @@ export function drawHelper({
   startTime,
   drawLine,
   drawText,
-}) {
+}: DrawHelperOption) {
   // 密度为1s时
   if (timeSpacing === 1) {
     for(let i = 0; i < screenScaleCount; i++) {
