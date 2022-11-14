@@ -10,7 +10,6 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest",
     "release": "release-it",
     "prepublishOnly": "pnpm run build"
   },
