@@ -2,7 +2,7 @@
  * @Author: thelostword
  * @Date: 2022-11-14 17:00:52
  * @LastEditors: thelostword
- * @LastEditTime: 2022-11-14 17:00:56
+ * @LastEditTime: 2022-11-15 11:25:58
  * @FilePath: \timeline\types\timeline.d.ts
  */
 declare type AreaItem = {
@@ -10,22 +10,13 @@ declare type AreaItem = {
     endTime: number;
     bgColor?: string;
 };
-declare type Area = AreaItem[];
+
 declare type DrawArgs = {
     currentTime?: number;
     zoom?: number;
-    areas?: Area;
-    _privateFlag?: boolean;
+    areas?: AreaItem[];
 };
-declare type Draw = (args: DrawArgs) => void;
-declare type ScaleHeight = {
-    height6: number;
-    height5: number;
-    height4: number;
-    height3: number;
-    height2: number;
-    height1: number;
-};
+
 declare type TimeLineOption = {
     fill?: boolean;
     width?: number;
@@ -43,4 +34,12 @@ declare type TimeLineOption = {
     minZoom?: number;
 };
 
-export { Area, AreaItem, Draw, DrawArgs, ScaleHeight, TimeLineOption };
+declare type CallFunction = (params:number) => void;
+
+declare class Timeline {
+  constructor(id: string, option?: TimeLineOption);
+  draw(option: DrawArgs ): void;
+  on(type: 'timeUpdate', call: CallFunction): void;
+}
+
+export = Timeline;
