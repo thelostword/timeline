@@ -1,12 +1,12 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2023-02-21 09:55:39
+ * @LastEditTime: 2023-02-21 10:27:02
  * @LastEditors: thelostword
  * @Description: 
  * @FilePath: \timeline\README.md
 -->
-[中文](./README.md) | [English](./README_EN.md)
+中文 | [English](./README_EN.md)
 # timeline
 Canvas 时间轴，支持缩放、拖拽、无限滚动
 ![预览图](./example/demo.png)

@@ -1,12 +1,12 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2023-02-21 09:56:22
+ * @LastEditTime: 2023-02-21 10:27:16
  * @LastEditors: thelostword
  * @Description: 
  * @FilePath: \timeline\README_EN.md
 -->
-[中文](./README.md) | [English](./README_EN.md)
+[中文](./README.md) | English
 # timeline
 Canvas timeline, supports zooming, dragging, and infinite scrolling.
 ![preview](./example/demo.png)
