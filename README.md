@@ -1,14 +1,15 @@
 <!--
  * @Author: losting
  * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2022-11-14 17:51:32
+ * @LastEditTime: 2023-02-21 09:55:39
  * @LastEditors: thelostword
  * @Description: 
  * @FilePath: \timeline\README.md
 -->
+[中文](./README.md) | [English](./README_EN.md)
 # timeline
-canvas 时间轴，支持缩放、拖拽、无限滚动
-![preview](./example/demo.png)
+Canvas 时间轴，支持缩放、拖拽、无限滚动
+![预览图](./example/demo.png)
 
 ### 使用 es module
 ``` shell
@@ -85,9 +86,9 @@ timeline.on('timeUpdate', (time) => {
 | pointColor | string | #00aeec | 当前时间指针颜色 |
 | pointWidth | number | 3 | 当前时间指针宽度 |
 | fps | number | 60 | 帧数 |
-| zoom | number | 2 | 初始缩放值，`minZoom` ~ `maxZoom` 之间(包含)的正整数 |
-| maxZoom | number | 9 | 最大缩放限制，1~9之间的正整数 |
-| minZoom | number | 1 | 最小缩放限制，1~9之间的正整数 |
+| zoom | integer | 2 | 初始缩放值，`minZoom` ~ `maxZoom` 之间(包含)的正整数 |
+| maxZoom | integer | 9 | 最大缩放限制，1~9之间的整数 |
+| minZoom | integer | 1 | 最小缩放限制，1~9之间的整数 |
 
 
 ### 事件
