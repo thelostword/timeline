@@ -11,7 +11,7 @@
 Canvas 时间轴，支持缩放、拖拽、无限滚动
 ![预览图](./example/demo.png)
 
-### 使用 es module
+### es module
 ``` shell
 npm install @losting/timeline
 ```
@@ -89,7 +89,7 @@ timeline.on('timeUpdate', (time) => {
 | zoom | integer | 2 | 初始缩放值，`minZoom` ~ `maxZoom` 之间(包含)的正整数 |
 | maxZoom | integer | 9 | 最大缩放限制，1~9之间的整数 |
 | minZoom | integer | 1 | 最小缩放限制，1~9之间的整数 |
-
+| timeFormat | string | YYYY/MM/DD HH:mm:ss | 时间格式 |
 
 ### 事件
 

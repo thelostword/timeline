@@ -11,7 +11,7 @@
 Canvas timeline, supports zooming, dragging, and infinite scrolling.
 ![preview](./example/demo.png)
 
-### Using ES Module
+### ES Module
 ``` shell
 npm install @losting/timeline
 ```
@@ -89,6 +89,7 @@ timeline.on('timeUpdate', (time) => {
 | zoom | integer | 2 | The initial zoom value, a integer between minZoom and maxZoom (inclusive) |
 | maxZoom | integer | 9 | The maximum zoom limit, a integer between 1 and 9 |
 | minZoom | integer | 1 | The minimum zoom limit, a integer between 1 and 9 |
+| timeFormat | string | YYYY/MM/DD HH:mm:ss | date-time format |
 
 
 ### Events

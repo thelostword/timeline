@@ -45,6 +45,7 @@ export type TimeLineOption = {
   zoom?: number;
   maxZoom?: number;
   minZoom?: number;
+  timeFormat?: string;
 }
 
 export type DrawHelperOption = {

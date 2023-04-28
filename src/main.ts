@@ -33,6 +33,7 @@ const defaultOptions = {
   zoom: 2,
   maxZoom: 9,
   minZoom: 1,
+  timeFormat: 'YYYY/MM/DD HH:mm:ss',
 }
 
 class TimeLine {
@@ -62,12 +63,12 @@ class TimeLine {
   scaleColor: string;
   // 阴影区颜色
   areaBgColor: string;
-
   // 是否在拖拽中
   #isDraging: boolean;
-
   // fps
   fps: number;
+  // timeFormat
+  timeFormat: string;
 
   constructor(id: string, options: TimeLineOption) {
     if (!id) {
@@ -77,7 +78,7 @@ class TimeLine {
     this.canvasContext = this.$canvas.getContext('2d') as CanvasRenderingContext2D;
 
     // 获取配置项
-    const { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, fps, zoom, maxZoom, minZoom } = { ...defaultOptions, ...options };
+    const { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, fps, zoom, maxZoom, minZoom, timeFormat } = { ...defaultOptions, ...options };
 
     // 检查zoom参数是否合法
     if (zoom < minZoom || zoom > maxZoom || zoom % 1 !== 0) {
@@ -149,6 +150,8 @@ class TimeLine {
     this.areaBgColor = areaBgColor;
     // fps
     this.fps = fps;
+    // timeFormat
+    this.timeFormat = timeFormat;
   }
 
   // 绘制时间轴
@@ -212,7 +215,7 @@ class TimeLine {
     // 绘制当前时间指针
     this.drawLine(xCenterPoint - this.pointWidth / 2, this.$canvas.height, this.pointWidth, this.pointColor);
     this.drawArea(xCenterPoint - 54, 4, xCenterPoint + 54, 18, this.pointColor);
-    this.drawText(xCenterPoint, 6, `${dateTime(this.currentTime, 'YYYY/MM/DD HH:mm:ss')}`, this.textColor, 'center', 'top');
+    this.drawText(xCenterPoint, 6, `${dateTime(this.currentTime, this.timeFormat)}`, this.textColor, 'center', 'top');
 
     // 鼠标滚轮事件
     this.$canvas.onwheel = this._onZoom.bind(this);

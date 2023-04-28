@@ -40,11 +40,11 @@
   "homepage": "https://github.com/thelostword/timeline#readme",
   "devDependencies": {
     "@types/lodash.throttle": "^4.1.7",
-    "dayjs": "^1.11.6",
+    "dayjs": "^1.11.7",
     "lodash.throttle": "^4.1.1",
     "mitt": "^3.0.0",
-    "release-it": "^15.5.0",
-    "typescript": "^4.8.4",
-    "vite": "^3.2.3"
+    "release-it": "^15.10.1",
+    "typescript": "^4.9.5",
+    "vite": "^3.2.6"
   }
 }

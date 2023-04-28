@@ -20,6 +20,7 @@ const timeline = new MoeTimeline('timeline', {
   maxZoom: 7,
   minZoom: 2,
   zoom: 2,
+  // timeFormat: 'YYYY/MM/DD HH:mm:ss'
 });
 
 timeline.draw({
