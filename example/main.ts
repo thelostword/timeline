@@ -1,49 +1,38 @@
-/*
- * @Author: thelostword
- * @Date: 2022-11-14 16:54:04
- * @LastEditors: thelostword
- * @LastEditTime: 2022-11-14 16:56:25
- * @FilePath: \timeline\example\main.ts
- */
-import MoeTimeline from '../src/main';
+import Timeline from '../src/main';
 
-const timeline = new MoeTimeline('timeline', {
+const timeline = new Timeline('#timeline', {
   fill: false,
   width: 1000,
   height: 60,
-  // bgColor: 'rgba(0,0,0,0.5)',
-  // textColor: '#000',
-  // pointColor: '#000',
-  // centerTimePointColor: '#000',
-  // centerTimePointWidth: 5,
   scaleSpacing: 7,
-  maxZoom: 7,
-  minZoom: 2,
   zoom: 2,
-  // timeFormat: 'YYYY/MM/DD HH:mm:ss'
+  timeSpacingList: [10, 50, 100, 500, 1000],
+  scaleHeight: {
+    long: 15,
+    short: 5
+  }
 });
 
 timeline.draw({
-  currentTime: 1651827817,
+  currentTime: 1651827817000,
   areas: [{
-    startTime: 1651827433,
-    endTime: 1651829413,
+    startTime: 1651827433000,
+    endTime: 1651829413000,
     // bgColor: '#00AEEC'
   },{
-    startTime: 1651829533,
-    endTime: 1651832533,
+    startTime: 1651829533000,
+    endTime: 1651832533000,
     // bgColor: '#00AEEC'
   }],
 });
 
 // setInterval(() => {
 //   timeline.draw()
-// }, 1000);
+// }, 50);
 
-timeline.on('timeUpdate', (e: number) => {
-  console.log(e, 'currentTime change');
-  const _date = new Date(e * 1000)
-  console.log(_date)
+timeline.on('dragend', (e) => {
+  const timestamp = new Date(e as number);
+  console.log(timestamp);
 })
 
 console.log(timeline);

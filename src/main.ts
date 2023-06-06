@@ -1,392 +1,320 @@
-/*
- * @Author: losting
- * @Date: 2022-04-01 16:05:12
- * @LastEditTime: 2022-11-14 17:19:27
- * @LastEditors: thelostword
- * @Description: 
- * @FilePath: \timeline\src\main.ts
- */
-
 import type {
-  Area,
-  DrawArgs,
-  ScaleHeight,
-  TimeLineOption
+  AreaType,
+  DrawType,
+  ScaleHeightType,
+  ConfigMap,
+  InstanceConfigMap,
+  DrawTextType,
+  DrawAreaType,
+  DrawLineType,
 } from './type';
+import type { EventType, Handler } from 'mitt';
 import mitt from 'mitt';
-import throttle from 'lodash.throttle';
-import { dateTime } from './utils/time';
-import { drawHelper } from './draw-helper';
+import { throttle, drawScale } from './utils';
+import { defaultConfig } from './config';
 
-
-// 默认配置
-const defaultOptions = {
-  fill:false,
-  bgColor: 'rgba(0,0,0,0.5)',
-  textColor: '#ffffff',
-  scaleColor: '#ffffff',
-  areaBgColor: '#ffffff55',
-  pointColor: '#00aeec',
-  pointWidth: 3,
-  scaleSpacing: 7,
-  fps: 60,
-  zoom: 2,
-  maxZoom: 9,
-  minZoom: 1,
-  timeFormat: 'YYYY/MM/DD HH:mm:ss',
-}
 
 class TimeLine {
   $canvas: HTMLCanvasElement; // canvas 元素
-  canvasContext: CanvasRenderingContext2D; // canvas context,
+  ctx: CanvasRenderingContext2D; // canvas context,
+  $canvasParent: HTMLElement | undefined;
 
-  #emitter: any;
+  cfg: InstanceConfigMap;
+  #emitter = mitt();
 
-  private currentTime: number; // 当前时间
-  private areas?: Area; // 阴影区域
+  #currentTime = 0; // 当前时间
+  #areas?: AreaType; // 阴影区域
 
-  #timeSpacingMap: number[]; // 5 10 30 60 120 300 取值范围
-  #timeSpacing: number; // 5 10 30 60 120 300 取值范围
-  scaleSpacing: number; // 刻度间距
-
-  bgColor: string;
+  #timeSpacing: number;
 
   // 刻度高度
-  #scaleHeight: ScaleHeight;
-  // 当前时间指针宽度
-  pointWidth: number;
-  // 当前指针颜色
-  pointColor: string;
-  // 文字颜色
-  textColor: string;
-  // 刻度颜色
-  scaleColor: string;
-  // 阴影区颜色
-  areaBgColor: string;
+  #scaleHeight: ScaleHeightType;
   // 是否在拖拽中
-  #isDraging: boolean;
-  // fps
-  fps: number;
-  // timeFormat
-  timeFormat: string;
+  #isDragging = false;
 
-  constructor(id: string, options: TimeLineOption) {
-    if (!id) {
-      throw new Error('canvas id is required!');
-    }
-    this.$canvas = document.getElementById(id) as HTMLCanvasElement;
-    this.canvasContext = this.$canvas.getContext('2d') as CanvasRenderingContext2D;
+  constructor(el: string, cfg?: ConfigMap) {
+    // ----------- 检查el参数 -----------
+    if (!el) throw new Error('canvas Element Or Element ID is required!');
+    if (typeof el === 'string') this.$canvas = document.querySelector(el) as HTMLCanvasElement;
+    else this.$canvas = el;
+    if (!(this.$canvas instanceof HTMLCanvasElement)) throw new Error('element must be canvas!');
+    this.ctx = this.$canvas.getContext('2d')!;
 
     // 获取配置项
-    const { fill, width, height, bgColor, textColor, scaleColor, areaBgColor, pointColor, pointWidth, scaleSpacing, fps, zoom, maxZoom, minZoom, timeFormat } = { ...defaultOptions, ...options };
+    this.cfg = { ...defaultConfig, ...cfg };
+    const { fill, width, height, zoom, timeSpacingList, scaleHeight } = this.cfg;
 
     // 检查zoom参数是否合法
-    if (zoom < minZoom || zoom > maxZoom || zoom % 1 !== 0) {
-      throw new Error(`zoom must be minZoom ~ maxZoom(${minZoom} ~1 ${maxZoom}), and must be an integer`);
-    }
-    if (maxZoom < 1 || maxZoom > 9 || maxZoom % 1 !== 0) {
-      throw new Error('maxZoom must be 1 ~ 9, and must be an integer');
-    }
-    if (minZoom < 1 || minZoom > 9 || minZoom % 1 !== 0) {
-      throw new Error('minZoom must be 1 ~ 9, and must be an integer');
-    }
-    if (maxZoom < minZoom) {
-      throw new Error('maxZoom must be greater than minZoom');
+    if (zoom < 0 || zoom >= timeSpacingList.length || zoom % 1 !== 0) {
+      throw new Error(`zoom must be 0 ~ ${timeSpacingList.length - 1}, and must be an integer`);
     }
     
-    // 判断使用父元素宽高
+    // 是否填充到父元素
     if (fill) {
       // 获取父元素
       const $canvasParent = this.$canvas.parentElement as HTMLElement;
+      this.$canvasParent = $canvasParent;
       // 将canvas 宽高设为父元素宽高
       this.$canvas.width = $canvasParent.clientWidth;
       this.$canvas.height = $canvasParent.clientHeight;
       // resize observer
-      const parentResizeObserver = new ResizeObserver(throttle(this._onParentResize.bind(this), 200));
-      // 监听父元素resize
-      parentResizeObserver.observe($canvasParent);
+      const resizeObserver = new ResizeObserver(throttle(this.#onParentResize.bind(this), 200));
+      resizeObserver.observe($canvasParent);
     } else {
       if (width) this.$canvas.width = width;
       if (height) this.$canvas.height = height;
     }
-
-    this.#isDraging = false;
-    this.#emitter = mitt();
-
-    this.currentTime = 0;
     
-    const timeSpacingMap = [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
-    this.#timeSpacingMap = [];
-    for (let i = minZoom - 1; i < maxZoom; i++) {
-      this.#timeSpacingMap.push(timeSpacingMap[i]);
-    }
+    this.#timeSpacing = timeSpacingList[zoom];
     
-    // this.#timeSpacing = 60; // 时间间距
-    this.#timeSpacing = timeSpacingMap[zoom - 1];
-    this.scaleSpacing = scaleSpacing; // 默认刻度间距7px
-    
-
     // 刻度高度
-    this.#scaleHeight = {
-      height6: this.$canvas.height / 2, // 1/2高度
-      height5: this.$canvas.height / 3, // 1/3高度
-      height4: this.$canvas.height / 4, // 1/4高度
-      height3: this.$canvas.height / 5, // 1/5高度
-      height2: this.$canvas.height / 8, // 1/8高度
-      height1: this.$canvas.height / 10, // 1/10高度
+    if (scaleHeight?.long && scaleHeight?.short) {
+      this.#scaleHeight = scaleHeight;
+    } else {
+      this.#scaleHeight = {
+        long: this.$canvas.height / 3, // 1/3高度
+        medium: this.$canvas.height / 6, // 1/6高度
+        short: this.$canvas.height / 10, // 1/10高度
+      };
     }
-
-    // canvas 背景颜色
-    this.bgColor = bgColor;
-    // 当前时间指针宽度
-    this.pointWidth = pointWidth;
-    // 当前指针颜色
-    this.pointColor = pointColor;
-    // 文字颜色
-    this.textColor = textColor;
-    // 刻度颜色
-    this.scaleColor = scaleColor;
-    // 阴影区颜色
-    this.areaBgColor = areaBgColor;
-    // fps
-    this.fps = fps;
-    // timeFormat
-    this.timeFormat = timeFormat;
+    
+    // 鼠标滚轮滚动-缩放
+    this.$canvas.addEventListener('wheel', this.#onZoom.bind(this), { passive: false });
+    // 拖拽按下-拖拽
+    this.$canvas.addEventListener('mousedown', this.#onDrag.bind(this));
   }
 
   // 绘制时间轴
-  draw ({currentTime, areas, _privateFlag}: DrawArgs = {}): void {
+  draw ({currentTime, areas, _privateFlag}: DrawType = {}) {
     // console.time('draw');
     // 拖拽中禁止外部调用,防止冲突
-    if (this.#isDraging && !_privateFlag) {
-      return;
-    }
+    if (this.#isDragging && !_privateFlag) return;
     
     // 获取参数
-    this.currentTime = currentTime || Math.floor(Date.now() / 1000);
-    this.areas = areas || [];
+    this.#currentTime = currentTime || Date.now();
+    this.#areas = areas || [];
 
     // 当前屏可绘制刻度数量
-    const screenScaleCount = Math.ceil(this.$canvas.width / this.scaleSpacing);
-    // 当前屏显示秒数
-    const screenSecondCount = screenScaleCount * this.#timeSpacing;
+    const screenScaleCount = Math.ceil(this.$canvas.width / this.cfg.scaleSpacing);
+    // 当前屏显示毫秒数
+    const screenMillisecondCount = screenScaleCount * this.#timeSpacing;
 
     // 开始时间
-    const startTime = this.currentTime - screenSecondCount / 2;
+    const startTime = this.#currentTime - screenMillisecondCount / 2;
     // 结束时间
-    const endTime = this.currentTime + screenSecondCount / 2;
+    const endTime = this.#currentTime + screenMillisecondCount / 2;
 
     // canvas X轴中心点（当前时间指示刻度）
     const xCenterPoint = this.$canvas.width / 2;
 
-    // 每1px所占时间单位（秒）
-    const timePerPixel = screenSecondCount / this.$canvas.width;
+    // 每1px所占时间单位（毫秒）
+    const timePerPixel = screenMillisecondCount / this.$canvas.width;
 
-
-    // 清空画布及事件
-    this.clear();
+    // 清空画布
+    this.#clear();
 
     // 填充背景
-    this.drawArea(0, 0, this.$canvas.width, this.$canvas.height, this.bgColor);
+    // this.#drawArea(0, 0, this.$canvas.width, this.$canvas.height, this.cfg.bgColor);
+    this.#drawArea({
+      startX: 0,
+      startY: 0,
+      endX: this.$canvas.width,
+      endY: this.$canvas.height,
+      bgColor: this.cfg.bgColor,
+    });
 
     // 绘制阴影区域
-    this.areas.forEach(item => {
+    this.#areas.forEach(item => {
       const startX = item.startTime < startTime ? 0 : Math.floor((item.startTime - startTime) / timePerPixel);
       const endX = item.endTime > endTime ? this.$canvas.width : Math.floor((item.endTime - startTime) / timePerPixel);
-      this.drawArea(startX, 0, endX, this.$canvas.height, item.bgColor || this.areaBgColor);
+      this.#drawArea({
+        startX,
+        startY: 0,
+        endX,
+        endY: this.$canvas.height,
+        bgColor: item.bgColor || this.cfg.areaBgColor,
+      });
     });
 
-    // 绘制刻度
-    drawHelper.bind(this)({
-      pointWidth: this.pointWidth,
-      timePerPixel,
-      scaleHeight: this.#scaleHeight,
-      scaleSpacing: this.scaleSpacing,
-      timeSpacing: this.#timeSpacing,
+    // 绘制时间/刻度
+    drawScale.bind(this)({
+      xCenterPoint,
       screenScaleCount,
       startTime,
-      drawLine: this.drawLine.bind(this),
-      drawText: this.drawText.bind(this),
+      timePerPixel,
+      scaleHeight: this.#scaleHeight,
+      timeSpacing: this.#timeSpacing,
+      currentTime: this.#currentTime,
+      $canvas: this.$canvas,
+      cfg: this.cfg,
+      drawLine: this.#drawLine.bind(this),
+      drawText: this.#drawText.bind(this),
+      drawArea: this.#drawArea.bind(this),
     });
-
+    
     // 绘制比例尺
-    this.drawTimelineScale(this.#timeSpacing);
-
-    // 绘制当前时间指针
-    this.drawLine(xCenterPoint - this.pointWidth / 2, this.$canvas.height, this.pointWidth, this.pointColor);
-    this.drawArea(xCenterPoint - 54, 4, xCenterPoint + 54, 18, this.pointColor);
-    this.drawText(xCenterPoint, 6, `${dateTime(this.currentTime, this.timeFormat)}`, this.textColor, 'center', 'top');
-
-    // 鼠标滚轮事件
-    this.$canvas.onwheel = this._onZoom.bind(this);
-    // 拖拽事件
-    this.$canvas.onmousedown = this._onDrag.bind(this);
+    this.#drawTimelineScale();
     // console.timeEnd('draw');
+  }
+
+  // 获取当前时间
+  getCurrentTime() {
+    return this.#currentTime;
   }
   
   // 拖拽
-  private _onDrag({ clientX }: MouseEvent) {
-    this.#isDraging = true;
-    let prexOffset = 0;
-    document.onmousemove = throttle((moveEvent) => {
-      const curxOffset = moveEvent.clientX - clientX;
-      const currentTime = this.currentTime - this.#timeSpacing / this.scaleSpacing * (curxOffset - prexOffset);
+  #onDrag(downEvent: MouseEvent) {
+    this.#isDragging = true;
+    let preXOffset = 0;
 
-      prexOffset = curxOffset;
-
+    // 监听鼠标移动
+    const moveListener = throttle(({ offsetX }: MouseEvent) => {
+      const curXOffset = offsetX - downEvent.offsetX;
+      const currentTime = this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (curXOffset - preXOffset);
+      preXOffset = curXOffset;
       this.draw({
         currentTime: Math.round(currentTime),
-        areas: this.areas,
+        areas: this.#areas,
         _privateFlag: true,
       });
-    }, this.#timeSpacing === 1 ? 100 : 1000 / this.fps);
+    }, 1000 / this.cfg.fps);
 
-    document.onmouseup = () => {
-      document.onmousemove = null;
-      document.onmouseup = null;
-      this.#isDraging = false;
-      this.emit('timeUpdate', this.currentTime);
+    // 监听是否移动到区域之外
+    const outsideListener = ({offsetX, offsetY}: MouseEvent) => {
+      const AFFECT = 3;
+      if (offsetX < AFFECT || offsetX > this.$canvas.width - AFFECT || offsetY < AFFECT || offsetY > this.$canvas.height - AFFECT) {
+        this.$canvas.removeEventListener('mousemove', moveListener);
+        this.$canvas.removeEventListener('mousemove', outsideListener);
+        this.#isDragging = false;
+        this.#emit('dragend', this.#currentTime);
+      }
     };
+
+    // 监听鼠标放开
+    const mouseupListener = () => {
+      this.$canvas.removeEventListener('mousemove', moveListener);
+      this.$canvas.removeEventListener('mousemove', outsideListener);
+      this.#isDragging = false;
+      this.#emit('dragend', this.#currentTime);
+      document.removeEventListener('mouseup', mouseupListener);
+    };
+    
+    this.$canvas.addEventListener('mousemove', moveListener);
+    this.$canvas.addEventListener('mousemove', outsideListener);
+    document.addEventListener('mouseup', mouseupListener);
   }
+
   // 缩放
-  private _onZoom(e: WheelEvent) {
+  #onZoom(e: WheelEvent) {
     e.preventDefault();
-    const currentIndex = this.#timeSpacingMap.findIndex(item => item === this.#timeSpacing);
+    const currentIndex = this.cfg.timeSpacingList.findIndex(item => item === this.#timeSpacing);
     if (e.deltaY < 0 && currentIndex > 0) {
-      this.#timeSpacing = this.#timeSpacingMap[currentIndex - 1];
+      this.#timeSpacing = this.cfg.timeSpacingList[currentIndex - 1];
       this.draw({
-        currentTime: this.currentTime,
-        areas: this.areas,
+        currentTime: this.#currentTime,
+        areas: this.#areas,
         _privateFlag: true,
       });
-    } else if (e.deltaY > 0 && currentIndex < this.#timeSpacingMap.length - 1) {
-      this.#timeSpacing = this.#timeSpacingMap[currentIndex + 1];
+    } else if (e.deltaY > 0 && currentIndex < this.cfg.timeSpacingList.length - 1) {
+      this.#timeSpacing = this.cfg.timeSpacingList[currentIndex + 1];
       this.draw({
-        currentTime: this.currentTime,
-        areas: this.areas,
+        currentTime: this.#currentTime,
+        areas: this.#areas,
         _privateFlag: true,
       });
     }
   }
 
   // 父元素size变化
-  private _onParentResize() {
-    const $canvasParent = this.$canvas.parentNode as HTMLElement;
-    if (!$canvasParent) {
-      return;
-    }
-    this.$canvas.width = $canvasParent.clientWidth;
-    this.$canvas.height = $canvasParent.clientHeight;
+  #onParentResize() {
+    if (!this.$canvasParent) return;
+    this.$canvas.width = this.$canvasParent.clientWidth;
+    this.$canvas.height = this.$canvasParent.clientHeight;
     // 刻度高度
-    this.#scaleHeight = {
-      height6: this.$canvas.height / 2, // 1/2高度
-      height5: this.$canvas.height / 3, // 1/3高度
-      height4: this.$canvas.height / 4, // 1/4高度
-      height3: this.$canvas.height / 5, // 1/5高度
-      height2: this.$canvas.height / 8, // 1/8高度
-      height1: this.$canvas.height / 10, // 1/10高度
+    if (!this.cfg.scaleHeight) {
+      this.#scaleHeight = {
+        long: this.$canvas.height / 3, // 1/3高度
+        medium: this.$canvas.height / 6, // 1/6高度
+        short: this.$canvas.height / 10, // 1/10高度
+      }
     }
     this.draw({
-      currentTime: this.currentTime,
-      areas: this.areas,
+      currentTime: this.#currentTime,
+      areas: this.#areas,
     });
   }
 
   // 清空画布
-  private clear() {
-    if(this.canvasContext) {
-      this.canvasContext.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
-    }
-    if (this.$canvas) {
-      this.$canvas.onwheel = null;
-      this.$canvas.onmousedown = null;
-    }
+  #clear() {
+    this.ctx.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
   }
+  
   // 绘制比例尺
-  private drawTimelineScale(timespacing: number) {
-    // [1, 10, 30, 60, 120, 300, 7200, 86400, 604800];
-    let text = '';
-    switch (timespacing) {
-      case 1:
-        text = '1s';
-        break;
-      case 10:
-        text = '10s';
-        break;
-      case 30:
-        text = '30s';
-        break;
-      case 60:
-        text = '1min';
-        break;
-      case 120:
-        text = '2min';
-        break;
-      case 300:
-        text = '5min';
-        break;
-      case 7200:
-        text = '2hour';
-        break;
-      case 86400:
-        text = '1day';
-        break;
-      case 604800:
-        text = '1week';
-        break;
-      default:
-        break;
-    }
-    this.drawText(this.scaleSpacing + 12, 9, `${text}`, this.textColor, 'left', 'middle');
+  #drawTimelineScale() {
+    const genPixelText = () => {
+      if (this.#timeSpacing < 1000) return `${this.#timeSpacing}ms`;
+      if (this.#timeSpacing < 60000) return `${Math.round(this.#timeSpacing / 100) / 10}sec`;
+      if (this.#timeSpacing < 3600000) return `${Math.round(this.#timeSpacing / 100 / 60) / 10}min`;
+      if (this.#timeSpacing < 86400000) return `${Math.round(this.#timeSpacing / 100 / 60 / 60) / 10}hours`;
+      if (this.#timeSpacing < 604800000) return `${Math.round(this.#timeSpacing / 100 / 60 / 60 / 24) / 10}days`;
+      return `${Math.round(this.#timeSpacing / 100 / 60 / 60 / 24 / 7) / 10}weeks`;
+    };
+    this.#drawText({
+      x: this.cfg.scaleSpacing + 12,
+      y: 9,
+      text: genPixelText(),
+      align: 'left',
+      baseLine: 'middle',
+    });
 
-    this.canvasContext.beginPath();
-    this.canvasContext.moveTo(5, 6);
-    this.canvasContext.lineTo(5, 10);
-    this.canvasContext.lineTo(this.scaleSpacing + 7, 10);
-    this.canvasContext.lineTo(this.scaleSpacing + 7, 6);
-    this.canvasContext.strokeStyle = this.scaleColor;
-    this.canvasContext.lineWidth = 1.5;
-    this.canvasContext.stroke();
+    this.ctx.beginPath();
+    this.ctx.moveTo(5, 6);
+    this.ctx.lineTo(5, 10);
+    this.ctx.lineTo(this.cfg.scaleSpacing + 6, 10);
+    this.ctx.lineTo(this.cfg.scaleSpacing + 6, 6);
+    this.ctx.strokeStyle = this.cfg.scaleColor;
+    this.ctx.lineWidth = 1.5;
+    this.ctx.stroke();
   }
 
   // 绘制线条
-  private drawLine(x: number, y: number, width: number = 1, color: string = this.scaleColor): void {
-    this.canvasContext.beginPath();
-    this.canvasContext.moveTo(x, this.$canvas.height);
-    this.canvasContext.lineTo(x, this.$canvas.height - y);
-    this.canvasContext.closePath();
-    this.canvasContext.strokeStyle = color;
-    this.canvasContext.lineWidth = width;
-    this.canvasContext.stroke();
+  #drawLine({ x, y, width = 1, color= this.cfg.scaleColor }: DrawLineType) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, this.$canvas.height);
+    this.ctx.lineTo(x, this.$canvas.height - y);
+    this.ctx.closePath();
+    this.ctx.strokeStyle = color;
+    this.ctx.lineWidth = width;
+    this.ctx.stroke();
   }
 
   // 绘制文字
-  private drawText(x: number, y: number, text: string, color: string = this.textColor, align: CanvasTextAlign = 'center', baseLine: CanvasTextBaseline ='alphabetic'): void {
-    this.canvasContext.beginPath();
-    this.canvasContext.font = '11px Arial';
-    this.canvasContext.fillStyle = color;
-    this.canvasContext.textAlign = align;
-    this.canvasContext.textBaseline = baseLine;
-    this.canvasContext.fillText(text, x, y);
-  }
+  #drawText ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine ='alphabetic' }: DrawTextType) {
+    this.ctx.beginPath();
+    this.ctx.font = `${fontSize} Arial`;
+    this.ctx.fillStyle = color;
+    this.ctx.textAlign = align;
+    this.ctx.textBaseline = baseLine;
+    this.ctx.fillText(text, x, y);
+  };
 
   // 绘制区域
-  private drawArea(startX: number, startY: number, endX: number, endY: number, bgColor: string) {
-    this.canvasContext.beginPath();
-    this.canvasContext.rect(startX, startY, endX - startX, endY - startY);
-    this.canvasContext.fillStyle = bgColor;
-    this.canvasContext.fill();
+  #drawArea({ startX, startY, endX, endY, bgColor }: DrawAreaType) {
+    this.ctx.beginPath();
+    this.ctx.rect(startX, startY, endX - startX, endY - startY);
+    this.ctx.fillStyle = bgColor;
+    this.ctx.fill();
   }
   
-  on(name: 'timeUpdate', listener: Function) {
+  on(name: 'dragend', listener: Handler) {
 		this.#emitter.on(name, listener);
 	}
 
-  off(name: 'timeUpdate', listener: Function) {
+  off(name: 'dragend', listener: Handler) {
 		this.#emitter.off(name, listener);
 	}
 
-	private emit(...args: unknown[]) {
+	#emit(...args: [EventType, unknown]) {
 		this.#emitter.emit(...args);
 	}
 }

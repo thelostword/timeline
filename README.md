@@ -1,17 +1,9 @@
-<!--
- * @Author: losting
- * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2023-02-21 10:27:02
- * @LastEditors: thelostword
- * @Description: 
- * @FilePath: \timeline\README.md
--->
-中文 | [English](./README_EN.md)
+[简体中文](./README.md) | English
 # timeline
-Canvas 时间轴，支持缩放、拖拽、无限滚动
-![预览图](./example/demo.png)
+Canvas timeline, supports zooming, dragging, and infinite scrolling.
+![preview](./example/demo.png)
 
-### es module
+### ES Module
 ``` shell
 npm install @losting/timeline
 ```
@@ -47,7 +39,7 @@ timeline.on('timeUpdate', (time) => {
 })
 ```
 
-### 直接使用
+### Direct Use
 ``` html
 <!DOCTYPE html>
 <html lang="en">
@@ -73,38 +65,39 @@ timeline.on('timeUpdate', (time) => {
 ```
 
 ### TimeLine options
-| 属性 | 类型 | 默认值 | 说明 |
+| Property | Type | Default | Description |
 | --- | --- | --- | --- |
-| width | number | 无 | canvas宽度 |
-| height | number | 无 | canvas高度 |
-| fill | boolean | false | 是否适应父容器宽高,若为false则需要手动设定canvas宽高 |
-| bgColor | string | rgba(0,0,0,0.5) | canvas背景色 |
-| textColor | string | #ffffff | 文字颜色 |
-| scaleColor | string | #ffffff | 刻度颜色 |
-| scaleSpacing | number | 7 | 刻度间距 |
-| areaBgColor | string | #ffffff55 | 阴影区域背景颜色 |
-| pointColor | string | #00aeec | 当前时间指针颜色 |
-| pointWidth | number | 3 | 当前时间指针宽度 |
-| fps | number | 60 | 帧数 |
-| zoom | integer | 2 | 初始缩放值，`minZoom` ~ `maxZoom` 之间(包含)的正整数 |
-| maxZoom | integer | 9 | 最大缩放限制，1~9之间的整数 |
-| minZoom | integer | 1 | 最小缩放限制，1~9之间的整数 |
-| timeFormat | string | YYYY/MM/DD HH:mm:ss | 时间格式 |
+| width | number | N/A | The width of the canvas |
+| height | number | N/A | The height of the canvas |
+| fill | boolean | false | Whether to fit the parent container width and height. If false, you need to manually set the width and height of the canvas |
+| bgColor | string | rgba(0,0,0,0.5) | The background color of the canvas |
+| textColor | string | #ffffff | The color of the text |
+| scaleColor | string | #ffffff | The color of the scale |
+| scaleSpacing | number | 7 | The spacing between scales |
+| areaBgColor | string | #ffffff55 | The background color of the shaded area |
+| pointColor | string | #00aeec | The color of the current time pointer |
+| pointWidth | number | 3 | The width of the current time pointer |
+| fps | number | 60 | The number of frames per second |
+| zoom | integer | 2 | The initial zoom value, a integer between minZoom and maxZoom (inclusive) |
+| maxZoom | integer | 9 | The maximum zoom limit, a integer between 1 and 9 |
+| minZoom | integer | 1 | The minimum zoom limit, a integer between 1 and 9 |
+| timeFormat | string | YYYY/MM/DD HH:mm:ss | date-time format |
 
-### 事件
 
-| 方法名 | 说明 |
+### Events
+
+| Method | Description |
 | --- | --- |
-| draw | 生成时间轴，返回值：无 |
-| on | 事件监听。 |
+| draw | Generate the timeline. Return value: N/A |
+| on | Event listener. |
 
-#### draw方法
-| 参数 | 类型 | 是否必填 | 说明 |
+#### The draw method
+| Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| currentTime | number | 否 | 当前所在时间，默认为当前时间 |
-| areas | array | 否 | 阴影区域 |
+| currentTime | number | No | The current time. Default value: the current time |
+| areas | array | No | Shaded areas |
 
-#### on 方法
+#### The on method
 ``` js
 timeline.on(eventName, (value) => {
   // ...
@@ -116,9 +109,9 @@ timeline.on(eventName, (value) => {
 
 
 #### areas
-| 参数 | 类型 | 是否必填 | 说明 |
+| Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| startTime | number | 是 | 阴影区域开始时间 |
-| endTime | number | 是 | 阴影区域结束时间点 |
-| bgColor | string | 否 | 背景颜色, 默认值：#ffffff55 |
+| startTime | number | Yes | The start time of the shaded area |
+| endTime | number | Yes | The end time of the shaded area |
+| bgColor | string | No | The background color. Default value: #ffffff55 |
 
