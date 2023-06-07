@@ -1,53 +1,47 @@
-<!--
- * @Author: losting
- * @Date: 2022-05-07 15:31:25
- * @LastEditTime: 2023-02-21 10:27:16
- * @LastEditors: thelostword
- * @Description: 
- * @FilePath: \timeline\README_EN.md
--->
-[中文](./README.md) | English
+[简体中文](./README.md) | English
 # timeline
-Canvas timeline, supports zooming, dragging, and infinite scrolling.
+Canvas timeline supports zooming, dragging, infinite scrolling, and custom control levels.
 ![preview](./example/demo.png)
 
+
+## Usage
 ### ES Module
 ``` shell
 npm install @losting/timeline
 ```
 ``` html
-<div id="root" style="width: 100%;height: 70px;">
-  <canvas id="timeline"></canvas>
-</div>
+<canvas id="Timeline"></canvas>
 ```
 
 ``` JavaScript
 import Timeline from '@losting/timeline';
 
-// new Timeline(canvasId, options)
-const timeline = new Timeline('timeline', {
-  fill: true,
+const timeline = new Timeline('#Timeline', {
+  fill: false,
+  width: 1000,
+  height: 60,
 });
 
+// Custom drawing
 timeline.draw({
-  currentTime: 1651829532,
+  currentTime: 1651827817000,
   areas: [{
-    startTime: 1651827433,
-    endTime: 1651829413,
-    // bgColor: '#00AEEC55'
+    startTime: 1651827433000,
+    endTime: 1651829413000,
+    bgColor: '#f897aa'
   },{
-    startTime: 1651829533,
-    endTime: 1651832533,
-    // bgColor: '#00AEEC55'
+    startTime: 1651829533000,
+    endTime: 1651832533000,
   }],
 });
 
-timeline.on('timeUpdate', (time) => {
-  console.log('selected time:', time);
+timeline.on('dragged', (timestamp) => {
+  console.log(new Date(timestamp));
+  // ...
 })
 ```
 
-### Direct Use
+### CDN
 ``` html
 <!DOCTYPE html>
 <html lang="en">
@@ -56,28 +50,25 @@ timeline.on('timeUpdate', (time) => {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="./dist/timeline.iife.js"></script>
+  <script src="https://unpkg.com/@losting/timeline@3.0.0/dist/timeline.iife.js"></script>
 </head>
 <body>
-  <div id="root" style="width: 100%;height: 70px;">
-    <canvas id="timeline"></canvas>
-  </div>
+  <canvas id="Timeline"></canvas>
   <script>
-    const timeline = new window['$timeline']('timeline', {
-      fill: true,
-    });
+    const timeline = new window['$timeline']('#Timeline');
     // ....
   </script>
 </body>
 </html>
 ```
 
-### TimeLine options
+
+### Config
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
-| width | number | N/A | The width of the canvas |
-| height | number | N/A | The height of the canvas |
 | fill | boolean | false | Whether to fit the parent container width and height. If false, you need to manually set the width and height of the canvas |
+| width | number | 1000 | The width of the canvas |
+| height | number | 60 | The height of the canvas |
 | bgColor | string | rgba(0,0,0,0.5) | The background color of the canvas |
 | textColor | string | #ffffff | The color of the text |
 | scaleColor | string | #ffffff | The color of the scale |
@@ -86,40 +77,69 @@ timeline.on('timeUpdate', (time) => {
 | pointColor | string | #00aeec | The color of the current time pointer |
 | pointWidth | number | 3 | The width of the current time pointer |
 | fps | number | 60 | The number of frames per second |
-| zoom | integer | 2 | The initial zoom value, a integer between minZoom and maxZoom (inclusive) |
-| maxZoom | integer | 9 | The maximum zoom limit, a integer between 1 and 9 |
-| minZoom | integer | 1 | The minimum zoom limit, a integer between 1 and 9 |
-| timeFormat | string | YYYY/MM/DD HH:mm:ss | date-time format |
-
+| zoom | integer | 2 | The initial zoom value, a integer between `0` and `timeSpacingList.length - 1` (inclusive),The index value corresponding to `timeSpacingList`. |
+| timeSpacingList | number[] | [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000] | Customize the time (in milliseconds) occupied by each tick. |
+| ~~maxZoom~~ | - | - | Removed, use `timeSpacingList` instead. |
+| ~~minZoom~~ | - | - | Removed, use `timeSpacingList` instead. |
+| ~~timeFormat~~ | - | - | Removed. |
 
 ### Events
 
-| Method | Description |
+| Method | Description | Example |
 | --- | --- |
-| draw | Generate the timeline. Return value: N/A |
-| on | Event listener. |
+| draw | Generate the timeline. | draw([DrawConfig](#DrawConfig)) |
+| on | Listen to internal events of the timeline. Currently, only the event name `dragged` is supported, which is the callback event for the end of dragging. | on(name, (listener) => void) |
+| off | Cancel listening to internal events of the timeline. | off(name, listener)、 Cancel all event listeners for the timeline. off('*') |
 
-#### The draw method
-| Parameter | Type | Required | Description |
+#### DrawConfig
+| Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- |
-| currentTime | number | No | The current time. Default value: the current time |
-| areas | array | No | Shaded areas |
+| currentTime | number | No | | TDate.now() | The center point points to the timestamp in milliseconds. |
+| areas | Object[] | No | [] | Shaded areas |
 
-#### The on method
-``` js
-timeline.on(eventName, (value) => {
-  // ...
-});
+##### AreaConfig
+| Parameter | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| startTime | number | Yes | - | Start timestamp of the shadow area (in milliseconds). |
+| endTime | number | Yes | - | End timestamp of the shadow area (in milliseconds). |
+| bgColor | string | No | `Config.bgColor` | Background color of the current shadow area. |
+
+
+## Upgrade v2.X -> v3.X.
+``` html
+<canvas id="Timeline"></canvas>
+<script>
+  // -------- v2 -----------
+  const timeline = new Timeline('Timeline', {
+    fill: false,
+    width: 1000,
+    height: 60,
+  });
+  timeline.on('timeUpdate', (timestamp) => {
+    // ...
+  })
+
+  // ---------> v3 --------------
+  const timeline = new Timeline('#Timeline', {
+    // ...
+    // Note that the timestamps here have been changed from seconds to milliseconds.
+  });
+  // OR
+  const timeline = new Timeline(document.querySelector('#Timeline'), {
+    // ...
+  });
+
+  timeline.on('dragged', (timestamp) => {
+    // ...
+  })
+
+</script>
+
 ```
-| eventName | value |
-| --- | --- |
-| timeUpdate | currentTime |
+> For other changes, please refer to the above-mentioned documentation.
 
+## License
 
-#### areas
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| startTime | number | Yes | The start time of the shaded area |
-| endTime | number | Yes | The end time of the shaded area |
-| bgColor | string | No | The background color. Default value: #ffffff55 |
+[MIT](https://opensource.org/licenses/MIT)
 
+Copyright (c) 2022-present, XiuLiu <https://www.github.com/thelostword>
