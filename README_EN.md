@@ -2,7 +2,7 @@
 # timeline
 Canvas timeline supports zooming, dragging, infinite scrolling, and custom control levels.
 ![preview](./example/demo.png)
-
+[Demo address](thelostword.github.io/timeline/)
 
 ## Usage
 ### ES Module
