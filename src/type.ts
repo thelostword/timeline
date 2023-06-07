@@ -19,6 +19,7 @@ export type ConfigMap = {
   zoom?: number;
   timeSpacingList?: number[];
   scaleHeight?: ScaleHeightType;
+  bgTextColor?: string;
 }
 export type InstanceConfigMap = {
   fill?: boolean;
@@ -35,6 +36,7 @@ export type InstanceConfigMap = {
   zoom: number;
   timeSpacingList: number[];
   scaleHeight?: ScaleHeightType;
+  bgTextColor?: string;
 }
 
 export type AreaItemType = {

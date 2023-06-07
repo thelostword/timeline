@@ -4,12 +4,41 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta name="author" content="https://github.com/thelostword" />
+  <title>timeline</title>
 </head>
-<body style="height: 200vh;">
-  <div id="root" style="width: 80%;height: 70px;margin: 0 auto;">
-    <canvas id="timeline"></canvas>
+<body>
+  <canvas id="Timeline"></canvas>
+  <div>
+    <p>current time:</p>
+    <strong id="TimeValue"></strong>
   </div>
-  <script type="module" src="/example/main.ts"></script>
+
+  <script type="module">
+    import TimeLine from './dist/timeline.es.js';
+
+    const timeline = new TimeLine('#Timeline', {
+      fill: false,
+      zoom: 4,
+    });
+
+    timeline.draw({
+      currentTime: 1651827817000,
+      areas: [{
+        startTime: 1651827433000,
+        endTime: 1651829413000,
+        bgColor: '#f897aa'
+      },{
+        startTime: 1651829533000,
+        endTime: 1651832533000,
+      }],
+    });
+
+    const TimeValue = document.querySelector('#TimeValue');
+    TimeValue.textContent = new Date(timeline.getCurrentTime());
+    timeline.on('dragged', (timestamp) => {
+      TimeValue.textContent = new Date(timestamp);
+    })
+  </script>
 </body>
 </html>

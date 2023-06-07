@@ -47,7 +47,7 @@ export const drawScale: DrawScale = ({xCenterPoint, cfg, timePerPixel, timeSpaci
       fontSize: `${$canvas.height - 5}px`,
       align: 'right',
       baseLine: 'top',
-      color: setAlpha(cfg.textColor, .18)
+      color: cfg.bgTextColor,
     });
 
     // 刻度

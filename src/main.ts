@@ -10,20 +10,20 @@ import type {
 } from './type';
 import type { EventType, Handler } from 'mitt';
 import mitt from 'mitt';
-import { throttle, drawScale } from './utils';
+import { throttle, drawScale, setAlpha } from './utils';
 import { defaultConfig } from './config';
 
 
 class TimeLine {
-  $canvas: HTMLCanvasElement; // canvas 元素
-  ctx: CanvasRenderingContext2D; // canvas context,
+  $canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
   $canvasParent: HTMLElement | undefined;
 
   cfg: InstanceConfigMap;
   #emitter = mitt();
 
-  #currentTime = 0; // 当前时间
-  #areas?: AreaType; // 阴影区域
+  #currentTime = 0;
+  #areas?: AreaType;
 
   #timeSpacing: number;
 
@@ -42,7 +42,8 @@ class TimeLine {
 
     // 获取配置项
     this.cfg = { ...defaultConfig, ...cfg };
-    const { fill, width, height, zoom, timeSpacingList, scaleHeight } = this.cfg;
+    const { fill, width, height, zoom, timeSpacingList, scaleHeight, textColor } = this.cfg;
+    this.cfg.bgTextColor = setAlpha(textColor, .18);
 
     // 检查zoom参数是否合法
     if (zoom < 0 || zoom >= timeSpacingList.length || zoom % 1 !== 0) {
@@ -77,6 +78,8 @@ class TimeLine {
         short: this.$canvas.height / 10, // 1/10高度
       };
     }
+
+    this.draw();
     
     // 鼠标滚轮滚动-缩放
     this.$canvas.addEventListener('wheel', this.#onZoom.bind(this), { passive: false });
@@ -98,15 +101,12 @@ class TimeLine {
     const screenScaleCount = Math.ceil(this.$canvas.width / this.cfg.scaleSpacing);
     // 当前屏显示毫秒数
     const screenMillisecondCount = screenScaleCount * this.#timeSpacing;
-
     // 开始时间
     const startTime = this.#currentTime - screenMillisecondCount / 2;
     // 结束时间
     const endTime = this.#currentTime + screenMillisecondCount / 2;
-
     // canvas X轴中心点（当前时间指示刻度）
     const xCenterPoint = this.$canvas.width / 2;
-
     // 每1px所占时间单位（毫秒）
     const timePerPixel = screenMillisecondCount / this.$canvas.width;
 
@@ -114,7 +114,6 @@ class TimeLine {
     this.#clear();
 
     // 填充背景
-    // this.#drawArea(0, 0, this.$canvas.width, this.$canvas.height, this.cfg.bgColor);
     this.#drawArea({
       startX: 0,
       startY: 0,
@@ -166,14 +165,16 @@ class TimeLine {
   #onDrag(downEvent: MouseEvent) {
     this.#isDragging = true;
     let preXOffset = 0;
+    let currentTime = this.#currentTime;
 
     // 监听鼠标移动
     const moveListener = throttle(({ offsetX }: MouseEvent) => {
+      if (!this.#isDragging) return;
       const curXOffset = offsetX - downEvent.offsetX;
-      const currentTime = this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (curXOffset - preXOffset);
+      currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (curXOffset - preXOffset));
       preXOffset = curXOffset;
       this.draw({
-        currentTime: Math.round(currentTime),
+        currentTime,
         areas: this.#areas,
         _privateFlag: true,
       });
@@ -185,8 +186,6 @@ class TimeLine {
       if (offsetX < AFFECT || offsetX > this.$canvas.width - AFFECT || offsetY < AFFECT || offsetY > this.$canvas.height - AFFECT) {
         this.$canvas.removeEventListener('mousemove', moveListener);
         this.$canvas.removeEventListener('mousemove', outsideListener);
-        this.#isDragging = false;
-        this.#emit('dragend', this.#currentTime);
       }
     };
 
@@ -194,9 +193,9 @@ class TimeLine {
     const mouseupListener = () => {
       this.$canvas.removeEventListener('mousemove', moveListener);
       this.$canvas.removeEventListener('mousemove', outsideListener);
-      this.#isDragging = false;
-      this.#emit('dragend', this.#currentTime);
       document.removeEventListener('mouseup', mouseupListener);
+      this.#isDragging = false;
+      this.#emit('dragged', currentTime);
     };
     
     this.$canvas.addEventListener('mousemove', moveListener);
@@ -306,11 +305,11 @@ class TimeLine {
     this.ctx.fill();
   }
   
-  on(name: 'dragend', listener: Handler) {
+  on(name: 'dragged', listener: Handler) {
 		this.#emitter.on(name, listener);
 	}
 
-  off(name: 'dragend', listener: Handler) {
+  off(name: 'dragged', listener: Handler) {
 		this.#emitter.off(name, listener);
 	}
 

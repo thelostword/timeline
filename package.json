@@ -1,7 +1,7 @@
 {
   "name": "@losting/timeline",
   "version": "2.2.0",
-  "description": "canvas timeline",
+  "description": "Canvas timeline supports zooming, dragging, infinite scrolling, and custom control levels.",
   "type": "module",
   "main": "./dist/timeline.iife.js",
   "module": "./dist/timeline.es.js",
@@ -10,15 +10,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "release": "release-it",
-    "prepublishOnly": "pnpm run build"
+    "release": "release-it"
   },
   "files": [
     "LICENSE",
     "dist",
     "types",
+    "README.md",
     "example/demo.png",
-    "README.md"
+    "index.html"
   ],
   "keywords": [
     "timeline",
