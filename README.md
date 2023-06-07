@@ -2,7 +2,7 @@
 # Timeline
 Canvas 时间轴，支持缩放、拖拽、无限滚动、自定义控制级别
 ![预览图](./example/demo.png)
-
+[演示地址](thelostword.github.io/timeline/)
 
 ## 如何使用
 ### ES Module
@@ -123,6 +123,7 @@ timeline.on('dragged', (timestamp) => {
   // ---------> v3 --------------
   const timeline = new Timeline('#Timeline', {
     // ...
+    // 注意这里时间戳由秒全部变为毫秒
   });
   // OR
   const timeline = new Timeline(document.querySelector('#Timeline'), {
