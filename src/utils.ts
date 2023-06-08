@@ -1,4 +1,4 @@
-import type { DrawScale } from './type';
+import type timeline from '../types';
 import dayjs from 'dayjs';
 
 // 格式化
@@ -37,7 +37,7 @@ export const setAlpha = (color: string, alpha: number) => {
 }
 
 // 刻度绘制
-export const drawScale: DrawScale = ({xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
+export const drawScale: timeline.DrawScale = ({xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
   const drawMethods = ({ space, scaleFormat, bgFormat, currentFormat }: { space: number, scaleFormat: string, bgFormat: string, currentFormat: string }) => {
     // 当前年月日
     drawText({

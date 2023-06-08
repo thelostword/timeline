@@ -1,4 +1,4 @@
-export = timeline;
+export = timeline.TimeLine;
 
 declare namespace timeline {
   export type ElementType = string | HTMLCanvasElement;
@@ -29,7 +29,9 @@ declare namespace timeline {
     // 默认焦距
     zoom?: number,
     // 时间间距
-    timeSpacingList: number[],
+    timeSpacingList?: number[],
+    // 背景文字颜色
+    bgTextColor?: string,
   }
   
   export type DrawAreasType = {
@@ -45,56 +47,62 @@ declare namespace timeline {
   export type DragendEventType = 'dragend';
   export type DragendHandler<T = number> = (event: T) => void;
 
-  class TimeLine {
-    constructor (el: ElementType, config: ConfigMap);
+  export class TimeLine {
+    constructor (el: ElementType, config?: ConfigMap);
 
     /**
-     * draw methods.
+     * Custom draw methods.
      * ```
-     * new TimeLine(document.querySelector('#Timeline'), {
-     * ...
-     * })
-     * .draw({...})
+     * const timeline = new TimeLine('#Timeline');
+     * timeline.draw({
+     *  currentTime: 1651827817000,
+     *  areas: [{
+     *    startTime: 1651827433000,
+     *    endTime: 1651829413000,
+     *    bgColor: '#f897aa',
+     *  }, ...]
+     * });
      * ```
-     * Docs: https://github.com/thelostword/timeline#draw
+     * Docs: https://github.com/thelostword/timeline#Events
      */
     draw(cfg: DrawType): void;
 
     /**
-     * get time of center point.
+     * Get the current time.
      * ```
-     * new TimeLine(document.querySelector('#Timeline'), {
-     * ...
-     * })
-     * .getCurrentTime() // => timestamp
+     * const timeline = new TimeLine('#Timeline');
+     * timeline.getCurrentTime(); // => timestamp
      * ```
-     * Docs: https://github.com/thelostword/timeline#getCurrentTime
+     * Docs: https://github.com/thelostword/timeline#Events
      */
     getCurrentTime(): number;
 
     /**
      * event listener.
      * ```
-     * new TimeLine(document.querySelector('#Timeline'), {
-     * ...
-     * })
-     * .on('dragend', (timestamp) => {
-     * ....
-     * })
+     * const timeline = new TimeLine('#Timeline');
+     * const listener = (timestamp) => {
+     *  // ...
+     * }
+     * timeline.on('dragend', listener);
      * ```
-     * Docs: https://github.com/thelostword/timeline#on
+     * Docs: https://github.com/thelostword/timeline#Events
      */
     on(event: DragendEventType, listener: DragendHandler): void;
 
     /**
      * event listener.
      * ```
-     * new TimeLine(document.querySelector('#Timeline'), {
-     * ...
-     * })
-     * .off('dragend', listener)
+     * const timeline = new TimeLine('#Timeline');
+     * const listener = (timestamp) => {
+     *  // ...
+     * }
+     * timeline.on('dragend', listener);
+     * timeline.off('dragend', listener);
+     * // Cancel all event listeners
+     * timeline.off('*');
      * ```
-     * Docs: https://github.com/thelostword/timeline#off
+     * Docs: https://github.com/thelostword/timeline#Events
      */
     off(event: DragendEventType, listener: DragendHandler): void;
   }
