@@ -109,15 +109,17 @@ class TimeLine {
 
     // 绘制阴影区域
     this.#areas.forEach(item => {
-      const startX = item.startTime < startTime ? 0 : Math.floor((item.startTime - startTime) / timePerPixel);
-      const endX = item.endTime > endTime ? this.$canvas.width : Math.floor((item.endTime - startTime) / timePerPixel);
-      this.#drawArea({
-        startX,
-        startY: 0,
-        endX,
-        endY: this.$canvas.height,
-        bgColor: item.bgColor || this.cfg.areaBgColor,
-      });
+      const startX = item.startTime <= startTime ? 0 : Math.round((item.startTime - startTime) / timePerPixel);
+      const endX = item.endTime >= endTime ? this.$canvas.width : Math.round((item.endTime - startTime) / timePerPixel);
+      if (startX < this.$canvas.width && endX > 0) {
+        this.#drawArea({
+          startX,
+          startY: 0,
+          endX,
+          endY: this.$canvas.height,
+          bgColor: item.bgColor || this.cfg.areaBgColor,
+        });
+      }
     });
 
     // 绘制时间/刻度

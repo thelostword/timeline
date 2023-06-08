@@ -15,7 +15,7 @@
   "files": [
     "LICENSE",
     "dist",
-    "types",
+    "types/timeline.d.ts",
     "README.md",
     "example/demo.png",
     "index.html"

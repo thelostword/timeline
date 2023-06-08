@@ -4,7 +4,7 @@ var V = (a, t, s) => (Ct(a, typeof t != "symbol" ? t + "" : t, s), s), gt = (a, 
   if (!t.has(a))
     throw TypeError("Cannot " + s);
 };
-var f = (a, t, s) => (gt(a, t, "read from private field"), s ? s.call(a) : t.get(a)), T = (a, t, s) => {
+var f = (a, t, s) => (gt(a, t, "read from private field"), s ? s.call(a) : t.get(a)), F = (a, t, s) => {
   if (t.has(a))
     throw TypeError("Cannot add the same private member more than once");
   t instanceof WeakSet ? t.add(a) : t.set(a, s);
@@ -35,7 +35,7 @@ var Yt = { exports: {} };
   (function(s, r) {
     a.exports = r();
   })(Ot, function() {
-    var s = 1e3, r = 6e4, l = 36e5, g = "millisecond", $ = "second", p = "minute", v = "hour", x = "day", b = "week", D = "month", F = "quarter", _ = "year", W = "date", Q = "Invalid Date", ft = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/, K = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g, lt = { name: "en", weekdays: "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"), months: "January_February_March_April_May_June_July_August_September_October_November_December".split("_"), ordinal: function(o) {
+    var s = 1e3, r = 6e4, l = 36e5, g = "millisecond", $ = "second", p = "minute", v = "hour", x = "day", b = "week", Y = "month", S = "quarter", _ = "year", W = "date", Q = "Invalid Date", ft = /^(\d{4})[-/]?(\d{1,2})?[-/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$/, K = /\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g, lt = { name: "en", weekdays: "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"), months: "January_February_March_April_May_June_July_August_September_October_November_December".split("_"), ordinal: function(o) {
       var n = ["th", "st", "nd", "rd"], e = o % 100;
       return "[" + o + (n[(e - 20) % 10] || n[e] || n[0]) + "]";
     } }, P = function(o, n, e) {
@@ -47,12 +47,12 @@ var Yt = { exports: {} };
     }, m: function o(n, e) {
       if (n.date() < e.date())
         return -o(e, n);
-      var h = 12 * (e.year() - n.year()) + (e.month() - n.month()), i = n.clone().add(h, D), u = e - i < 0, c = n.clone().add(h + (u ? -1 : 1), D);
+      var h = 12 * (e.year() - n.year()) + (e.month() - n.month()), i = n.clone().add(h, Y), u = e - i < 0, c = n.clone().add(h + (u ? -1 : 1), Y);
       return +(-(h + (e - i) / (u ? i - c : c - i)) || 0);
     }, a: function(o) {
       return o < 0 ? Math.ceil(o) || 0 : Math.floor(o);
     }, p: function(o) {
-      return { M: D, y: _, w: b, d: x, D: W, h: v, m: p, s: $, ms: g, Q: F }[o] || String(o || "").toLowerCase().replace(/s$/, "");
+      return { M: Y, y: _, w: b, d: x, D: W, h: v, m: p, s: $, ms: g, Q: S }[o] || String(o || "").toLowerCase().replace(/s$/, "");
     }, u: function(o) {
       return o === void 0;
     } }, k = "en", j = {};
@@ -132,15 +132,15 @@ var Yt = { exports: {} };
           return u ? I : I.endOf(x);
         }, w = function(U, C) {
           return d.w(i.toDate()[U].apply(i.toDate("s"), (u ? [0, 0, 0, 0] : [23, 59, 59, 999]).slice(C)), i);
-        }, M = this.$W, S = this.$M, z = this.$D, E = "set" + (this.$u ? "UTC" : "");
+        }, M = this.$W, T = this.$M, z = this.$D, E = "set" + (this.$u ? "UTC" : "");
         switch (c) {
           case _:
             return u ? m(1, 0) : m(31, 11);
-          case D:
-            return u ? m(1, S) : m(0, S + 1);
+          case Y:
+            return u ? m(1, T) : m(0, T + 1);
           case b:
             var R = this.$locale().weekStart || 0, q = (M < R ? M + 7 : M) - R;
-            return m(u ? z - q : z + (6 - q), S);
+            return m(u ? z - q : z + (6 - q), T);
           case x:
           case W:
             return w(E + "Hours", 0);
@@ -156,8 +156,8 @@ var Yt = { exports: {} };
       }, n.endOf = function(e) {
         return this.startOf(e, !1);
       }, n.$set = function(e, h) {
-        var i, u = d.p(e), c = "set" + (this.$u ? "UTC" : ""), m = (i = {}, i[x] = c + "Date", i[W] = c + "Date", i[D] = c + "Month", i[_] = c + "FullYear", i[v] = c + "Hours", i[p] = c + "Minutes", i[$] = c + "Seconds", i[g] = c + "Milliseconds", i)[u], w = u === x ? this.$D + (h - this.$W) : h;
-        if (u === D || u === _) {
+        var i, u = d.p(e), c = "set" + (this.$u ? "UTC" : ""), m = (i = {}, i[x] = c + "Date", i[W] = c + "Date", i[Y] = c + "Month", i[_] = c + "FullYear", i[v] = c + "Hours", i[p] = c + "Minutes", i[$] = c + "Seconds", i[g] = c + "Milliseconds", i)[u], w = u === x ? this.$D + (h - this.$W) : h;
+        if (u === Y || u === _) {
           var M = this.clone().set(W, 1);
           M.$d[m](w), M.init(), this.$d = M.set(W, Math.min(this.$D, M.daysInMonth())).$d;
         } else
@@ -170,12 +170,12 @@ var Yt = { exports: {} };
       }, n.add = function(e, h) {
         var i, u = this;
         e = Number(e);
-        var c = d.p(h), m = function(S) {
+        var c = d.p(h), m = function(T) {
           var z = y(u);
-          return d.w(z.date(z.date() + Math.round(S * e)), u);
+          return d.w(z.date(z.date() + Math.round(T * e)), u);
         };
-        if (c === D)
-          return this.set(D, this.$M + e);
+        if (c === Y)
+          return this.set(Y, this.$M + e);
         if (c === _)
           return this.set(_, this.$y + e);
         if (c === x)
@@ -190,24 +190,24 @@ var Yt = { exports: {} };
         var h = this, i = this.$locale();
         if (!this.isValid())
           return i.invalidDate || Q;
-        var u = e || "YYYY-MM-DDTHH:mm:ssZ", c = d.z(this), m = this.$H, w = this.$m, M = this.$M, S = i.weekdays, z = i.months, E = function(C, I, mt, it) {
+        var u = e || "YYYY-MM-DDTHH:mm:ssZ", c = d.z(this), m = this.$H, w = this.$m, M = this.$M, T = i.weekdays, z = i.months, E = function(C, I, mt, it) {
           return C && (C[I] || C(h, u)) || mt[I].slice(0, it);
         }, R = function(C) {
           return d.s(m % 12 || 12, C, "0");
         }, q = i.meridiem || function(C, I, mt) {
           var it = C < 12 ? "AM" : "PM";
           return mt ? it.toLowerCase() : it;
-        }, U = { YY: String(this.$y).slice(-2), YYYY: d.s(this.$y, 4, "0"), M: M + 1, MM: d.s(M + 1, 2, "0"), MMM: E(i.monthsShort, M, z, 3), MMMM: E(z, M), D: this.$D, DD: d.s(this.$D, 2, "0"), d: String(this.$W), dd: E(i.weekdaysMin, this.$W, S, 2), ddd: E(i.weekdaysShort, this.$W, S, 3), dddd: S[this.$W], H: String(m), HH: d.s(m, 2, "0"), h: R(1), hh: R(2), a: q(m, w, !0), A: q(m, w, !1), m: String(w), mm: d.s(w, 2, "0"), s: String(this.$s), ss: d.s(this.$s, 2, "0"), SSS: d.s(this.$ms, 3, "0"), Z: c };
+        }, U = { YY: String(this.$y).slice(-2), YYYY: d.s(this.$y, 4, "0"), M: M + 1, MM: d.s(M + 1, 2, "0"), MMM: E(i.monthsShort, M, z, 3), MMMM: E(z, M), D: this.$D, DD: d.s(this.$D, 2, "0"), d: String(this.$W), dd: E(i.weekdaysMin, this.$W, T, 2), ddd: E(i.weekdaysShort, this.$W, T, 3), dddd: T[this.$W], H: String(m), HH: d.s(m, 2, "0"), h: R(1), hh: R(2), a: q(m, w, !0), A: q(m, w, !1), m: String(w), mm: d.s(w, 2, "0"), s: String(this.$s), ss: d.s(this.$s, 2, "0"), SSS: d.s(this.$ms, 3, "0"), Z: c };
         return u.replace(K, function(C, I) {
           return I || U[C] || c.replace(":", "");
         });
       }, n.utcOffset = function() {
         return 15 * -Math.round(this.$d.getTimezoneOffset() / 15);
       }, n.diff = function(e, h, i) {
-        var u, c = d.p(h), m = y(e), w = (m.utcOffset() - this.utcOffset()) * r, M = this - m, S = d.m(this, m);
-        return S = (u = {}, u[_] = S / 12, u[D] = S, u[F] = S / 3, u[b] = (M - w) / 6048e5, u[x] = (M - w) / 864e5, u[v] = M / l, u[p] = M / r, u[$] = M / s, u)[c] || M, i ? S : d.a(S);
+        var u, c = d.p(h), m = y(e), w = (m.utcOffset() - this.utcOffset()) * r, M = this - m, T = d.m(this, m);
+        return T = (u = {}, u[_] = T / 12, u[Y] = T, u[S] = T / 3, u[b] = (M - w) / 6048e5, u[x] = (M - w) / 864e5, u[v] = M / l, u[p] = M / r, u[$] = M / s, u)[c] || M, i ? T : d.a(T);
       }, n.daysInMonth = function() {
-        return this.endOf(D).$D;
+        return this.endOf(Y).$D;
       }, n.$locale = function() {
         return j[this.$L];
       }, n.locale = function(e, h) {
@@ -227,7 +227,7 @@ var Yt = { exports: {} };
         return this.$d.toUTCString();
       }, o;
     }(), pt = et.prototype;
-    return y.prototype = pt, [["$ms", g], ["$s", $], ["$m", p], ["$H", v], ["$W", x], ["$M", D], ["$y", _], ["$D", W]].forEach(function(o) {
+    return y.prototype = pt, [["$ms", g], ["$s", $], ["$m", p], ["$H", v], ["$W", x], ["$M", Y], ["$y", _], ["$D", W]].forEach(function(o) {
       pt[o[1]] = function(n) {
         return this.$g(n, o[0], o[1]);
       };
@@ -254,8 +254,8 @@ const Et = /* @__PURE__ */ Lt(_t), $t = (a, t = "MM/DD HH:mm") => Et(a).format(t
   r.fillStyle = a, r.fillRect(0, 0, 1, 1);
   const l = r.getImageData(0, 0, 1, 1).data;
   return `rgba(${l[0]}, ${l[1]}, ${l[2]}, ${t})`;
-}, Wt = ({ xCenterPoint: a, cfg: t, timePerPixel: s, timeSpacing: r, currentTime: l, $canvas: g, screenScaleCount: $, scaleHeight: p, startTime: v, drawLine: x, drawText: b, drawArea: D }) => {
-  const F = ({ space: _, scaleFormat: W, bgFormat: Q, currentFormat: ft }) => {
+}, Wt = ({ xCenterPoint: a, cfg: t, timePerPixel: s, timeSpacing: r, currentTime: l, $canvas: g, screenScaleCount: $, scaleHeight: p, startTime: v, drawLine: x, drawText: b, drawArea: Y }) => {
+  const S = ({ space: _, scaleFormat: W, bgFormat: Q, currentFormat: ft }) => {
     b({
       x: g.width - a / 10,
       y: 6,
@@ -284,7 +284,7 @@ const Et = /* @__PURE__ */ Lt(_t), $t = (a, t = "MM/DD HH:mm") => Et(a).format(t
       y: g.height,
       width: t.pointWidth,
       color: t.pointColor
-    }), D({
+    }), Y({
       startX: a - 50,
       startY: 4,
       endX: a + 50,
@@ -298,7 +298,7 @@ const Et = /* @__PURE__ */ Lt(_t), $t = (a, t = "MM/DD HH:mm") => Et(a).format(t
       baseLine: "top"
     });
   };
-  r < 100 ? F({ space: 10, scaleFormat: "mm:ss:SSS", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss:SSS" }) : r < 1e3 ? F({ space: 10, scaleFormat: "mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss:SSS" }) : r < 1e4 ? F({ space: 10, scaleFormat: "mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss" }) : r < 6e4 ? F({ space: 12, scaleFormat: "HH:mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss" }) : r < 6e5 ? F({ space: 10, scaleFormat: "HH:mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss" }) : r < 36e5 ? F({ space: 12, scaleFormat: "MM/DD HH:mm", bgFormat: "YYYY/MM", currentFormat: "MM/DD HH:mm:ss" }) : r < 864e5 ? F({ space: 12, scaleFormat: "MM/DD HH:mm", bgFormat: "YYYY/MM", currentFormat: "YYYY/MM/DD HH:mm" }) : r < 6048e5 ? F({ space: 10, scaleFormat: "YYYY/MM/DD", bgFormat: "YYYY", currentFormat: "YYYY/MM/DD" }) : F({ space: 10, scaleFormat: "YYYY/MM/DD", bgFormat: "YYYY", currentFormat: "YYYY/MM/DD" });
+  r < 100 ? S({ space: 10, scaleFormat: "mm:ss:SSS", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss:SSS" }) : r < 1e3 ? S({ space: 10, scaleFormat: "mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss:SSS" }) : r < 1e4 ? S({ space: 10, scaleFormat: "mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss" }) : r < 6e4 ? S({ space: 12, scaleFormat: "HH:mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss" }) : r < 6e5 ? S({ space: 10, scaleFormat: "HH:mm:ss", bgFormat: "YYYY/MM/DD", currentFormat: "HH:mm:ss" }) : r < 36e5 ? S({ space: 12, scaleFormat: "MM/DD HH:mm", bgFormat: "YYYY/MM", currentFormat: "MM/DD HH:mm:ss" }) : r < 864e5 ? S({ space: 12, scaleFormat: "MM/DD HH:mm", bgFormat: "YYYY/MM", currentFormat: "YYYY/MM/DD HH:mm" }) : r < 6048e5 ? S({ space: 10, scaleFormat: "YYYY/MM/DD", bgFormat: "YYYY", currentFormat: "YYYY/MM/DD" }) : S({ space: 10, scaleFormat: "YYYY/MM/DD", bgFormat: "YYYY", currentFormat: "YYYY/MM/DD" });
 }, Pt = {
   fill: !0,
   width: 1e3,
@@ -314,38 +314,38 @@ const Et = /* @__PURE__ */ Lt(_t), $t = (a, t = "MM/DD HH:mm") => Et(a).format(t
   zoom: 3,
   timeSpacingList: [10, 100, 1e3, 1e4, 6e4, 6e5, 36e5, 864e5, 6048e5]
 };
-var Z, O, A, Y, X, N, nt, Dt, rt, wt, at, xt, ot, yt, ht, bt, ct, St, G, vt, B, st, ut, Tt;
+var Z, O, A, D, X, N, nt, Dt, rt, wt, at, xt, ot, yt, ht, bt, ct, St, G, vt, B, st, ut, Tt;
 class zt {
   constructor(t, s) {
     // 拖拽
-    T(this, nt);
+    F(this, nt);
     // 缩放
-    T(this, rt);
+    F(this, rt);
     // 父元素size变化
-    T(this, at);
+    F(this, at);
     // 清空画布
-    T(this, ot);
+    F(this, ot);
     // 绘制比例尺
-    T(this, ht);
+    F(this, ht);
     // 绘制线条
-    T(this, ct);
+    F(this, ct);
     // 绘制文字
-    T(this, G);
+    F(this, G);
     // 绘制区域
-    T(this, B);
-    T(this, ut);
+    F(this, B);
+    F(this, ut);
     V(this, "$canvas");
     V(this, "ctx");
     V(this, "$canvasParent");
     V(this, "cfg");
-    T(this, Z, Ht());
-    T(this, O, 0);
-    T(this, A, void 0);
-    T(this, Y, void 0);
+    F(this, Z, Ht());
+    F(this, O, 0);
+    F(this, A, void 0);
+    F(this, D, void 0);
     // 刻度高度
-    T(this, X, void 0);
+    F(this, X, void 0);
     // 是否在拖拽中
-    T(this, N, !1);
+    F(this, N, !1);
     if (!t)
       throw new Error("canvas Element Or Element ID is required!");
     typeof t == "string" ? this.$canvas = document.querySelector(t) : this.$canvas = t, this.ctx = this.$canvas.getContext("2d"), this.cfg = { ...Pt, ...s };
@@ -353,11 +353,11 @@ class zt {
     if (b || (this.cfg.bgTextColor = At(x, 0.18)), $ < 0 || $ >= p.length || $ % 1 !== 0)
       throw new Error(`zoom must be 0 ~ ${p.length - 1}, and must be an integer`);
     if (r) {
-      const D = this.$canvas.parentElement;
-      this.$canvasParent = D, this.$canvas.width = D.clientWidth, this.$canvas.height = D.clientHeight, new ResizeObserver(Mt(H(this, at, xt).bind(this), 200)).observe(D);
+      const Y = this.$canvas.parentElement;
+      this.$canvasParent = Y, this.$canvas.width = Y.clientWidth, this.$canvas.height = Y.clientHeight, new ResizeObserver(Mt(H(this, at, xt).bind(this), 200)).observe(Y);
     } else
       l && (this.$canvas.width = l), g && (this.$canvas.height = g);
-    L(this, Y, p[$]), v != null && v.long && (v != null && v.short) ? L(this, X, v) : L(this, X, {
+    L(this, D, p[$]), v != null && v.long && (v != null && v.short) ? L(this, X, v) : L(this, X, {
       long: this.$canvas.height / 3,
       // 1/3高度
       medium: this.$canvas.height / 6,
@@ -371,7 +371,7 @@ class zt {
     if (f(this, N) && !r)
       return;
     L(this, O, t || Date.now()), L(this, A, s || []);
-    const l = Math.ceil(this.$canvas.width / this.cfg.scaleSpacing), g = l * f(this, Y), $ = f(this, O) - g / 2, p = f(this, O) + g / 2, v = this.$canvas.width / 2, x = g / this.$canvas.width;
+    const l = Math.ceil(this.$canvas.width / this.cfg.scaleSpacing), g = l * f(this, D), $ = f(this, O) - g / 2, p = f(this, O) + g / 2, v = this.$canvas.width / 2, x = g / this.$canvas.width;
     H(this, ot, yt).call(this), H(this, B, st).call(this, {
       startX: 0,
       startY: 0,
@@ -379,11 +379,11 @@ class zt {
       endY: this.$canvas.height,
       bgColor: this.cfg.bgColor
     }), f(this, A).forEach((b) => {
-      const D = b.startTime < $ ? 0 : Math.floor((b.startTime - $) / x), F = b.endTime > p ? this.$canvas.width : Math.floor((b.endTime - $) / x);
-      H(this, B, st).call(this, {
-        startX: D,
+      const Y = b.startTime <= $ ? 0 : Math.round((b.startTime - $) / x), S = b.endTime >= p ? this.$canvas.width : Math.round((b.endTime - $) / x);
+      Y < this.$canvas.width && S > 0 && H(this, B, st).call(this, {
+        startX: Y,
         startY: 0,
-        endX: F,
+        endX: S,
         endY: this.$canvas.height,
         bgColor: b.bgColor || this.cfg.areaBgColor
       });
@@ -393,7 +393,7 @@ class zt {
       startTime: $,
       timePerPixel: x,
       scaleHeight: f(this, X),
-      timeSpacing: f(this, Y),
+      timeSpacing: f(this, D),
       currentTime: f(this, O),
       $canvas: this.$canvas,
       cfg: this.cfg,
@@ -413,14 +413,14 @@ class zt {
     f(this, Z).off(t, s);
   }
 }
-Z = new WeakMap(), O = new WeakMap(), A = new WeakMap(), Y = new WeakMap(), X = new WeakMap(), N = new WeakMap(), nt = new WeakSet(), Dt = function(t) {
+Z = new WeakMap(), O = new WeakMap(), A = new WeakMap(), D = new WeakMap(), X = new WeakMap(), N = new WeakMap(), nt = new WeakSet(), Dt = function(t) {
   L(this, N, !0);
   let s = 0, r = f(this, O);
   const l = Mt(({ offsetX: p }) => {
     if (!f(this, N))
       return;
     const v = p - t.offsetX;
-    r = Math.round(f(this, O) - f(this, Y) / this.cfg.scaleSpacing * (v - s)), s = v, this.draw({
+    r = Math.round(f(this, O) - f(this, D) / this.cfg.scaleSpacing * (v - s)), s = v, this.draw({
       currentTime: r,
       areas: f(this, A),
       _privateFlag: !0
@@ -433,12 +433,12 @@ Z = new WeakMap(), O = new WeakMap(), A = new WeakMap(), Y = new WeakMap(), X = 
   this.$canvas.addEventListener("mousemove", l), this.$canvas.addEventListener("mousemove", g), document.addEventListener("mouseup", $);
 }, rt = new WeakSet(), wt = function(t) {
   t.preventDefault();
-  const s = this.cfg.timeSpacingList.findIndex((r) => r === f(this, Y));
-  t.deltaY < 0 && s > 0 ? (L(this, Y, this.cfg.timeSpacingList[s - 1]), this.draw({
+  const s = this.cfg.timeSpacingList.findIndex((r) => r === f(this, D));
+  t.deltaY < 0 && s > 0 ? (L(this, D, this.cfg.timeSpacingList[s - 1]), this.draw({
     currentTime: f(this, O),
     areas: f(this, A),
     _privateFlag: !0
-  })) : t.deltaY > 0 && s < this.cfg.timeSpacingList.length - 1 && (L(this, Y, this.cfg.timeSpacingList[s + 1]), this.draw({
+  })) : t.deltaY > 0 && s < this.cfg.timeSpacingList.length - 1 && (L(this, D, this.cfg.timeSpacingList[s + 1]), this.draw({
     currentTime: f(this, O),
     areas: f(this, A),
     _privateFlag: !0
@@ -458,7 +458,7 @@ Z = new WeakMap(), O = new WeakMap(), A = new WeakMap(), Y = new WeakMap(), X = 
 }, ot = new WeakSet(), yt = function() {
   this.ctx.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
 }, ht = new WeakSet(), bt = function() {
-  const t = () => f(this, Y) < 1e3 ? `${f(this, Y)}ms` : f(this, Y) < 6e4 ? `${Math.round(f(this, Y) / 100) / 10}sec` : f(this, Y) < 36e5 ? `${Math.round(f(this, Y) / 100 / 60) / 10}min` : f(this, Y) < 864e5 ? `${Math.round(f(this, Y) / 100 / 60 / 60) / 10}hours` : f(this, Y) < 6048e5 ? `${Math.round(f(this, Y) / 100 / 60 / 60 / 24) / 10}days` : `${Math.round(f(this, Y) / 100 / 60 / 60 / 24 / 7) / 10}weeks`;
+  const t = () => f(this, D) < 1e3 ? `${f(this, D)}ms` : f(this, D) < 6e4 ? `${Math.round(f(this, D) / 100) / 10}sec` : f(this, D) < 36e5 ? `${Math.round(f(this, D) / 100 / 60) / 10}min` : f(this, D) < 864e5 ? `${Math.round(f(this, D) / 100 / 60 / 60) / 10}hours` : f(this, D) < 6048e5 ? `${Math.round(f(this, D) / 100 / 60 / 60 / 24) / 10}days` : `${Math.round(f(this, D) / 100 / 60 / 60 / 24 / 7) / 10}weeks`;
   H(this, G, vt).call(this, {
     x: this.cfg.scaleSpacing + 12,
     y: 9,

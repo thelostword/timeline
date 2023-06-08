@@ -62,7 +62,7 @@ timeline.on('dragged', (timestamp) => {
 </html>
 ```
 
-
+## Document
 ### Config
 | Property | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
