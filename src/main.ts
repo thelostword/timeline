@@ -1,50 +1,35 @@
-import type {
-  AreaType,
-  DrawType,
-  ScaleHeightType,
-  ConfigMap,
-  InstanceConfigMap,
-  DrawTextType,
-  DrawAreaType,
-  DrawLineType,
-} from './type';
+
+import type timeline from '../types';
 import type { EventType, Handler } from 'mitt';
 import mitt from 'mitt';
 import { throttle, drawScale, setAlpha } from './utils';
 import { defaultConfig } from './config';
 
-
 class TimeLine {
   $canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   $canvasParent: HTMLElement | undefined;
-
-  cfg: InstanceConfigMap;
+  cfg: timeline.InstanceConfigMap;
   #emitter = mitt();
-
   #currentTime = 0;
-  #areas?: AreaType;
-
+  #areas?: timeline.DrawAreasType[];
   #timeSpacing: number;
-
   // 刻度高度
-  #scaleHeight: ScaleHeightType;
+  #scaleHeight: timeline.ScaleHeightMap;
   // 是否在拖拽中
   #isDragging = false;
 
-  constructor(el: string, cfg?: ConfigMap) {
-    // ----------- 检查el参数 -----------
+  constructor(el: timeline.ElementType, cfg?: timeline.ConfigMap) {
     if (!el) throw new Error('canvas Element Or Element ID is required!');
     if (typeof el === 'string') this.$canvas = document.querySelector(el) as HTMLCanvasElement;
     else this.$canvas = el;
-    if (!(this.$canvas instanceof HTMLCanvasElement)) throw new Error('element must be canvas!');
     this.ctx = this.$canvas.getContext('2d')!;
 
     // 获取配置项
     this.cfg = { ...defaultConfig, ...cfg };
-    const { fill, width, height, zoom, timeSpacingList, scaleHeight, textColor } = this.cfg;
-    this.cfg.bgTextColor = setAlpha(textColor, .18);
-
+    const { fill, width, height, zoom, timeSpacingList, scaleHeight, textColor, bgTextColor } = this.cfg;
+    if (!bgTextColor) this.cfg.bgTextColor = setAlpha(textColor, .18);
+    
     // 检查zoom参数是否合法
     if (zoom < 0 || zoom >= timeSpacingList.length || zoom % 1 !== 0) {
       throw new Error(`zoom must be 0 ~ ${timeSpacingList.length - 1}, and must be an integer`);
@@ -88,7 +73,7 @@ class TimeLine {
   }
 
   // 绘制时间轴
-  draw ({currentTime, areas, _privateFlag}: DrawType = {}) {
+  draw ({currentTime, areas, _privateFlag}: timeline.DrawType = {}) {
     // console.time('draw');
     // 拖拽中禁止外部调用,防止冲突
     if (this.#isDragging && !_privateFlag) return;
@@ -277,7 +262,7 @@ class TimeLine {
   }
 
   // 绘制线条
-  #drawLine({ x, y, width = 1, color= this.cfg.scaleColor }: DrawLineType) {
+  #drawLine({ x, y, width = 1, color= this.cfg.scaleColor }: timeline.DrawLineType) {
     this.ctx.beginPath();
     this.ctx.moveTo(x, this.$canvas.height);
     this.ctx.lineTo(x, this.$canvas.height - y);
@@ -288,7 +273,7 @@ class TimeLine {
   }
 
   // 绘制文字
-  #drawText ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine ='alphabetic' }: DrawTextType) {
+  #drawText ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine ='alphabetic' }: timeline.DrawTextType) {
     this.ctx.beginPath();
     this.ctx.font = `${fontSize} Arial`;
     this.ctx.fillStyle = color;
@@ -298,18 +283,18 @@ class TimeLine {
   };
 
   // 绘制区域
-  #drawArea({ startX, startY, endX, endY, bgColor }: DrawAreaType) {
+  #drawArea({ startX, startY, endX, endY, bgColor }: timeline.DrawAreaType) {
     this.ctx.beginPath();
     this.ctx.rect(startX, startY, endX - startX, endY - startY);
     this.ctx.fillStyle = bgColor;
     this.ctx.fill();
   }
   
-  on(name: 'dragged', listener: Handler) {
+  on(name: timeline.DragendEventType, listener: Handler) {
 		this.#emitter.on(name, listener);
 	}
 
-  off(name: 'dragged', listener: Handler) {
+  off(name: timeline.DragendEventType, listener: Handler) {
 		this.#emitter.off(name, listener);
 	}
 
@@ -319,4 +304,4 @@ class TimeLine {
 }
 
 
-export default TimeLine
+export default TimeLine;

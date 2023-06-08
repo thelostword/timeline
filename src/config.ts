@@ -1,4 +1,6 @@
-export const defaultConfig = {
+import type timeline from '../types';
+
+export const defaultConfig: timeline.InstanceConfigMap = {
   fill: true,
   width: 1000,
   height: 60,

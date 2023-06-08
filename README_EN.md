@@ -2,7 +2,7 @@
 # timeline
 Canvas timeline supports zooming, dragging, infinite scrolling, and custom control levels.
 ![preview](./example/demo.png)
-[Demo address](thelostword.github.io/timeline/)
+[Demo address](https://thelostword.github.io/timeline/)
 
 ## Usage
 ### ES Module
@@ -64,36 +64,38 @@ timeline.on('dragged', (timestamp) => {
 
 
 ### Config
-| Property | Type | Default | Description |
-| --- | --- | --- | --- |
-| fill | boolean | false | Whether to fit the parent container width and height. If false, you need to manually set the width and height of the canvas |
-| width | number | 1000 | The width of the canvas |
-| height | number | 60 | The height of the canvas |
-| bgColor | string | rgba(0,0,0,0.5) | The background color of the canvas |
-| textColor | string | #ffffff | The color of the text |
-| scaleColor | string | #ffffff | The color of the scale |
-| scaleSpacing | number | 7 | The spacing between scales |
-| areaBgColor | string | #ffffff55 | The background color of the shaded area |
-| pointColor | string | #00aeec | The color of the current time pointer |
-| pointWidth | number | 3 | The width of the current time pointer |
-| fps | number | 60 | The number of frames per second |
-| zoom | integer | 2 | The initial zoom value, a integer between `0` and `timeSpacingList.length - 1` (inclusive),The index value corresponding to `timeSpacingList`. |
-| timeSpacingList | number[] | [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000] | Customize the time (in milliseconds) occupied by each tick. |
-| ~~maxZoom~~ | - | - | Removed, use `timeSpacingList` instead. |
-| ~~minZoom~~ | - | - | Removed, use `timeSpacingList` instead. |
-| ~~timeFormat~~ | - | - | Removed. |
+| Property | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| fill | boolean | No | false | Whether to fit the parent container width and height. If false, you need to manually set the width and height of the canvas |
+| width | number | No | 1000 | The width of the canvas |
+| height | number | No | 60 | The height of the canvas |
+| bgColor | string | No | rgba(0,0,0,0.5) | The background color of the canvas |
+| textColor | string | No | #ffffff | The color of the text |
+| scaleColor | string | No | #ffffff | The color of the scale |
+| scaleSpacing | number | No | 7 | The spacing between scales |
+| areaBgColor | string | No | #ffffff55 | The background color of the shaded area |
+| pointColor | string | No | #00aeec | The color of the current time pointer |
+| pointWidth | number | No | 3 | The width of the current time pointer |
+| fps | number | No | 60 | The number of frames per second |
+| zoom | integer | No | 2 | The initial zoom value, a integer between `0` and `timeSpacingList.length - 1` (inclusive),The index value corresponding to `timeSpacingList`. |
+| timeSpacingList | number[] | No | [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000] | Customize the time (in milliseconds) occupied by each tick. |
+| scaleHeight | object | No | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | Scale height. If this option is set, "long" and "short" must be filled in. |
+| ~~maxZoom~~ | - | - | No | Removed, use `timeSpacingList` instead. |
+| ~~minZoom~~ | - | - | No | Removed, use `timeSpacingList` instead. |
+| ~~timeFormat~~ | - | - | No | Removed. |
 
 ### Events
 
 | Method | Description | Example |
-| --- | --- |
+| --- | --- | --- |
 | draw | Generate the timeline. | draw([DrawConfig](#DrawConfig)) |
 | on | Listen to internal events of the timeline. Currently, only the event name `dragged` is supported, which is the callback event for the end of dragging. | on(name, (listener) => void) |
 | off | Cancel listening to internal events of the timeline. | off(name, listener)、 Cancel all event listeners for the timeline. off('*') |
+| getCurrentTime | Get the current time. | - |
 
 #### DrawConfig
 | Parameter | Type | Required | Default | Description |
-| --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | currentTime | number | No | | TDate.now() | The center point points to the timestamp in milliseconds. |
 | areas | Object[] | No | [] | Shaded areas |
 
@@ -142,4 +144,4 @@ timeline.on('dragged', (timestamp) => {
 
 [MIT](https://opensource.org/licenses/MIT)
 
-Copyright (c) 2022-present, XiuLiu <https://www.github.com/thelostword>
+Copyright (c) 2022-present losting<https://www.github.com/thelostword>
