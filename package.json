@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./dist/timeline.iife.js",
   "module": "./dist/timeline.es.js",
-  "types": "./types/timeline.d.ts",
+  "types": "./index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -15,10 +15,9 @@
   "files": [
     "LICENSE",
     "dist",
-    "types/timeline.d.ts",
+    "index.d.ts",
     "README.md",
-    "example/demo.png",
-    "index.html"
+    "example/demo.png"
   ],
   "keywords": [
     "timeline",

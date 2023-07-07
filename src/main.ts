@@ -1,5 +1,5 @@
 
-import type timeline from '../types';
+import type timeline from './typings';
 import type { EventType, Handler } from 'mitt';
 import mitt from 'mitt';
 import { throttle, drawScale, setAlpha } from './utils';

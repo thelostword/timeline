@@ -80,6 +80,7 @@ timeline.on('dragged', (timestamp) => {
 | zoom | integer | 否 | 3 | 初始缩放值，`0` ~ `timeSpacingList.length - 1` 之间(包含)的正整数。 对应 `timeSpacingList` 的索引值 |
 | timeSpacingList | number[] | 否 | `[10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000]` | 自定义每刻度所占时间（毫秒） |
 | scaleHeight | object | 否 | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | 刻度高度，如果设置此项，则long、short必填 |
+| bgTextColor | string | 否 | rgba(`textColor`, .18) | 背景文字的颜色 |
 | ~~maxZoom~~ | - | - | - | 已移除，设置 `timeSpacingList` 替代 |
 | ~~minZoom~~ | - | - | - | 已移除，设置 `timeSpacingList` 替代 |
 | ~~timeFormat~~ | - | - | - | 已移除 

@@ -1,4 +1,4 @@
-import type timeline from '../types';
+import type timeline from './typings';
 
 export const defaultConfig: timeline.InstanceConfigMap = {
   fill: true,

@@ -1,4 +1,4 @@
-import type timeline from '../types';
+import type timeline from './typings';
 import dayjs from 'dayjs';
 
 // 格式化

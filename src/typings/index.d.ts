@@ -3,23 +3,6 @@ export = timeline;
 declare namespace timeline {
   export type ElementType = string | HTMLCanvasElement;
 
-  export type ConfigMap = {
-    fill?: boolean,
-    width?: number,
-    height?: number,
-    bgColor?: string,
-    areaBgColor?: string,
-    textColor?: string,
-    scaleColor?: string,
-    scaleSpacing?: number,
-    pointColor?: string,
-    pointWidth?: number,
-    fps?: number,
-    zoom?: number,
-    timeSpacingList?: number[],
-    bgTextColor?: string,
-  }
-
   export type InstanceConfigMap = {
     fill?: boolean;
     width?: number;
@@ -37,6 +20,8 @@ declare namespace timeline {
     scaleHeight?: ScaleHeightMap;
     bgTextColor?: string;
   }
+
+  export type ConfigMap = Partial<InstanceConfigMap>;
   
   export type DrawAreasType = {
     startTime: number;

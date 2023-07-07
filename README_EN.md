@@ -80,6 +80,7 @@ timeline.on('dragged', (timestamp) => {
 | zoom | integer | No | 2 | The initial zoom value, a integer between `0` and `timeSpacingList.length - 1` (inclusive),The index value corresponding to `timeSpacingList`. |
 | timeSpacingList | number[] | No | [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000] | Customize the time (in milliseconds) occupied by each tick. |
 | scaleHeight | object | No | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | Scale height. If this option is set, "long" and "short" must be filled in. |
+| bgTextColor | string | No | rgba(`textColor`, .18) | The color of the text on the background |
 | ~~maxZoom~~ | - | - | No | Removed, use `timeSpacingList` instead. |
 | ~~minZoom~~ | - | - | No | Removed, use `timeSpacingList` instead. |
 | ~~timeFormat~~ | - | - | No | Removed. |
