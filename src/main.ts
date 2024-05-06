@@ -2,7 +2,7 @@
 import type timeline from './typings';
 import type { EventType, Handler } from 'mitt';
 import mitt from 'mitt';
-import { throttle, drawScale, setAlpha } from './utils';
+import { throttle, drawScale, setAlpha, format } from './utils';
 import { defaultConfig } from './config';
 
 class TimeLine {
@@ -14,9 +14,7 @@ class TimeLine {
   #currentTime = 0;
   #areas?: timeline.DrawAreasType[];
   #timeSpacing: number;
-  // 刻度高度
   #scaleHeight: timeline.ScaleHeightMap;
-  // 是否在拖拽中
   #isDragging = false;
 
   constructor(el: timeline.ElementType, cfg?: timeline.ConfigMap) {
@@ -27,14 +25,18 @@ class TimeLine {
 
     // 获取配置项
     this.cfg = { ...defaultConfig, ...cfg };
+    // 兼容
+    if (cfg?.pointColor) this.cfg.pointerColor = cfg.pointColor;
+    if (cfg?.pointWidth) this.cfg.pointerWidth = cfg.pointWidth;
+
     const { fill, width, height, zoom, timeSpacingList, scaleHeight, textColor, bgTextColor } = this.cfg;
     if (!bgTextColor) this.cfg.bgTextColor = setAlpha(textColor, .18);
-    
+
     // 检查zoom参数是否合法
     if (zoom < 0 || zoom >= timeSpacingList.length || zoom % 1 !== 0) {
       throw new Error(`zoom must be 0 ~ ${timeSpacingList.length - 1}, and must be an integer`);
     }
-    
+
     // 是否填充到父元素
     if (fill) {
       // 获取父元素
@@ -47,25 +49,25 @@ class TimeLine {
       const resizeObserver = new ResizeObserver(throttle(this.#onParentResize.bind(this), 200));
       resizeObserver.observe($canvasParent);
     } else {
-      if (width) this.$canvas.width = width;
-      if (height) this.$canvas.height = height;
+      this.$canvas.width = width;
+      this.$canvas.height = height;
     }
-    
+
     this.#timeSpacing = timeSpacingList[zoom];
-    
+
     // 刻度高度
     if (scaleHeight?.long && scaleHeight?.short) {
       this.#scaleHeight = scaleHeight;
     } else {
       this.#scaleHeight = {
-        long: this.$canvas.height / 3, // 1/3高度
-        medium: this.$canvas.height / 6, // 1/6高度
-        short: this.$canvas.height / 10, // 1/10高度
+        long: this.$canvas.height / 3,
+        medium: this.$canvas.height / 6,
+        short: this.$canvas.height / 10,
       };
     }
 
     this.draw();
-    
+
     // 鼠标滚轮滚动-缩放
     this.$canvas.addEventListener('wheel', this.#onZoom.bind(this), { passive: false });
     // 拖拽按下-拖拽
@@ -77,7 +79,7 @@ class TimeLine {
     // console.time('draw');
     // 拖拽中禁止外部调用,防止冲突
     if (this.#isDragging && !_privateFlag) return;
-    
+
     // 获取参数
     this.#currentTime = currentTime || Date.now();
     this.#areas = areas || [];
@@ -137,7 +139,7 @@ class TimeLine {
       drawText: this.#drawText.bind(this),
       drawArea: this.#drawArea.bind(this),
     });
-    
+
     // 绘制比例尺
     this.#drawTimelineScale();
     // console.timeEnd('draw');
@@ -147,7 +149,7 @@ class TimeLine {
   getCurrentTime() {
     return this.#currentTime;
   }
-  
+
   // 拖拽
   #onDrag(downEvent: MouseEvent) {
     this.#isDragging = true;
@@ -184,7 +186,7 @@ class TimeLine {
       this.#isDragging = false;
       this.#emit('dragged', currentTime);
     };
-    
+
     this.$canvas.addEventListener('mousemove', moveListener);
     this.$canvas.addEventListener('mousemove', outsideListener);
     document.addEventListener('mouseup', mouseupListener);
@@ -219,9 +221,9 @@ class TimeLine {
     // 刻度高度
     if (!this.cfg.scaleHeight) {
       this.#scaleHeight = {
-        long: this.$canvas.height / 3, // 1/3高度
-        medium: this.$canvas.height / 6, // 1/6高度
-        short: this.$canvas.height / 10, // 1/10高度
+        long: this.$canvas.height / 3,
+        medium: this.$canvas.height / 6,
+        short: this.$canvas.height / 10,
       }
     }
     this.draw({
@@ -234,7 +236,7 @@ class TimeLine {
   #clear() {
     this.ctx.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
   }
-  
+
   // 绘制比例尺
   #drawTimelineScale() {
     const genPixelText = () => {
@@ -291,7 +293,7 @@ class TimeLine {
     this.ctx.fillStyle = bgColor;
     this.ctx.fill();
   }
-  
+
   on(name: timeline.DragendEventType, listener: Handler) {
 		this.#emitter.on(name, listener);
 	}
@@ -305,5 +307,8 @@ class TimeLine {
 	}
 }
 
-
-export default TimeLine;
+export {
+  format,
+  TimeLine as default
+}
+// export default TimeLine;

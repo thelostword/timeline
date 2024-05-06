@@ -1,8 +1,6 @@
 
 import path from 'node:path';
-/* eslint-disable */
 import { defineConfig } from 'vite';
-/* eslint-enable */
 
 export default () => defineConfig({
   build: {

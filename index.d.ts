@@ -1,5 +1,3 @@
-export = timeline.TimeLine;
-
 declare namespace timeline {
   export type ElementType = string | HTMLCanvasElement;
 
@@ -21,9 +19,13 @@ declare namespace timeline {
     // 刻度间距
     scaleSpacing?: number,
     // 当前时间显示背景色
-    pointColor?: string,
+    pointerColor?: string,
     // 当前时间显示宽度
-    pointWidth?: number,
+    pointerWidth?: number,
+    // 当前时间显示区域宽度
+    pointerDisplayWidth?: number,
+    // 当前时间显示区域高度
+    pointerDisplayHeight?: number,
     // 每秒帧数，Frames Per Second
     fps?: number,
     // 默认焦距
@@ -33,7 +35,7 @@ declare namespace timeline {
     // 背景文字颜色
     bgTextColor?: string,
   }
-  
+
   export type DrawAreasType = {
     startTime: number;
     endTime: number;
@@ -107,3 +109,15 @@ declare namespace timeline {
     off(event: DragendEventType, listener: DragendHandler): void;
   }
 }
+
+/**
+ * date formatter.
+ * ```
+ * const str = format(Date.now(), 'yyyy-MM-dd HH:mm:ss');
+ * console.log(str);
+ * ```
+ * Docs: https://day.js.org/docs/en/display/format
+ */
+export declare const format: (date: string | number | Date | null | undefined, fmt?: string) => string;
+
+export default timeline.TimeLine;

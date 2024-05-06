@@ -15,7 +15,7 @@
   </div>
 
   <script type="module">
-    import TimeLine from './dist/timeline.es.js';
+    import TimeLine, { format } from './dist/timeline.es.js';
 
     const timeline = new TimeLine('#Timeline', {
       fill: false,
@@ -35,10 +35,12 @@
     });
 
     const TimeValue = document.querySelector('#TimeValue');
-    TimeValue.textContent = new Date(timeline.getCurrentTime());
+    TimeValue.textContent = format(timeline.getCurrentTime(), 'YYYY-MM-DD HH:mm:ss');
+
     timeline.on('dragged', (timestamp) => {
-      TimeValue.textContent = new Date(timestamp);
-    })
+      TimeValue.textContent = format(timestamp, 'YYYY-MM-DD HH:mm:ss');
+    });
+    console.log(timeline);
   </script>
 </body>
 </html>

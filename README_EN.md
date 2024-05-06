@@ -2,7 +2,7 @@
 # timeline
 Canvas timeline supports zooming, dragging, infinite scrolling, and custom control levels.
 ![preview](./example/demo.png)
-[Demo address](https://thelostword.github.io/timeline/)
+<a href="https://thelostword.github.io/timeline/" target="_blank">Demo address</a>
 
 ## Usage
 ### ES Module
@@ -74,16 +74,15 @@ timeline.on('dragged', (timestamp) => {
 | scaleColor | string | No | #ffffff | The color of the scale |
 | scaleSpacing | number | No | 7 | The spacing between scales |
 | areaBgColor | string | No | #ffffff55 | The background color of the shaded area |
-| pointColor | string | No | #00aeec | The color of the current time pointer |
-| pointWidth | number | No | 3 | The width of the current time pointer |
+| pointerColor | string | No | #00aeec | The color of the current time pointer |
+| pointerWidth | number | No | 3 | The width of the current time pointer |
+| pointerDisplayWidth | number | No | 100 | width of pointer display area |
+| pointerDisplayHeight | number | No | 14 | height of pointer display area |
 | fps | number | No | 60 | The number of frames per second |
 | zoom | integer | No | 2 | The initial zoom value, a integer between `0` and `timeSpacingList.length - 1` (inclusive),The index value corresponding to `timeSpacingList`. |
 | timeSpacingList | number[] | No | [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000] | Customize the time (in milliseconds) occupied by each tick. |
 | scaleHeight | object | No | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | Scale height. If this option is set, "long" and "short" must be filled in. |
 | bgTextColor | string | No | rgba(`textColor`, .18) | The color of the text on the background |
-| ~~maxZoom~~ | - | - | No | Removed, use `timeSpacingList` instead. |
-| ~~minZoom~~ | - | - | No | Removed, use `timeSpacingList` instead. |
-| ~~timeFormat~~ | - | - | No | Removed. |
 
 ### Events
 
@@ -107,39 +106,6 @@ timeline.on('dragged', (timestamp) => {
 | endTime | number | Yes | - | End timestamp of the shadow area (in milliseconds). |
 | bgColor | string | No | `Config.bgColor` | Background color of the current shadow area. |
 
-
-## Upgrade v2.X -> v3.X.
-``` html
-<canvas id="Timeline"></canvas>
-<script>
-  // -------- v2 -----------
-  const timeline = new Timeline('Timeline', {
-    fill: false,
-    width: 1000,
-    height: 60,
-  });
-  timeline.on('timeUpdate', (timestamp) => {
-    // ...
-  })
-
-  // ---------> v3 --------------
-  const timeline = new Timeline('#Timeline', {
-    // ...
-    // Note that the timestamps here have been changed from seconds to milliseconds.
-  });
-  // OR
-  const timeline = new Timeline(document.querySelector('#Timeline'), {
-    // ...
-  });
-
-  timeline.on('dragged', (timestamp) => {
-    // ...
-  })
-
-</script>
-
-```
-> For other changes, please refer to the above-mentioned documentation.
 
 ## License
 

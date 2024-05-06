@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 
 // 格式化
 // https://day.js.org/docs/en/display/format
-export const formatTimestamp = (timestamp: number, format = 'MM/DD HH:mm') => dayjs(timestamp).format(format);
+export const format = (timestamp: number, fmt = 'MM/DD HH:mm') => dayjs(timestamp).format(fmt);
 
 // 节流函数
 export const throttle = (func: Function, delay: number) => {
@@ -37,13 +37,13 @@ export const setAlpha = (color: string, alpha: number) => {
 }
 
 // 刻度绘制
-export const drawScale: timeline.DrawScale = ({xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
-  const drawMethods = ({ space, scaleFormat, bgFormat, currentFormat }: { space: number, scaleFormat: string, bgFormat: string, currentFormat: string }) => {
+export const drawScale: timeline.DrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
+  const drawMethods = ({ space, scaleTimeFormat, bgTimeFormat, pointerTimeFormat }: { space: number, scaleTimeFormat: string, bgTimeFormat: string, pointerTimeFormat: string }) => {
     // 当前年月日
     drawText({
       x: $canvas.width - xCenterPoint / 10,
       y: 6,
-      text: formatTimestamp(currentTime, bgFormat),
+      text: format(currentTime, bgTimeFormat),
       fontSize: `${$canvas.height - 5}px`,
       align: 'right',
       baseLine: 'top',
@@ -55,14 +55,14 @@ export const drawScale: timeline.DrawScale = ({xCenterPoint, cfg, timePerPixel, 
     const xOffset = timeOffset / timePerPixel;
 
     for(let i = 0; i < screenScaleCount; i++) {
-      const x = i * cfg.scaleSpacing - xOffset - cfg.pointWidth / 2;
+      const x = i * cfg.scaleSpacing - xOffset - cfg.pointerWidth / 2;
       const time = startTime + i * timeSpacing - timeOffset;
       if (time % (timeSpacing * space) === 0) {
         drawLine({ x, y: scaleHeight.long });
         drawText({
           x,
           y: $canvas.height - scaleHeight.long - 5,
-          text: formatTimestamp(time, scaleFormat),
+          text: format(time, scaleTimeFormat),
           baseLine: 'bottom',
         });
         continue;
@@ -72,37 +72,34 @@ export const drawScale: timeline.DrawScale = ({xCenterPoint, cfg, timePerPixel, 
 
     // 当前时间指针
     drawLine({
-      x: xCenterPoint - cfg.pointWidth / 2,
+      x: xCenterPoint - cfg.pointerWidth / 2,
       y: $canvas.height,
-      width: cfg.pointWidth,
-      color: cfg.pointColor,
+      width: cfg.pointerWidth,
+      color: cfg.pointerColor,
     });
     drawArea({
-      startX: xCenterPoint - 50,
+      startX: xCenterPoint - cfg.pointerDisplayWidth / 2,
       startY: 4,
-      endX: xCenterPoint + 50,
-      endY: 18,
-      bgColor: cfg.pointColor,
+      endX: xCenterPoint + cfg.pointerDisplayWidth / 2,
+      endY: 4 + cfg.pointerDisplayHeight,
+      bgColor: cfg.pointerColor,
     });
     drawText({
       x: xCenterPoint,
-      y: 6,
-      text: formatTimestamp(currentTime, currentFormat),
+      y: cfg.pointerDisplayHeight / 2 + 5,
+      text: format(currentTime, pointerTimeFormat),
       align: 'center',
-      baseLine: 'top',
+      baseLine: 'middle',
     });
   }
 
-  if (timeSpacing < 100) drawMethods({ space: 10, scaleFormat: 'mm:ss:SSS', bgFormat: 'YYYY/MM/DD', currentFormat: 'HH:mm:ss:SSS' });
-  else if (timeSpacing < 1000) drawMethods({ space: 10, scaleFormat: 'mm:ss', bgFormat: 'YYYY/MM/DD', currentFormat: 'HH:mm:ss:SSS' });
-  else if (timeSpacing < 10000) drawMethods({ space: 10, scaleFormat: 'mm:ss', bgFormat: 'YYYY/MM/DD', currentFormat: 'HH:mm:ss' });
-  else if (timeSpacing < 60000) drawMethods({ space: 12, scaleFormat: 'HH:mm:ss', bgFormat: 'YYYY/MM/DD', currentFormat: 'HH:mm:ss' });
-  else if (timeSpacing < 600000) drawMethods({ space: 10, scaleFormat: 'HH:mm:ss', bgFormat: 'YYYY/MM/DD', currentFormat: 'HH:mm:ss' });
-  else if (timeSpacing < 3600000) drawMethods({ space: 12, scaleFormat: 'MM/DD HH:mm', bgFormat: 'YYYY/MM', currentFormat: 'MM/DD HH:mm:ss' });
-  else if (timeSpacing < 86400000) drawMethods({ space: 12, scaleFormat: 'MM/DD HH:mm', bgFormat: 'YYYY/MM', currentFormat: 'YYYY/MM/DD HH:mm' });
-  else if (timeSpacing < 604800000) drawMethods({ space: 10, scaleFormat: 'YYYY/MM/DD', bgFormat: 'YYYY', currentFormat: 'YYYY/MM/DD' });
-  else drawMethods({ space: 10, scaleFormat: 'YYYY/MM/DD', bgFormat: 'YYYY', currentFormat: 'YYYY/MM/DD' });
+  if (timeSpacing < 100) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss:SSS', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss:SSS' });
+  else if (timeSpacing < 1000) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss:SSS' });
+  else if (timeSpacing < 10000) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
+  else if (timeSpacing < 60000) drawMethods({ space: 12, scaleTimeFormat: 'HH:mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
+  else if (timeSpacing < 600000) drawMethods({ space: 10, scaleTimeFormat: 'HH:mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
+  else if (timeSpacing < 3600000) drawMethods({ space: 12, scaleTimeFormat: 'MM/DD HH:mm', bgTimeFormat: 'YYYY/MM', pointerTimeFormat: 'MM/DD HH:mm:ss' });
+  else if (timeSpacing < 86400000) drawMethods({ space: 12, scaleTimeFormat: 'MM/DD HH:mm', bgTimeFormat: 'YYYY/MM', pointerTimeFormat: 'YYYY/MM/DD HH:mm' });
+  else if (timeSpacing < 604800000) drawMethods({ space: 10, scaleTimeFormat: 'YYYY/MM/DD', bgTimeFormat: 'YYYY', pointerTimeFormat: 'YYYY/MM/DD' });
+  else drawMethods({ space: 10, scaleTimeFormat: 'YYYY/MM/DD', bgTimeFormat: 'YYYY', pointerTimeFormat: 'YYYY/MM/DD' });
 }
-
-
-

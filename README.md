@@ -2,7 +2,7 @@
 # Timeline
 Canvas 时间轴，支持缩放、拖拽、无限滚动、自定义控制级别
 ![预览图](./example/demo.png)
-[演示地址](https://thelostword.github.io/timeline/)
+<a href="https://thelostword.github.io/timeline/" target="_blank">演示地址</a>
 
 ## 如何使用
 ### ES Module
@@ -74,16 +74,15 @@ timeline.on('dragged', (timestamp) => {
 | scaleColor | string | 否 | #ffffff | 刻度颜色 |
 | scaleSpacing | number | 否 | 7 | 刻度间距 |
 | areaBgColor | string | 否 | #ffffff55 | 阴影区域背景颜色 |
-| pointColor | string | 否 | #00aeec | 当前时间指针颜色 |
-| pointWidth | number | 否 | 3 | 当前时间指针宽度 |
+| pointerColor | string | 否 | #00aeec | 当前时间指针颜色 |
+| pointerWidth | number | 否 | 3 | 当前时间指针宽度 |
+| pointerDisplayWidth | number | 否 | 100 | 当前时间显示区域宽度 |
+| pointerDisplayHeight | number | 否 | 14 | 当前时间显示区域高度 |
 | fps | number | 否 | 60 | 帧数 |
 | zoom | integer | 否 | 3 | 初始缩放值，`0` ~ `timeSpacingList.length - 1` 之间(包含)的正整数。 对应 `timeSpacingList` 的索引值 |
 | timeSpacingList | number[] | 否 | `[10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000]` | 自定义每刻度所占时间（毫秒） |
 | scaleHeight | object | 否 | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | 刻度高度，如果设置此项，则long、short必填 |
 | bgTextColor | string | 否 | rgba(`textColor`, .18) | 背景文字的颜色 |
-| ~~maxZoom~~ | - | - | - | 已移除，设置 `timeSpacingList` 替代 |
-| ~~minZoom~~ | - | - | - | 已移除，设置 `timeSpacingList` 替代 |
-| ~~timeFormat~~ | - | - | - | 已移除 
 
 ### Events
 
@@ -108,39 +107,6 @@ timeline.on('dragged', (timestamp) => {
 | endTime | number | 是 | - | 阴影区域结束时间戳（毫秒） |
 | bgColor | string | 否 | `Config.bgColor` | 当前阴影区背景颜色 |
 
-
-## 版本升级 v2.X -> v3.X
-``` html
-<canvas id="Timeline"></canvas>
-<script>
-  // -------- v2 -----------
-  const timeline = new Timeline('Timeline', {
-    fill: false,
-    width: 1000,
-    height: 60,
-  });
-  timeline.on('timeUpdate', (timestamp) => {
-    // ...
-  })
-
-  // ---------> v3 --------------
-  const timeline = new Timeline('#Timeline', {
-    // ...
-    // 注意这里时间戳由秒全部变为毫秒
-  });
-  // OR
-  const timeline = new Timeline(document.querySelector('#Timeline'), {
-    // ...
-  });
-
-  timeline.on('dragged', (timestamp) => {
-    // ...
-  })
-
-</script>
-
-```
-> 其他变更请参考上述文档
 
 ## License
 
