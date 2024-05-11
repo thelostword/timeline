@@ -1,23 +1,32 @@
 
-import type timeline from './typings';
-import type { EventType, Handler } from 'mitt';
+import type {
+  ICfg,
+  IScaleHeight,
+  IAreas,
+  IDrawOption,
+  IDrawText,
+  IDrawArea,
+  IDrawLine,
+  IEmitter
+} from './typings';
+import type { Handler } from 'mitt';
 import mitt from 'mitt';
 import { throttle, drawScale, setAlpha, format } from './utils';
 import { defaultConfig } from './config';
 
 class TimeLine {
   $canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
   $canvasParent: HTMLElement | undefined;
-  cfg: timeline.InstanceConfigMap;
-  #emitter = mitt();
+  ctx: CanvasRenderingContext2D;
+  cfg: ICfg;
+  #emitter = mitt<IEmitter>();
   #currentTime = 0;
-  #areas?: timeline.DrawAreasType[];
+  #areas?: IAreas[];
   #timeSpacing: number;
-  #scaleHeight: timeline.ScaleHeightMap;
+  #scaleHeight: IScaleHeight;
   #isDragging = false;
 
-  constructor(el: timeline.ElementType, cfg?: timeline.ConfigMap) {
+  constructor(el: string | HTMLCanvasElement, cfg?: ICfg) {
     if (!el) throw new Error('canvas Element Or Element ID is required!');
     if (typeof el === 'string') this.$canvas = document.querySelector(el) as HTMLCanvasElement;
     else this.$canvas = el;
@@ -25,6 +34,7 @@ class TimeLine {
 
     // 获取配置项
     this.cfg = { ...defaultConfig, ...cfg };
+
     // 兼容
     if (cfg?.pointColor) this.cfg.pointerColor = cfg.pointColor;
     if (cfg?.pointWidth) this.cfg.pointerWidth = cfg.pointWidth;
@@ -75,7 +85,7 @@ class TimeLine {
   }
 
   // 绘制时间轴
-  draw ({currentTime, areas, _privateFlag}: timeline.DrawType = {}) {
+  draw({ currentTime, areas, _privateFlag }: IDrawOption = {}) {
     // console.time('draw');
     // 拖拽中禁止外部调用,防止冲突
     if (this.#isDragging && !_privateFlag) return;
@@ -266,7 +276,7 @@ class TimeLine {
   }
 
   // 绘制线条
-  #drawLine({ x, y, width = 1, color= this.cfg.scaleColor }: timeline.DrawLineType) {
+  #drawLine: IDrawLine = ({ x, y, width = 1, color= this.cfg.scaleColor }) => {
     this.ctx.beginPath();
     this.ctx.moveTo(x, this.$canvas.height);
     this.ctx.lineTo(x, this.$canvas.height - y);
@@ -277,9 +287,9 @@ class TimeLine {
   }
 
   // 绘制文字
-  #drawText ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine ='alphabetic' }: timeline.DrawTextType) {
+  #drawText: IDrawText = ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine ='alphabetic' }) => {
     this.ctx.beginPath();
-    this.ctx.font = `${fontSize} Arial`;
+    this.ctx.font = `${fontSize} ${this.cfg.fontFamily}`;
     this.ctx.fillStyle = color;
     this.ctx.textAlign = align;
     this.ctx.textBaseline = baseLine;
@@ -287,22 +297,22 @@ class TimeLine {
   };
 
   // 绘制区域
-  #drawArea({ startX, startY, endX, endY, bgColor }: timeline.DrawAreaType) {
+  #drawArea: IDrawArea = ({ startX, startY, endX, endY, bgColor }) => {
     this.ctx.beginPath();
     this.ctx.rect(startX, startY, endX - startX, endY - startY);
     this.ctx.fillStyle = bgColor;
     this.ctx.fill();
   }
 
-  on(name: timeline.DragendEventType, listener: Handler) {
-		this.#emitter.on(name, listener);
+  on<Key extends keyof IEmitter>(type: Key, handler: Handler<IEmitter[Key]>) {
+		this.#emitter.on(type, handler);
 	}
 
-  off(name: timeline.DragendEventType, listener: Handler) {
-		this.#emitter.off(name, listener);
+  off<Key extends keyof IEmitter>(type: Key, handler?: Handler<IEmitter[Key]>) {
+		this.#emitter.off(type, handler);
 	}
 
-	#emit(...args: [EventType, unknown]) {
+	#emit<Key extends keyof IEmitter>(...args: [Key, IEmitter[Key]]) {
 		this.#emitter.emit(...args);
 	}
 }
@@ -311,4 +321,3 @@ export {
   format,
   TimeLine as default
 }
-// export default TimeLine;

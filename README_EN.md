@@ -71,6 +71,7 @@ timeline.on('dragged', (timestamp) => {
 | height | number | No | 60 | The height of the canvas |
 | bgColor | string | No | rgba(0,0,0,0.5) | The background color of the canvas |
 | textColor | string | No | #ffffff | The color of the text |
+| fontFamily | string | No | Arial | The font family |
 | scaleColor | string | No | #ffffff | The color of the scale |
 | scaleSpacing | number | No | 7 | The spacing between scales |
 | areaBgColor | string | No | #ffffff55 | The background color of the shaded area |
@@ -83,6 +84,7 @@ timeline.on('dragged', (timestamp) => {
 | timeSpacingList | number[] | No | [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000] | Customize the time (in milliseconds) occupied by each tick. |
 | scaleHeight | object | No | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | Scale height. If this option is set, "long" and "short" must be filled in. |
 | bgTextColor | string | No | rgba(`textColor`, .18) | The color of the text on the background |
+| thresholdsConfig | Object | 否 | [see: config.js](./src/config.ts) | corresponding scaling threshold configuration, when `timeSpacingList` exists, this option is required. |
 
 ### Events
 

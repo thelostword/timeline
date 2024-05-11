@@ -1,4 +1,4 @@
-import type timeline from './typings';
+import type { IDrawScale } from './typings';
 import dayjs from 'dayjs';
 
 // 格式化
@@ -37,7 +37,7 @@ export const setAlpha = (color: string, alpha: number) => {
 }
 
 // 刻度绘制
-export const drawScale: timeline.DrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
+export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
   const drawMethods = ({ space, scaleTimeFormat, bgTimeFormat, pointerTimeFormat }: { space: number, scaleTimeFormat: string, bgTimeFormat: string, pointerTimeFormat: string }) => {
     // 当前年月日
     drawText({
@@ -93,13 +93,36 @@ export const drawScale: timeline.DrawScale = ({ xCenterPoint, cfg, timePerPixel,
     });
   }
 
-  if (timeSpacing < 100) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss:SSS', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss:SSS' });
-  else if (timeSpacing < 1000) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss:SSS' });
-  else if (timeSpacing < 10000) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
-  else if (timeSpacing < 60000) drawMethods({ space: 12, scaleTimeFormat: 'HH:mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
-  else if (timeSpacing < 600000) drawMethods({ space: 10, scaleTimeFormat: 'HH:mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
-  else if (timeSpacing < 3600000) drawMethods({ space: 12, scaleTimeFormat: 'MM/DD HH:mm', bgTimeFormat: 'YYYY/MM', pointerTimeFormat: 'MM/DD HH:mm:ss' });
-  else if (timeSpacing < 86400000) drawMethods({ space: 12, scaleTimeFormat: 'MM/DD HH:mm', bgTimeFormat: 'YYYY/MM', pointerTimeFormat: 'YYYY/MM/DD HH:mm' });
-  else if (timeSpacing < 604800000) drawMethods({ space: 10, scaleTimeFormat: 'YYYY/MM/DD', bgTimeFormat: 'YYYY', pointerTimeFormat: 'YYYY/MM/DD' });
-  else drawMethods({ space: 10, scaleTimeFormat: 'YYYY/MM/DD', bgTimeFormat: 'YYYY', pointerTimeFormat: 'YYYY/MM/DD' });
+  // const formatThresholds: number[] = Object.keys(cfg.formats).map(Number).sort((a, b) => a - b);
+
+  const thresholdConfig = cfg.thresholdsConfig[timeSpacing];
+  if (thresholdConfig) {
+    drawMethods({
+      space: thresholdConfig.space,
+      scaleTimeFormat: thresholdConfig.scaleTimeFormat,
+      bgTimeFormat: thresholdConfig.bgTimeFormat,
+      pointerTimeFormat: thresholdConfig.pointerTimeFormat,
+    });
+  }
+
+  // formatThresholds.forEach((threshold) => {
+  //   if (timeSpacing !== threshold) return;
+  //   // const intervals = timeSpacing < 60000 || timeSpacing >= 604800000 || (timeSpacing >= 60000 && timeSpacing < 3600000) ? 10 : 12;
+  //   drawMethods({
+  //     space: cfg.formats[threshold].space || 10,
+  //     scaleTimeFormat: cfg.formats[threshold].scaleTimeFormat,
+  //     bgTimeFormat: cfg.formats[threshold].bgTimeFormat,
+  //     pointerTimeFormat: cfg.formats[threshold].pointerTimeFormat,
+  //   });
+  // });
+
+  // if (timeSpacing < 100) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss:SSS', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss:SSS' });
+  // else if (timeSpacing < 1000) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss:SSS' });
+  // else if (timeSpacing < 10000) drawMethods({ space: 10, scaleTimeFormat: 'mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
+  // else if (timeSpacing < 60000) drawMethods({ space: 12, scaleTimeFormat: 'HH:mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
+  // else if (timeSpacing < 600000) drawMethods({ space: 10, scaleTimeFormat: 'HH:mm:ss', bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'HH:mm:ss' });
+  // else if (timeSpacing < 3600000) drawMethods({ space: 12, scaleTimeFormat: 'MM/DD HH:mm', bgTimeFormat: 'YYYY/MM', pointerTimeFormat: 'MM/DD HH:mm:ss' });
+  // else if (timeSpacing < 86400000) drawMethods({ space: 12, scaleTimeFormat: 'MM/DD HH:mm', bgTimeFormat: 'YYYY/MM', pointerTimeFormat: 'YYYY/MM/DD HH:mm' });
+  // else if (timeSpacing < 604800000) drawMethods({ space: 10, scaleTimeFormat: 'YYYY/MM/DD', bgTimeFormat: 'YYYY', pointerTimeFormat: 'YYYY/MM/DD' });
+  // else drawMethods({ space: 10, scaleTimeFormat: 'YYYY/MM/DD', bgTimeFormat: 'YYYY', pointerTimeFormat: 'YYYY/MM/DD' });
 }

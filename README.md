@@ -71,6 +71,7 @@ timeline.on('dragged', (timestamp) => {
 | height | number | 否 | 60 | canvas高度 |
 | bgColor | string | 否 | rgba(0,0,0,0.5) | canvas背景色 |
 | textColor | string | 否 | #ffffff | 文字颜色 |
+| fontFamily | string | 否 | Arial | 字体 |
 | scaleColor | string | 否 | #ffffff | 刻度颜色 |
 | scaleSpacing | number | 否 | 7 | 刻度间距 |
 | areaBgColor | string | 否 | #ffffff55 | 阴影区域背景颜色 |
@@ -83,6 +84,7 @@ timeline.on('dragged', (timestamp) => {
 | timeSpacingList | number[] | 否 | `[10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000]` | 自定义每刻度所占时间（毫秒） |
 | scaleHeight | object | 否 | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | 刻度高度，如果设置此项，则long、short必填 |
 | bgTextColor | string | 否 | rgba(`textColor`, .18) | 背景文字的颜色 |
+| thresholdsConfig | Object | 否 | [见默认配置文件](./src/config.ts) | 对应缩放阈值的配置, 当 `timeSpacingList` 配置时，该选项必填 |
 
 ### Events
 

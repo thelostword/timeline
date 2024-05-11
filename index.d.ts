@@ -1,7 +1,7 @@
-declare namespace timeline {
+declare namespace TL {
   export type ElementType = string | HTMLCanvasElement;
 
-  export type ConfigMap = {
+  type CommonType = {
     // 根据父容器自动填充
     fill?: boolean,
     // 宽度
@@ -14,6 +14,8 @@ declare namespace timeline {
     areaBgColor?: string,
     // 文字颜色
     textColor?: string,
+    // 字体
+    fontFamily?: string,
     // 刻度颜色
     scaleColor?: string,
     // 刻度间距
@@ -30,11 +32,28 @@ declare namespace timeline {
     fps?: number,
     // 默认焦距
     zoom?: number,
-    // 时间间距
-    timeSpacingList?: number[],
     // 背景文字颜色
     bgTextColor?: string,
   }
+
+  export type ConfigMap<T extends number> = (CommonType & {
+    timeSpacingList?: undefined,
+    thresholdsConfig?: undefined,
+  }) | (CommonType & {
+    // 时间间距
+    timeSpacingList: T[],
+    // 其他配置，暂定，配置结构待调整，key必须为 timeSpacingList 中的值
+    thresholdsConfig: Record<T, {
+      // 刻度时间格式化
+      scaleTimeFormat: string,
+      // 背景显示时间格式化
+      bgTimeFormat: string,
+      // 当前时间格式化
+      pointerTimeFormat: string,
+      // 刻度时间显示间距，间隔的小刻度数量
+      space: number,
+    }>,
+  });
 
   export type DrawAreasType = {
     startTime: number;
@@ -46,11 +65,16 @@ declare namespace timeline {
     areas?: DrawAreasType[];
   }
 
-  export type DragendEventType = 'dragend';
+  export type DragendEventType = 'dragged';
   export type DragendHandler<T = number> = (event: T) => void;
 
-  export class TimeLine {
-    constructor (el: ElementType, config?: ConfigMap);
+  export class TimeLine<T extends number> {
+    $canvas: HTMLCanvasElement;
+    $canvasParent: HTMLElement;
+    cfg: ConfigMap<T>;
+    ctx: CanvasRenderingContext2D;
+
+    constructor (el: ElementType, config?: ConfigMap<T>);
 
     /**
      * Custom draw methods.
@@ -120,4 +144,4 @@ declare namespace timeline {
  */
 export declare const format: (date: string | number | Date | null | undefined, fmt?: string) => string;
 
-export default timeline.TimeLine;
+export default TL.TimeLine;
