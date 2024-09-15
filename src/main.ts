@@ -163,15 +163,14 @@ class TimeLine {
   // 拖拽
   #onDrag(downEvent: MouseEvent) {
     this.#isDragging = true;
-    let preXOffset = 0;
+    let prevClientX = downEvent.clientX;
     let currentTime = this.#currentTime;
 
     // 监听鼠标移动
-    const moveListener = throttle(({ offsetX }: MouseEvent) => {
+    const moveListener = throttle(({ clientX }: MouseEvent) => {
       if (!this.#isDragging) return;
-      const curXOffset = offsetX - downEvent.offsetX;
-      currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (curXOffset - preXOffset));
-      preXOffset = curXOffset;
+      currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (clientX - prevClientX));
+      prevClientX = clientX;
       this.draw({
         currentTime,
         areas: this.#areas,
