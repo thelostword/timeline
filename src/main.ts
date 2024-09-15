@@ -179,14 +179,17 @@ class TimeLine {
     }, 1000 / this.cfg.fps);
 
     // 监听是否移动到区域之外
-    const outsideListener = ({offsetX, offsetY}: MouseEvent) => {
+    const outsideListener = (e: MouseEvent) => {
+      const rect = this.$canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
       const AFFECT = 3;
-      if (offsetX < AFFECT || offsetX > this.$canvas.width - AFFECT || offsetY < AFFECT || offsetY > this.$canvas.height - AFFECT) {
+      if (x < AFFECT || x > this.$canvas.width - AFFECT || y < AFFECT || y > this.$canvas.height - AFFECT) {
         this.$canvas.removeEventListener('mousemove', moveListener);
         this.$canvas.removeEventListener('mousemove', outsideListener);
       }
     };
-
+    
     // 监听鼠标放开
     const mouseupListener = () => {
       this.$canvas.removeEventListener('mousemove', moveListener);
