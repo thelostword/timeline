@@ -240,7 +240,7 @@ class TimeLine {
   }
 
   // 缩放
-  #onZoom(e: WheelEvent) {
+  #onZoom(e: WheelEvent | TouchEvent) {
     e.preventDefault();
     let delta = 0;
 

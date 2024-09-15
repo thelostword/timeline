@@ -551,7 +551,7 @@ Mt = function(t) {
     this.$canvas.removeEventListener("mousemove", f), this.$canvas.removeEventListener("mousemove", d), document.removeEventListener("mouseup", m), S(this, W, !1), _(this, b, dt).call(this, "dragged", r);
   };
   this.$canvas.addEventListener("mousemove", f), this.$canvas.addEventListener("mousemove", d), document.addEventListener("mouseup", m);
-}, // Touch event handlers
+}, // 触摸事件监听器
 Dt = function(t) {
   t.preventDefault(), S(this, W, !0), S(this, I, t.touches[0].clientX);
 }, Tt = function(t) {
