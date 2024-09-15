@@ -240,44 +240,25 @@ class TimeLine {
   }
 
   // 缩放
-  #onZoom(e: WheelEvent | TouchEvent) {
+  #onZoom(e: WheelEvent) {
     e.preventDefault();
-    let delta = 0;
-
-    if (e instanceof WheelEvent) {
-      delta = e.deltaY;
-    } else if (e instanceof TouchEvent && e.touches.length === 2) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const currentDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-
-      if (this.#lastPinchDistance) {
-        delta = this.#lastPinchDistance - currentDistance;
-      }
-
-      this.#lastPinchDistance = currentDistance;
-    } else {
-      return;
-    }
-
     const currentIndex = this.cfg.timeSpacingList.findIndex(item => item === this.#timeSpacing);
-    if (delta < 0 && currentIndex > 0) {
+    if (e.deltaY < 0 && currentIndex > 0) {
       this.#timeSpacing = this.cfg.timeSpacingList[currentIndex - 1];
-    } else if (delta > 0 && currentIndex < this.cfg.timeSpacingList.length - 1) {
+      this.draw({
+        currentTime: this.#currentTime,
+        areas: this.#areas,
+        _privateFlag: true,
+      });
+    } else if (e.deltaY > 0 && currentIndex < this.cfg.timeSpacingList.length - 1) {
       this.#timeSpacing = this.cfg.timeSpacingList[currentIndex + 1];
-    } else {
-      return;
+      this.draw({
+        currentTime: this.#currentTime,
+        areas: this.#areas,
+        _privateFlag: true,
+      });
     }
-
-    this.draw({
-      currentTime: this.#currentTime,
-      areas: this.#areas,
-      _privateFlag: true,
-    });
   }
-
-  // Add a property to store the last pinch distance
-  #lastPinchDistance: number | null = null;
 
   // 父元素size变化
   #onParentResize() {
