@@ -163,15 +163,14 @@ class TimeLine {
   // 拖拽
   #onDrag(downEvent: MouseEvent) {
     this.#isDragging = true;
-    let preXOffset = 0;
+    let prevClientX = downEvent.clientX;
     let currentTime = this.#currentTime;
 
     // 监听鼠标移动
-    const moveListener = throttle(({ offsetX }: MouseEvent) => {
+    const moveListener = throttle(({ clientX }: MouseEvent) => {
       if (!this.#isDragging) return;
-      const curXOffset = offsetX - downEvent.offsetX;
-      currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (curXOffset - preXOffset));
-      preXOffset = curXOffset;
+      currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (clientX - prevClientX));
+      prevClientX = clientX;
       this.draw({
         currentTime,
         areas: this.#areas,
@@ -180,14 +179,17 @@ class TimeLine {
     }, 1000 / this.cfg.fps);
 
     // 监听是否移动到区域之外
-    const outsideListener = ({offsetX, offsetY}: MouseEvent) => {
+    const outsideListener = (e: MouseEvent) => {
+      const rect = this.$canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
       const AFFECT = 3;
-      if (offsetX < AFFECT || offsetX > this.$canvas.width - AFFECT || offsetY < AFFECT || offsetY > this.$canvas.height - AFFECT) {
+      if (x < AFFECT || x > this.$canvas.width - AFFECT || y < AFFECT || y > this.$canvas.height - AFFECT) {
         this.$canvas.removeEventListener('mousemove', moveListener);
         this.$canvas.removeEventListener('mousemove', outsideListener);
       }
     };
-
+    
     // 监听鼠标放开
     const mouseupListener = () => {
       this.$canvas.removeEventListener('mousemove', moveListener);
