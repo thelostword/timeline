@@ -1,4 +1,3 @@
-
 import type {
   ICfg,
   IScaleHeight,
@@ -25,6 +24,7 @@ class TimeLine {
   #timeSpacing: number;
   #scaleHeight: IScaleHeight;
   #isDragging = false;
+  #lastTouchX: number | null = null;
 
   constructor(el: string | HTMLCanvasElement, cfg?: ICfg) {
     if (!el) throw new Error('canvas Element Or Element ID is required!');
@@ -82,6 +82,10 @@ class TimeLine {
     this.$canvas.addEventListener('wheel', this.#onZoom.bind(this), { passive: false });
     // 拖拽按下-拖拽
     this.$canvas.addEventListener('mousedown', this.#onDrag.bind(this));
+    // 触摸事件监听器
+    this.$canvas.addEventListener('touchstart', this.#onTouchStart.bind(this), { passive: false });
+    this.$canvas.addEventListener('touchmove', this.#onTouchMove.bind(this), { passive: false });
+    this.$canvas.addEventListener('touchend', this.#onTouchEnd.bind(this));
   }
 
   // 绘制时间轴
@@ -189,7 +193,7 @@ class TimeLine {
         this.$canvas.removeEventListener('mousemove', outsideListener);
       }
     };
-    
+
     // 监听鼠标放开
     const mouseupListener = () => {
       this.$canvas.removeEventListener('mousemove', moveListener);
@@ -202,6 +206,37 @@ class TimeLine {
     this.$canvas.addEventListener('mousemove', moveListener);
     this.$canvas.addEventListener('mousemove', outsideListener);
     document.addEventListener('mouseup', mouseupListener);
+  }
+
+  // 触摸事件监听器
+  #onTouchStart(e: TouchEvent) {
+    e.preventDefault();
+    this.#isDragging = true;
+    this.#lastTouchX = e.touches[0].clientX;
+  }
+
+  #onTouchMove(e: TouchEvent) {
+    e.preventDefault();
+    if (!this.#isDragging || this.#lastTouchX === null) return;
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - this.#lastTouchX;
+    const currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * deltaX);
+
+    this.#lastTouchX = touch.clientX;
+
+    this.draw({
+      currentTime,
+      areas: this.#areas,
+      _privateFlag: true,
+    });
+  }
+
+  #onTouchEnd() {
+    if (!this.#isDragging) return;
+    this.#isDragging = false;
+    this.#lastTouchX = null;
+    this.#emit('dragged', this.#currentTime);
   }
 
   // 缩放
@@ -278,7 +313,7 @@ class TimeLine {
   }
 
   // 绘制线条
-  #drawLine: IDrawLine = ({ x, y, width = 1, color= this.cfg.scaleColor }) => {
+  #drawLine: IDrawLine = ({ x, y, width = 1, color = this.cfg.scaleColor }) => {
     this.ctx.beginPath();
     this.ctx.moveTo(x, this.$canvas.height);
     this.ctx.lineTo(x, this.$canvas.height - y);
@@ -289,7 +324,7 @@ class TimeLine {
   }
 
   // 绘制文字
-  #drawText: IDrawText = ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine ='alphabetic' }) => {
+  #drawText: IDrawText = ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine = 'alphabetic' }) => {
     this.ctx.beginPath();
     this.ctx.font = `${fontSize} ${this.cfg.fontFamily}`;
     this.ctx.fillStyle = color;
@@ -307,16 +342,16 @@ class TimeLine {
   }
 
   on<Key extends keyof IEmitter>(type: Key, handler: Handler<IEmitter[Key]>) {
-		this.#emitter.on(type, handler);
-	}
+    this.#emitter.on(type, handler);
+  }
 
   off<Key extends keyof IEmitter>(type: Key, handler?: Handler<IEmitter[Key]>) {
-		this.#emitter.off(type, handler);
-	}
+    this.#emitter.off(type, handler);
+  }
 
-	#emit<Key extends keyof IEmitter>(...args: [Key, IEmitter[Key]]) {
-		this.#emitter.emit(...args);
-	}
+  #emit<Key extends keyof IEmitter>(...args: [Key, IEmitter[Key]]) {
+    this.#emitter.emit(...args);
+  }
 }
 
 export {
