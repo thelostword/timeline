@@ -25,6 +25,14 @@ export const throttle = (func: Function, delay: number) => {
   };
 }
 
+// 获取双指距离
+export const getPinchDistance = (touches: TouchList) => {
+  const [touch1, touch2] = [touches[0], touches[1]];
+  const dx = touch2.clientX - touch1.clientX;
+  const dy = touch2.clientY - touch1.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 // 修改颜色透明度并输出 rgba 格式
 export const setAlpha = (color: string, alpha: number) => {
   const canvas = document.createElement('canvas');

@@ -10,7 +10,7 @@ import type {
 } from './typings';
 import type { Handler } from 'mitt';
 import mitt from 'mitt';
-import { throttle, drawScale, setAlpha, format } from './utils';
+import { throttle, drawScale, setAlpha, format, getPinchDistance } from './utils';
 import { defaultConfig } from './config';
 
 class TimeLine {
@@ -18,6 +18,8 @@ class TimeLine {
   $canvasParent: HTMLElement | undefined;
   ctx: CanvasRenderingContext2D;
   cfg: ICfg;
+  timeRanges?: [number, number];
+  msPerPixel?: number;
   #emitter = mitt<IEmitter>();
   #currentTime = 0;
   #areas?: IAreas[];
@@ -25,6 +27,7 @@ class TimeLine {
   #scaleHeight: IScaleHeight;
   #isDragging = false;
   #lastTouchX: number | null = null;
+  #lastPinchDistance: number | null = null;
 
   constructor(el: string | HTMLCanvasElement, cfg?: ICfg) {
     if (!el) throw new Error('canvas Element Or Element ID is required!');
@@ -84,7 +87,7 @@ class TimeLine {
     this.$canvas.addEventListener('mousedown', this.#onDrag.bind(this));
     // 触摸事件监听器
     this.$canvas.addEventListener('touchstart', this.#onTouchStart.bind(this), { passive: false });
-    this.$canvas.addEventListener('touchmove', this.#onTouchMove.bind(this), { passive: false });
+    this.$canvas.addEventListener('touchmove', throttle(this.#onTouchMove.bind(this), 1000 / this.cfg.fps), { passive: false });
     this.$canvas.addEventListener('touchend', this.#onTouchEnd.bind(this));
   }
 
@@ -98,18 +101,17 @@ class TimeLine {
     this.#currentTime = currentTime || Date.now();
     this.#areas = areas || [];
 
+    // canvas X轴中心点（当前时间指示刻度）
+    const xCenterPoint = this.$canvas.width / 2;
+
     // 当前屏可绘制刻度数量
     const screenScaleCount = Math.ceil(this.$canvas.width / this.cfg.scaleSpacing);
     // 当前屏显示毫秒数
     const screenMillisecondCount = screenScaleCount * this.#timeSpacing;
-    // 开始时间
-    const startTime = this.#currentTime - screenMillisecondCount / 2;
-    // 结束时间
-    const endTime = this.#currentTime + screenMillisecondCount / 2;
-    // canvas X轴中心点（当前时间指示刻度）
-    const xCenterPoint = this.$canvas.width / 2;
+    // 可视区域起止时间
+    const [startTime,  endTime] = this.timeRanges = [this.#currentTime - screenMillisecondCount / 2, this.#currentTime + screenMillisecondCount / 2];
     // 每1px所占时间单位（毫秒）
-    const timePerPixel = screenMillisecondCount / this.$canvas.width;
+    this.msPerPixel = screenMillisecondCount / this.$canvas.width;
 
     // 清空画布
     this.#clear();
@@ -125,8 +127,8 @@ class TimeLine {
 
     // 绘制阴影区域
     this.#areas.forEach(item => {
-      const startX = item.startTime <= startTime ? 0 : Math.round((item.startTime - startTime) / timePerPixel);
-      const endX = item.endTime >= endTime ? this.$canvas.width : Math.round((item.endTime - startTime) / timePerPixel);
+      const startX = item.startTime <= startTime ? 0 : Math.round((item.startTime - startTime) / this.msPerPixel!);
+      const endX = item.endTime >= endTime ? this.$canvas.width : Math.round((item.endTime - startTime) / this.msPerPixel!);
       if (startX < this.$canvas.width && endX > 0) {
         this.#drawArea({
           startX,
@@ -143,7 +145,7 @@ class TimeLine {
       xCenterPoint,
       screenScaleCount,
       startTime,
-      timePerPixel,
+      timePerPixel: this.msPerPixel,
       scaleHeight: this.#scaleHeight,
       timeSpacing: this.#timeSpacing,
       currentTime: this.#currentTime,
@@ -208,37 +210,6 @@ class TimeLine {
     document.addEventListener('mouseup', mouseupListener);
   }
 
-  // 触摸事件监听器
-  #onTouchStart(e: TouchEvent) {
-    e.preventDefault();
-    this.#isDragging = true;
-    this.#lastTouchX = e.touches[0].clientX;
-  }
-
-  #onTouchMove(e: TouchEvent) {
-    e.preventDefault();
-    if (!this.#isDragging || this.#lastTouchX === null) return;
-
-    const touch = e.touches[0];
-    const deltaX = touch.clientX - this.#lastTouchX;
-    const currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * deltaX);
-
-    this.#lastTouchX = touch.clientX;
-
-    this.draw({
-      currentTime,
-      areas: this.#areas,
-      _privateFlag: true,
-    });
-  }
-
-  #onTouchEnd() {
-    if (!this.#isDragging) return;
-    this.#isDragging = false;
-    this.#lastTouchX = null;
-    this.#emit('dragged', this.#currentTime);
-  }
-
   // 缩放
   #onZoom(e: WheelEvent) {
     e.preventDefault();
@@ -258,6 +229,67 @@ class TimeLine {
         _privateFlag: true,
       });
     }
+  }
+
+  // 触摸事件监听器
+  #onTouchStart(e: TouchEvent) {
+    e.preventDefault();
+    this.#isDragging = true;
+    this.#lastTouchX = e.touches[0].clientX;
+    if (e.touches.length === 2) this.#lastPinchDistance = getPinchDistance(e.touches);
+  }
+
+  #onTouchMove(e: TouchEvent) {
+    e.preventDefault();
+    if (!this.#isDragging) return;
+
+    // Pinch zoom gesture
+    if (e.touches.length === 2 && this.#lastPinchDistance !== null) {
+      const currentPinchDistance = getPinchDistance(e.touches);
+      const isReaching = Math.abs(this.#lastPinchDistance - currentPinchDistance) >= 45;
+
+      if (!isReaching) return;
+      const currentIndex = this.cfg.timeSpacingList.findIndex(item => item === this.#timeSpacing);
+      if (currentIndex <= 0 || currentIndex >= this.cfg.timeSpacingList.length - 1) return;
+
+      if (currentPinchDistance < this.#lastPinchDistance) {
+        this.#timeSpacing = this.cfg.timeSpacingList[currentIndex + 1];
+      } else {
+        this.#timeSpacing = this.cfg.timeSpacingList[currentIndex - 1];
+      }
+
+      if (isReaching) this.#lastPinchDistance = currentPinchDistance;
+
+      this.draw({
+        currentTime: this.#currentTime,
+        areas: this.#areas,
+        _privateFlag: true,
+      });
+
+      return;
+    }
+
+    if (this.#lastTouchX === null) return;
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - this.#lastTouchX;
+    const currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * deltaX);
+
+    this.#lastTouchX = touch.clientX;
+
+    this.draw({
+      currentTime,
+      areas: this.#areas,
+      _privateFlag: true,
+    });
+  }
+
+  #onTouchEnd(e: TouchEvent) {
+    if (!this.#isDragging) return;
+    this.#isDragging = false;
+    this.#lastTouchX = null;
+    if (e.touches.length < 2) this.#lastPinchDistance = null;
+    this.#emit('dragged', this.#currentTime);
   }
 
   // 父元素size变化

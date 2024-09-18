@@ -50,7 +50,7 @@ timeline.on('dragged', (timestamp) => {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="https://unpkg.com/@losting/timeline@3.0.0/dist/timeline.iife.js"></script>
+  <script src="https://unpkg.com/@losting/timeline@4.0.0/dist/timeline.iife.js"></script>
 </head>
 <body>
   <canvas id="Timeline"></canvas>
