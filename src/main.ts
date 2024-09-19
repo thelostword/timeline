@@ -18,7 +18,7 @@ class TimeLine {
   $canvasParent: HTMLElement | undefined;
   ctx: CanvasRenderingContext2D;
   cfg: ICfg;
-  timeRanges?: [number, number];
+  timeRange?: [number, number];
   msPerPixel?: number;
   #emitter = mitt<IEmitter>();
   #currentTime = 0;
@@ -109,7 +109,7 @@ class TimeLine {
     // 当前屏显示毫秒数
     const screenMillisecondCount = screenScaleCount * this.#timeSpacing;
     // 可视区域起止时间
-    const [startTime,  endTime] = this.timeRanges = [this.#currentTime - screenMillisecondCount / 2, this.#currentTime + screenMillisecondCount / 2];
+    const [startTime,  endTime] = this.timeRange = [this.#currentTime - screenMillisecondCount / 2, this.#currentTime + screenMillisecondCount / 2];
     // 每1px所占时间单位（毫秒）
     this.msPerPixel = screenMillisecondCount / this.$canvas.width;
 
@@ -246,18 +246,17 @@ class TimeLine {
     // Pinch zoom gesture
     if (e.touches.length === 2 && this.#lastPinchDistance !== null) {
       const currentPinchDistance = getPinchDistance(e.touches);
-      const isReaching = Math.abs(this.#lastPinchDistance - currentPinchDistance) >= 45;
+      const isReaching = Math.abs(this.#lastPinchDistance - currentPinchDistance) >= 35;
 
       if (!isReaching) return;
-      const currentIndex = this.cfg.timeSpacingList.findIndex(item => item === this.#timeSpacing);
-      if (currentIndex <= 0 || currentIndex >= this.cfg.timeSpacingList.length - 1) return;
+      let currentIndex = this.cfg.timeSpacingList.findIndex(item => item === this.#timeSpacing);
 
-      if (currentPinchDistance < this.#lastPinchDistance) {
-        this.#timeSpacing = this.cfg.timeSpacingList[currentIndex + 1];
-      } else {
-        this.#timeSpacing = this.cfg.timeSpacingList[currentIndex - 1];
-      }
+      if (currentPinchDistance < this.#lastPinchDistance) currentIndex += 1;
+      else currentIndex -= 1;
 
+      if (currentIndex < 0 || currentIndex > this.cfg.timeSpacingList.length - 1) return;
+
+      this.#timeSpacing = this.cfg.timeSpacingList[currentIndex];
       if (isReaching) this.#lastPinchDistance = currentPinchDistance;
 
       this.draw({
