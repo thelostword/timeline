@@ -18,8 +18,8 @@ class TimeLine {
   $canvasParent: HTMLElement | undefined;
   ctx: CanvasRenderingContext2D;
   cfg: ICfg;
-  timeRange?: [number, number];
-  msPerPixel?: number;
+  #timeRange?: [number, number];
+  #msPerPixel?: number;
   #emitter = mitt<IEmitter>();
   #currentTime = 0;
   #areas?: IAreas[];
@@ -109,9 +109,9 @@ class TimeLine {
     // 当前屏显示毫秒数
     const screenMillisecondCount = screenScaleCount * this.#timeSpacing;
     // 可视区域起止时间
-    const [startTime,  endTime] = this.timeRange = [this.#currentTime - screenMillisecondCount / 2, this.#currentTime + screenMillisecondCount / 2];
+    const [startTime,  endTime] = this.#timeRange = [this.#currentTime - screenMillisecondCount / 2, this.#currentTime + screenMillisecondCount / 2];
     // 每1px所占时间单位（毫秒）
-    this.msPerPixel = screenMillisecondCount / this.$canvas.width;
+    this.#msPerPixel = screenMillisecondCount / this.$canvas.width;
 
     // 清空画布
     this.#clear();
@@ -127,8 +127,8 @@ class TimeLine {
 
     // 绘制阴影区域
     this.#areas.forEach(item => {
-      const startX = item.startTime <= startTime ? 0 : Math.round((item.startTime - startTime) / this.msPerPixel!);
-      const endX = item.endTime >= endTime ? this.$canvas.width : Math.round((item.endTime - startTime) / this.msPerPixel!);
+      const startX = item.startTime <= startTime ? 0 : Math.round((item.startTime - startTime) / this.#msPerPixel!);
+      const endX = item.endTime >= endTime ? this.$canvas.width : Math.round((item.endTime - startTime) / this.#msPerPixel!);
       if (startX < this.$canvas.width && endX > 0) {
         this.#drawArea({
           startX,
@@ -145,7 +145,7 @@ class TimeLine {
       xCenterPoint,
       screenScaleCount,
       startTime,
-      timePerPixel: this.msPerPixel,
+      timePerPixel: this.#msPerPixel,
       scaleHeight: this.#scaleHeight,
       timeSpacing: this.#timeSpacing,
       currentTime: this.#currentTime,
@@ -164,6 +164,14 @@ class TimeLine {
   // 获取当前时间
   getCurrentTime() {
     return this.#currentTime;
+  }
+  // 获取时间范围
+  getTimeRange() {
+    return this.#timeRange;
+  }
+  // 获取1px所占毫秒数
+  getMsPerPixel() {
+    return this.#msPerPixel;
   }
 
   // 拖拽
@@ -221,6 +229,7 @@ class TimeLine {
         areas: this.#areas,
         _privateFlag: true,
       });
+      this.#emit('zoom', currentIndex - 1);
     } else if (e.deltaY > 0 && currentIndex < this.cfg.timeSpacingList.length - 1) {
       this.#timeSpacing = this.cfg.timeSpacingList[currentIndex + 1];
       this.draw({
@@ -228,6 +237,7 @@ class TimeLine {
         areas: this.#areas,
         _privateFlag: true,
       });
+      this.#emit('zoom', currentIndex + 1);
     }
   }
 
