@@ -131,6 +131,27 @@ declare namespace TL {
      * Docs: https://github.com/thelostword/timeline#Events
      */
     off(event: DragendEventType, listener: DragendHandler): void;
+
+
+    /**
+     * Get the time range of the current Timeline.
+     * ```
+     * // Example:
+     * const timeline = new TimeLine('#Timeline');
+     * const timeRange = timeline.getTimeRange(); // output: undefined, because the draw method has not been called yet.
+     * ```
+     */
+    getTimeRange(): [number, number] | undefined;
+
+    /**
+     * Get the number of milliseconds per pixel.
+     * ```
+     * // Example:
+     * const timeline = new TimeLine('#Timeline');
+     * const msPerPixel = timeline.getMsPerPixel(); // output: undefined, because the draw method has not been called yet.
+     * ```
+     */
+    getMsPerPixel(): number | undefined;
   }
 }
 

@@ -50,7 +50,7 @@ timeline.on('dragged', (timestamp) => {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="https://unpkg.com/@losting/timeline@3.0.0/dist/timeline.iife.js"></script>
+  <script src="https://unpkg.com/@losting/timeline@4.0.0/dist/timeline.iife.js"></script>
 </head>
 <body>
   <canvas id="Timeline"></canvas>
@@ -86,8 +86,8 @@ timeline.on('dragged', (timestamp) => {
 | bgTextColor | string | 否 | rgba(`textColor`, .18) | 背景文字的颜色 |
 | thresholdsConfig | Object | 否 | [见默认配置文件](./src/config.ts) | 对应缩放阈值的配置, 当 `timeSpacingList` 配置时，该选项必填 |
 
-### Events
 
+### Events
 | 事件名 | 说明 | 参数示例 |
 | --- | --- | --- |
 | draw | timeline 的自定义绘制方法 | draw([DrawConfig](#DrawConfig)) |

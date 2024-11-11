@@ -10,8 +10,19 @@
 <body>
   <canvas id="Timeline"></canvas>
   <div>
-    <p>current time:</p>
+    <span>current time:</span>
+    <br>
     <strong id="TimeValue"></strong>
+
+    <br>
+    <span>Time Range:</span>
+    <br>
+    <strong id="TimeRange"></strong>
+
+    <br>
+    <span>Number of milliseconds per pixel:</span>
+    <br>
+    <strong id="MsPerPixel"></strong>
   </div>
 
   <script type="module">
@@ -37,8 +48,25 @@
     const TimeValue = document.querySelector('#TimeValue');
     TimeValue.textContent = format(timeline.getCurrentTime(), 'YYYY-MM-DD HH:mm:ss');
 
+    const TimeRange = document.querySelector('#TimeRange');
+    const timeRange = timeline.getTimeRange();
+    TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss')} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss')}` : 'Undefined';
+
+    const MsPerPixel = document.querySelector('#MsPerPixel');
+    MsPerPixel.textContent = `${timeline.getMsPerPixel()} ms`;
+
+
     timeline.on('dragged', (timestamp) => {
       TimeValue.textContent = format(timestamp, 'YYYY-MM-DD HH:mm:ss');
+
+      // update timeRange
+      const timeRange = timeline.getTimeRange();
+      TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss')} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss')}` : 'Undefined';
+    });
+
+    timeline.on('zoom', (zoom) => {
+      MsPerPixel.textContent = `${timeline.getMsPerPixel()} ms`;
+      console.log(zoom);
     });
     console.log(timeline);
   </script>

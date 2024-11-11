@@ -1,4 +1,3 @@
-
 import type {
   ICfg,
   IScaleHeight,
@@ -11,7 +10,7 @@ import type {
 } from './typings';
 import type { Handler } from 'mitt';
 import mitt from 'mitt';
-import { throttle, drawScale, setAlpha, format } from './utils';
+import { throttle, drawScale, setAlpha, format, getPinchDistance } from './utils';
 import { defaultConfig } from './config';
 
 class TimeLine {
@@ -19,12 +18,16 @@ class TimeLine {
   $canvasParent: HTMLElement | undefined;
   ctx: CanvasRenderingContext2D;
   cfg: ICfg;
+  #timeRange?: [number, number];
+  #msPerPixel?: number;
   #emitter = mitt<IEmitter>();
   #currentTime = 0;
   #areas?: IAreas[];
   #timeSpacing: number;
   #scaleHeight: IScaleHeight;
   #isDragging = false;
+  #lastTouchX: number | null = null;
+  #lastPinchDistance: number | null = null;
 
   constructor(el: string | HTMLCanvasElement, cfg?: ICfg) {
     if (!el) throw new Error('canvas Element Or Element ID is required!');
@@ -82,6 +85,10 @@ class TimeLine {
     this.$canvas.addEventListener('wheel', this.#onZoom.bind(this), { passive: false });
     // 拖拽按下-拖拽
     this.$canvas.addEventListener('mousedown', this.#onDrag.bind(this));
+    // 触摸事件监听器
+    this.$canvas.addEventListener('touchstart', this.#onTouchStart.bind(this), { passive: false });
+    this.$canvas.addEventListener('touchmove', throttle(this.#onTouchMove.bind(this), 1000 / this.cfg.fps), { passive: false });
+    this.$canvas.addEventListener('touchend', this.#onTouchEnd.bind(this));
   }
 
   // 绘制时间轴
@@ -94,18 +101,17 @@ class TimeLine {
     this.#currentTime = currentTime || Date.now();
     this.#areas = areas || [];
 
+    // canvas X轴中心点（当前时间指示刻度）
+    const xCenterPoint = this.$canvas.width / 2;
+
     // 当前屏可绘制刻度数量
     const screenScaleCount = Math.ceil(this.$canvas.width / this.cfg.scaleSpacing);
     // 当前屏显示毫秒数
     const screenMillisecondCount = screenScaleCount * this.#timeSpacing;
-    // 开始时间
-    const startTime = this.#currentTime - screenMillisecondCount / 2;
-    // 结束时间
-    const endTime = this.#currentTime + screenMillisecondCount / 2;
-    // canvas X轴中心点（当前时间指示刻度）
-    const xCenterPoint = this.$canvas.width / 2;
+    // 可视区域起止时间
+    const [startTime,  endTime] = this.#timeRange = [this.#currentTime - screenMillisecondCount / 2, this.#currentTime + screenMillisecondCount / 2];
     // 每1px所占时间单位（毫秒）
-    const timePerPixel = screenMillisecondCount / this.$canvas.width;
+    this.#msPerPixel = screenMillisecondCount / this.$canvas.width;
 
     // 清空画布
     this.#clear();
@@ -121,8 +127,8 @@ class TimeLine {
 
     // 绘制阴影区域
     this.#areas.forEach(item => {
-      const startX = item.startTime <= startTime ? 0 : Math.round((item.startTime - startTime) / timePerPixel);
-      const endX = item.endTime >= endTime ? this.$canvas.width : Math.round((item.endTime - startTime) / timePerPixel);
+      const startX = item.startTime <= startTime ? 0 : Math.round((item.startTime - startTime) / this.#msPerPixel!);
+      const endX = item.endTime >= endTime ? this.$canvas.width : Math.round((item.endTime - startTime) / this.#msPerPixel!);
       if (startX < this.$canvas.width && endX > 0) {
         this.#drawArea({
           startX,
@@ -139,7 +145,7 @@ class TimeLine {
       xCenterPoint,
       screenScaleCount,
       startTime,
-      timePerPixel,
+      timePerPixel: this.#msPerPixel,
       scaleHeight: this.#scaleHeight,
       timeSpacing: this.#timeSpacing,
       currentTime: this.#currentTime,
@@ -159,19 +165,26 @@ class TimeLine {
   getCurrentTime() {
     return this.#currentTime;
   }
+  // 获取时间范围
+  getTimeRange() {
+    return this.#timeRange;
+  }
+  // 获取1px所占毫秒数
+  getMsPerPixel() {
+    return this.#msPerPixel;
+  }
 
   // 拖拽
   #onDrag(downEvent: MouseEvent) {
     this.#isDragging = true;
-    let preXOffset = 0;
+    let prevClientX = downEvent.clientX;
     let currentTime = this.#currentTime;
 
     // 监听鼠标移动
-    const moveListener = throttle(({ offsetX }: MouseEvent) => {
+    const moveListener = throttle(({ clientX }: MouseEvent) => {
       if (!this.#isDragging) return;
-      const curXOffset = offsetX - downEvent.offsetX;
-      currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (curXOffset - preXOffset));
-      preXOffset = curXOffset;
+      currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * (clientX - prevClientX));
+      prevClientX = clientX;
       this.draw({
         currentTime,
         areas: this.#areas,
@@ -180,9 +193,12 @@ class TimeLine {
     }, 1000 / this.cfg.fps);
 
     // 监听是否移动到区域之外
-    const outsideListener = ({offsetX, offsetY}: MouseEvent) => {
+    const outsideListener = (e: MouseEvent) => {
+      const rect = this.$canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
       const AFFECT = 3;
-      if (offsetX < AFFECT || offsetX > this.$canvas.width - AFFECT || offsetY < AFFECT || offsetY > this.$canvas.height - AFFECT) {
+      if (x < AFFECT || x > this.$canvas.width - AFFECT || y < AFFECT || y > this.$canvas.height - AFFECT) {
         this.$canvas.removeEventListener('mousemove', moveListener);
         this.$canvas.removeEventListener('mousemove', outsideListener);
       }
@@ -213,6 +229,7 @@ class TimeLine {
         areas: this.#areas,
         _privateFlag: true,
       });
+      this.#emit('zoom', currentIndex - 1);
     } else if (e.deltaY > 0 && currentIndex < this.cfg.timeSpacingList.length - 1) {
       this.#timeSpacing = this.cfg.timeSpacingList[currentIndex + 1];
       this.draw({
@@ -220,7 +237,68 @@ class TimeLine {
         areas: this.#areas,
         _privateFlag: true,
       });
+      this.#emit('zoom', currentIndex + 1);
     }
+  }
+
+  // 触摸事件监听器
+  #onTouchStart(e: TouchEvent) {
+    e.preventDefault();
+    this.#isDragging = true;
+    this.#lastTouchX = e.touches[0].clientX;
+    if (e.touches.length === 2) this.#lastPinchDistance = getPinchDistance(e.touches);
+  }
+
+  #onTouchMove(e: TouchEvent) {
+    e.preventDefault();
+    if (!this.#isDragging) return;
+
+    // Pinch zoom gesture
+    if (e.touches.length === 2 && this.#lastPinchDistance !== null) {
+      const currentPinchDistance = getPinchDistance(e.touches);
+      const isReaching = Math.abs(this.#lastPinchDistance - currentPinchDistance) >= 35;
+
+      if (!isReaching) return;
+      let currentIndex = this.cfg.timeSpacingList.findIndex(item => item === this.#timeSpacing);
+
+      if (currentPinchDistance < this.#lastPinchDistance) currentIndex += 1;
+      else currentIndex -= 1;
+
+      if (currentIndex < 0 || currentIndex > this.cfg.timeSpacingList.length - 1) return;
+
+      this.#timeSpacing = this.cfg.timeSpacingList[currentIndex];
+      if (isReaching) this.#lastPinchDistance = currentPinchDistance;
+
+      this.draw({
+        currentTime: this.#currentTime,
+        areas: this.#areas,
+        _privateFlag: true,
+      });
+
+      return;
+    }
+
+    if (this.#lastTouchX === null) return;
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - this.#lastTouchX;
+    const currentTime = Math.round(this.#currentTime - this.#timeSpacing / this.cfg.scaleSpacing * deltaX);
+
+    this.#lastTouchX = touch.clientX;
+
+    this.draw({
+      currentTime,
+      areas: this.#areas,
+      _privateFlag: true,
+    });
+  }
+
+  #onTouchEnd(e: TouchEvent) {
+    if (!this.#isDragging) return;
+    this.#isDragging = false;
+    this.#lastTouchX = null;
+    if (e.touches.length < 2) this.#lastPinchDistance = null;
+    this.#emit('dragged', this.#currentTime);
   }
 
   // 父元素size变化
@@ -276,7 +354,7 @@ class TimeLine {
   }
 
   // 绘制线条
-  #drawLine: IDrawLine = ({ x, y, width = 1, color= this.cfg.scaleColor }) => {
+  #drawLine: IDrawLine = ({ x, y, width = 1, color = this.cfg.scaleColor }) => {
     this.ctx.beginPath();
     this.ctx.moveTo(x, this.$canvas.height);
     this.ctx.lineTo(x, this.$canvas.height - y);
@@ -287,7 +365,7 @@ class TimeLine {
   }
 
   // 绘制文字
-  #drawText: IDrawText = ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine ='alphabetic' }) => {
+  #drawText: IDrawText = ({ x, y, text, color = this.cfg.textColor, fontSize = '11px', align = 'center', baseLine = 'alphabetic' }) => {
     this.ctx.beginPath();
     this.ctx.font = `${fontSize} ${this.cfg.fontFamily}`;
     this.ctx.fillStyle = color;
@@ -305,16 +383,16 @@ class TimeLine {
   }
 
   on<Key extends keyof IEmitter>(type: Key, handler: Handler<IEmitter[Key]>) {
-		this.#emitter.on(type, handler);
-	}
+    this.#emitter.on(type, handler);
+  }
 
   off<Key extends keyof IEmitter>(type: Key, handler?: Handler<IEmitter[Key]>) {
-		this.#emitter.off(type, handler);
-	}
+    this.#emitter.off(type, handler);
+  }
 
-	#emit<Key extends keyof IEmitter>(...args: [Key, IEmitter[Key]]) {
-		this.#emitter.emit(...args);
-	}
+  #emit<Key extends keyof IEmitter>(...args: [Key, IEmitter[Key]]) {
+    this.#emitter.emit(...args);
+  }
 }
 
 export {
