@@ -2,6 +2,8 @@ declare namespace TL {
   export type ElementType = string | HTMLCanvasElement;
 
   type CommonType = {
+    // 时区
+    timezone?: string,
     // 根据父容器自动填充
     fill?: boolean,
     // 宽度
@@ -163,6 +165,6 @@ declare namespace TL {
  * ```
  * Docs: https://day.js.org/docs/en/display/format
  */
-export declare const format: (date: string | number | Date | null | undefined, fmt?: string) => string;
+export declare const format: (date: string | number | Date | null | undefined, fmt?: string, timezone?: string) => string;
 
 export default TL.TimeLine;
