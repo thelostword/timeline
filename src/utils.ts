@@ -53,7 +53,7 @@ export const setAlpha = (color: string, alpha: number) => {
 
 // 刻度绘制
 export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
-  const drawMethods = ({ space, scaleTimeFormat, bgTimeFormat, pointerTimeFormat, timezone }: { space: number, scaleTimeFormat: string, bgTimeFormat: string, pointerTimeFormat: string, timezone: string }) => {
+  const drawMethods = ({ space, scaleTimeFormat, bgTimeFormat, pointerTimeFormat, timezone }: { space: number, scaleTimeFormat: string, bgTimeFormat: string, pointerTimeFormat: string, timezone?: string }) => {
     // 当前年月日
     drawText({
       x: $canvas.width - xCenterPoint / 10,
