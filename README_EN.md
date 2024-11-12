@@ -72,6 +72,7 @@ timeline.on('dragged', (timestamp) => {
 | bgColor | string | No | rgba(0,0,0,0.5) | The background color of the canvas |
 | textColor | string | No | #ffffff | The color of the text |
 | fontFamily | string | No | Arial | The font family |
+| timezone | string | No | - | The timezone to display times in. Accepts both IANA timezone format (e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo') or UTC offset format (e.g., '+04:00', '-08:00') |
 | scaleColor | string | No | #ffffff | The color of the scale |
 | scaleSpacing | number | No | 7 | The spacing between scales |
 | areaBgColor | string | No | #ffffff55 | The background color of the shaded area |

@@ -72,6 +72,7 @@ timeline.on('dragged', (timestamp) => {
 | bgColor | string | 否 | rgba(0,0,0,0.5) | canvas背景色 |
 | textColor | string | 否 | #ffffff | 文字颜色 |
 | fontFamily | string | 否 | Arial | 字体 |
+| timezone | string | 否 | - | 时间显示的时区。支持 IANA 时区格式（如：'Asia/Shanghai'、'America/New_York'、'Europe/London'）或 UTC 偏移格式（如：'+04:00'、'-08:00'） |
 | scaleColor | string | 否 | #ffffff | 刻度颜色 |
 | scaleSpacing | number | 否 | 7 | 刻度间距 |
 | areaBgColor | string | 否 | #ffffff55 | 阴影区域背景颜色 |
