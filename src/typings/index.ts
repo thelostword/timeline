@@ -6,6 +6,7 @@ export type IScaleHeight = {
 }
 
 export type ICfg = {
+  timezone?: string,
   fill: boolean;
   width: number;
   height: number;

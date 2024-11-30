@@ -1,9 +1,16 @@
 import type { IDrawScale } from './typings';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+// 时区
+// https://day.js.org/docs/en/plugin/timezone
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // 格式化
 // https://day.js.org/docs/en/display/format
-export const format = (timestamp: number, fmt = 'MM/DD HH:mm') => dayjs(timestamp).format(fmt);
+export const format = (timestamp: number, fmt = 'MM/DD HH:mm Z', timezone?: string) => dayjs(timestamp).tz(timezone).format(fmt);
 
 // 节流函数
 export const throttle = (func: Function, delay: number) => {
@@ -46,12 +53,12 @@ export const setAlpha = (color: string, alpha: number) => {
 
 // 刻度绘制
 export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpacing, currentTime, $canvas, screenScaleCount, scaleHeight, startTime, drawLine, drawText, drawArea }) => {
-  const drawMethods = ({ space, scaleTimeFormat, bgTimeFormat, pointerTimeFormat }: { space: number, scaleTimeFormat: string, bgTimeFormat: string, pointerTimeFormat: string }) => {
+  const drawMethods = ({ space, scaleTimeFormat, bgTimeFormat, pointerTimeFormat, timezone }: { space: number, scaleTimeFormat: string, bgTimeFormat: string, pointerTimeFormat: string, timezone: string }) => {
     // 当前年月日
     drawText({
       x: $canvas.width - xCenterPoint / 10,
       y: 6,
-      text: format(currentTime, bgTimeFormat),
+      text: format(currentTime, bgTimeFormat, timezone),
       fontSize: `${$canvas.height - 5}px`,
       align: 'right',
       baseLine: 'top',
@@ -70,7 +77,7 @@ export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpa
         drawText({
           x,
           y: $canvas.height - scaleHeight.long - 5,
-          text: format(time, scaleTimeFormat),
+          text: format(time, scaleTimeFormat, timezone),
           baseLine: 'bottom',
         });
         continue;
@@ -95,7 +102,7 @@ export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpa
     drawText({
       x: xCenterPoint,
       y: cfg.pointerDisplayHeight / 2 + 5,
-      text: format(currentTime, pointerTimeFormat),
+      text: format(currentTime, pointerTimeFormat, timezone),
       align: 'center',
       baseLine: 'middle',
     });
@@ -110,6 +117,7 @@ export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpa
       scaleTimeFormat: thresholdConfig.scaleTimeFormat,
       bgTimeFormat: thresholdConfig.bgTimeFormat,
       pointerTimeFormat: thresholdConfig.pointerTimeFormat,
+      timezone: cfg.timezone
     });
   }
 

@@ -28,7 +28,10 @@
   <script type="module">
     import TimeLine, { format } from './dist/timeline.es.js';
 
+    const timezone = 'America/New_York';
+
     const timeline = new TimeLine('#Timeline', {
+      timezone,
       fill: false,
       zoom: 4,
     });
@@ -46,22 +49,22 @@
     });
 
     const TimeValue = document.querySelector('#TimeValue');
-    TimeValue.textContent = format(timeline.getCurrentTime(), 'YYYY-MM-DD HH:mm:ss');
+    TimeValue.textContent = format(timeline.getCurrentTime(), 'YYYY-MM-DD HH:mm:ss', timezone);
 
     const TimeRange = document.querySelector('#TimeRange');
     const timeRange = timeline.getTimeRange();
-    TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss')} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss')}` : 'Undefined';
+    TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss', timezone)} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss', timezone)}` : 'Undefined';
 
     const MsPerPixel = document.querySelector('#MsPerPixel');
     MsPerPixel.textContent = `${timeline.getMsPerPixel()} ms`;
 
 
     timeline.on('dragged', (timestamp) => {
-      TimeValue.textContent = format(timestamp, 'YYYY-MM-DD HH:mm:ss');
+      TimeValue.textContent = format(timestamp, 'YYYY-MM-DD HH:mm:ss', timezone);
 
       // update timeRange
       const timeRange = timeline.getTimeRange();
-      TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss')} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss')}` : 'Undefined';
+      TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss', timezone)} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss', timezone)}` : 'Undefined';
     });
 
     timeline.on('zoom', (zoom) => {
