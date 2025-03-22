@@ -85,6 +85,8 @@ timeline.on('dragged', (timestamp) => {
 | timeSpacingList | number[] | No | [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000] | Customize the time (in milliseconds) occupied by each tick. |
 | scaleHeight | object | No | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | Scale height. If this option is set, "long" and "short" must be filled in. |
 | bgTextColor | string | No | rgba(`textColor`, .18) | The color of the text on the background |
+| minimumTime | number | No | -Infinity | Minimum selectable time |
+| maximumTime | number | No | Infinity | Maximum selectable time |
 | thresholdsConfig | Object | 否 | [see: config.js](./src/config.ts) | corresponding scaling threshold configuration, when `timeSpacingList` exists, this option is required. |
 
 ### Events

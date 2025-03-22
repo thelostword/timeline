@@ -98,8 +98,17 @@ class TimeLine {
     if (this.#isDragging && !_privateFlag) return;
 
     // 获取参数
-    this.#currentTime = currentTime || Date.now();
+    let _currentTime = currentTime || Date.now();
+    // 限制时间范围
+    {
+      if (_currentTime < this.cfg.minimumTime) _currentTime = this.cfg.minimumTime;
+      if (_currentTime > this.cfg.maximumTime) _currentTime = this.cfg.maximumTime;
+    }
+
+    this.#currentTime = _currentTime;
     this.#areas = areas || [];
+
+
 
     // canvas X轴中心点（当前时间指示刻度）
     const xCenterPoint = this.$canvas.width / 2;

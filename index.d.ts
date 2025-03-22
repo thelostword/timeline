@@ -36,6 +36,10 @@ declare namespace TL {
     zoom?: number,
     // 背景文字颜色
     bgTextColor?: string,
+    // 允许的最小时间
+    minimumTime?: number,
+    // 允许的最大时间
+    maximumTime?: number,
   }
 
   export type ConfigMap<T extends number> = (CommonType & {

@@ -30,6 +30,8 @@ export type ICfg = {
   timeSpacingList: number[];
   scaleHeight?: IScaleHeight;
   bgTextColor?: string;
+  minimumTime: number;
+  maximumTime: number;
   thresholdsConfig: {
     [key: number]: {
       scaleTimeFormat: string;

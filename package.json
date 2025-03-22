@@ -1,6 +1,6 @@
 {
   "name": "@losting/timeline",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "Canvas timeline supports zooming, dragging, infinite scrolling, and custom control levels.",
   "type": "module",
   "main": "./dist/timeline.umd.js",
