@@ -19,6 +19,8 @@ export const defaultConfig: ICfg = {
   timeSpacingList: [10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000],
   // scaleHeight: ,
   // bgTextColor: ,
+  minimumTime: -Infinity,
+  maximumTime: Infinity,
   thresholdsConfig: {
     10: {
       scaleTimeFormat: 'mm:ss:SSS',

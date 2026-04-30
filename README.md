@@ -50,12 +50,12 @@ timeline.on('dragged', (timestamp) => {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="https://unpkg.com/@losting/timeline@4.0.0/dist/timeline.iife.js"></script>
+  <script src="https://unpkg.com/@losting/timeline@5.2.0/dist/timeline.iife.js"></script>
 </head>
 <body>
   <canvas id="Timeline"></canvas>
   <script>
-    const timeline = new window['$timeline']('#Timeline');
+    const timeline = new window['$timeline'].default('#Timeline');
     // ....
   </script>
 </body>
@@ -72,6 +72,7 @@ timeline.on('dragged', (timestamp) => {
 | bgColor | string | 否 | rgba(0,0,0,0.5) | canvas背景色 |
 | textColor | string | 否 | #ffffff | 文字颜色 |
 | fontFamily | string | 否 | Arial | 字体 |
+| timezone | string | 否 | - | 时间显示的时区。支持 IANA 时区格式（如：'Asia/Shanghai'、'America/New_York'、'Europe/London'）或 UTC 偏移格式（如：'+04:00'、'-08:00'） |
 | scaleColor | string | 否 | #ffffff | 刻度颜色 |
 | scaleSpacing | number | 否 | 7 | 刻度间距 |
 | areaBgColor | string | 否 | #ffffff55 | 阴影区域背景颜色 |
@@ -84,6 +85,8 @@ timeline.on('dragged', (timestamp) => {
 | timeSpacingList | number[] | 否 | `[10, 100, 1000, 10000, 60000, 600000, 3600000, 86400000, 604800000]` | 自定义每刻度所占时间（毫秒） |
 | scaleHeight | object | 否 | `{ long: this.$canvas.height / 3, short: this.$canvas.height / 10 }` | 刻度高度，如果设置此项，则long、short必填 |
 | bgTextColor | string | 否 | rgba(`textColor`, .18) | 背景文字的颜色 |
+| minimumTime | number | 否 | -Infinity | 限制可选范围，允许最小时间 |
+| maximumTime | number | 否 | Infinity | 限制可选范围，允许最大时间 |
 | thresholdsConfig | Object | 否 | [见默认配置文件](./src/config.ts) | 对应缩放阈值的配置, 当 `timeSpacingList` 配置时，该选项必填 |
 
 
