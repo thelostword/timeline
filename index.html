@@ -6,39 +6,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="https://github.com/thelostword" />
   <title>timeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #050505; display: flex; flex-direction: column; gap: 24px; padding: 24px; font-family: 'Courier New', monospace; color: #7a7a7a; }
+    canvas { display: block; width: 100%; }
+    .info { font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
+    .info strong { color: #a0a060; }
+    h3 { font-size: 11px; color: #555; margin-bottom: 8px; letter-spacing: 0.08em; }
+  </style>
 </head>
 <body>
-  <canvas id="Timeline"></canvas>
-  <div>
-    <span>current time:</span>
-    <br>
-    <strong id="TimeValue"></strong>
+  <canvas id="TimelineModern" height="64"></canvas>
 
-    <br>
-    <span>Time Range:</span>
-    <br>
-    <strong id="TimeRange"></strong>
-
-    <br>
-    <span>Number of milliseconds per pixel:</span>
-    <br>
-    <strong id="MsPerPixel"></strong>
+  <div class="info">
+    <div>current time: <strong id="TimeValue"></strong></div>
+    <div>range: <strong id="TimeRange"></strong></div>
+    <div>ms/px: <strong id="MsPerPixel"></strong></div>
   </div>
 
+  <h3>DEFAULT THEME</h3>
+  <canvas id="TimelineDefault"></canvas>
+
   <script type="module">
-    import TimeLine, { format } from './dist/timeline.es.js';
+    import TimeLine, { format } from './src/main.ts';
 
+    // --- Modern theme demo ---
+    const modernCanvas = document.querySelector('#TimelineModern');
+    modernCanvas.width = modernCanvas.parentElement.clientWidth;
+
+    const currentTime = new Date('2025-08-28T21:44:03').getTime();
+
+    const modern = new TimeLine('#TimelineModern', {
+      fill: false,
+      zoom: 4,
+      theme: 'modern',
+    });
+
+    modern.draw({
+      currentTime,
+      areas: [{
+        startTime: currentTime,
+        endTime: currentTime + 3600000,
+      }],
+    });
+
+    const TimeValue = document.querySelector('#TimeValue');
+    TimeValue.textContent = format(modern.getCurrentTime(), 'MM/DD/YYYY HH:mm:ss');
+
+    const TimeRange = document.querySelector('#TimeRange');
+    const timeRange = modern.getTimeRange();
+    TimeRange.textContent = timeRange
+      ? `${format(timeRange[0], 'HH:mm:ss')} ~ ${format(timeRange[1], 'HH:mm:ss')}`
+      : 'Undefined';
+
+    const MsPerPixel = document.querySelector('#MsPerPixel');
+    MsPerPixel.textContent = `${modern.getMsPerPixel()} ms`;
+
+    modern.on('dragged', (timestamp) => {
+      TimeValue.textContent = format(timestamp, 'MM/DD/YYYY HH:mm:ss');
+      const r = modern.getTimeRange();
+      TimeRange.textContent = r ? `${format(r[0], 'HH:mm:ss')} ~ ${format(r[1], 'HH:mm:ss')}` : 'Undefined';
+    });
+
+    modern.on('zoom', () => {
+      MsPerPixel.textContent = `${modern.getMsPerPixel()} ms`;
+    });
+
+    // --- Default theme demo ---
     const timezone = 'America/New_York';
-
-    const timeline = new TimeLine('#Timeline', {
+    const defaultTimeline = new TimeLine('#TimelineDefault', {
       timezone,
       fill: false,
       zoom: 4,
-      // minimumTime: 1651827433000,
-      // maximumTime: 1651829413000,
     });
 
-    timeline.draw({
+    defaultTimeline.draw({
       currentTime: 1651829413000,
       areas: [{
         startTime: 1651827433000,
@@ -49,31 +94,6 @@
         endTime: 1651832533000,
       }],
     });
-
-    const TimeValue = document.querySelector('#TimeValue');
-    TimeValue.textContent = format(timeline.getCurrentTime(), 'YYYY-MM-DD HH:mm:ss', timezone);
-
-    const TimeRange = document.querySelector('#TimeRange');
-    const timeRange = timeline.getTimeRange();
-    TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss', timezone)} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss', timezone)}` : 'Undefined';
-
-    const MsPerPixel = document.querySelector('#MsPerPixel');
-    MsPerPixel.textContent = `${timeline.getMsPerPixel()} ms`;
-
-
-    timeline.on('dragged', (timestamp) => {
-      TimeValue.textContent = format(timestamp, 'YYYY-MM-DD HH:mm:ss', timezone);
-
-      // update timeRange
-      const timeRange = timeline.getTimeRange();
-      TimeRange.textContent = timeRange ? `${format(timeRange[0], 'YYYY-MM-DD HH:mm:ss', timezone)} ~ ${format(timeRange[1], 'YYYY-MM-DD HH:mm:ss', timezone)}` : 'Undefined';
-    });
-
-    timeline.on('zoom', (zoom) => {
-      MsPerPixel.textContent = `${timeline.getMsPerPixel()} ms`;
-      console.log(zoom);
-    });
-    console.log(timeline);
   </script>
 </body>
 </html>

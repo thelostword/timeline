@@ -1,5 +1,31 @@
 import type { ICfg } from './typings';
 
+export const modernThemeOverrides: Partial<ICfg> = {
+  bgColor: '#0f1216',
+  textColor: '#7c8693',
+  fontFamily: "'JetBrains Mono', monospace",
+  scaleColor: '#232c36',
+  scaleSpacing: 10,
+  areaBgColor: 'rgba(255, 71, 87, 0.18)',
+  pointerColor: '#f5d547',
+  pointerTextColor: '#0a0c0f',
+  pointerWidth: 2,
+  pointerDisplayWidth: 146,
+  pointerDisplayHeight: 16,
+  bgTextColor: 'rgba(0,0,0,0)',
+  thresholdsConfig: {
+    10:       { scaleTimeFormat: 'mm:ss:SSS',   bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'MM/DD/YYYY  HH:mm:ss:SSS', space: 10 },
+    100:      { scaleTimeFormat: 'mm:ss',        bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'MM/DD/YYYY  HH:mm:ss:SSS', space: 10 },
+    1000:     { scaleTimeFormat: 'mm:ss',        bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'MM/DD/YYYY  HH:mm:ss',     space: 10 },
+    10000:    { scaleTimeFormat: 'HH:mm:ss',     bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'MM/DD/YYYY  HH:mm:ss',     space: 10 },
+    60000:    { scaleTimeFormat: 'HH:mm',        bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'MM/DD/YYYY  HH:mm:ss',     space: 10 },
+    600000:   { scaleTimeFormat: 'HH:mm',        bgTimeFormat: 'YYYY/MM/DD', pointerTimeFormat: 'MM/DD/YYYY  HH:mm:ss',     space: 10 },
+    3600000:  { scaleTimeFormat: 'MM/DD HH:mm',  bgTimeFormat: 'YYYY/MM',    pointerTimeFormat: 'MM/DD/YYYY  HH:mm',        space: 10 },
+    86400000: { scaleTimeFormat: 'MM/DD HH:mm',  bgTimeFormat: 'YYYY/MM',    pointerTimeFormat: 'MM/DD/YYYY  HH:mm',        space: 10 },
+    604800000:{ scaleTimeFormat: 'YYYY/MM/DD',   bgTimeFormat: 'YYYY',       pointerTimeFormat: 'YYYY/MM/DD',               space: 10 },
+  },
+};
+
 export const defaultConfig: ICfg = {
   fill: true,
   width: 1000,

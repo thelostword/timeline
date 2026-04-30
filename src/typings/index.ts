@@ -7,6 +7,7 @@ export type IScaleHeight = {
 
 export type ICfg = {
   timezone?: string,
+  theme?: string;
   fill: boolean;
   width: number;
   height: number;
@@ -17,6 +18,7 @@ export type ICfg = {
   scaleSpacing: number;
   areaBgColor: string;
   pointerColor: string;
+  pointerTextColor?: string;
   pointerWidth: number;
 
   // 弃用属性
@@ -65,7 +67,7 @@ export type IDrawText = (option: IDrawTextOption) => void;
 type IDrawAreaOption = { startX: number, startY: number, endX: number, endY: number, bgColor: string };
 export type IDrawArea = (option: IDrawAreaOption) => void;
 
-type IDrawLineOption = { x: number, y: number, width?: number, color?: string };
+type IDrawLineOption = { x: number, y: number, width?: number, color?: string, shadowBlur?: number, shadowColor?: string };
 export type IDrawLine = (option: IDrawLineOption) => void;
 
 

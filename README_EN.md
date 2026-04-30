@@ -19,7 +19,8 @@ import Timeline from '@losting/timeline';
 const timeline = new Timeline('#Timeline', {
   fill: false,
   width: 1000,
-  height: 60,
+  height: 68,
+  theme: 'modern',
 });
 
 // Custom drawing
@@ -28,7 +29,6 @@ timeline.draw({
   areas: [{
     startTime: 1651827433000,
     endTime: 1651829413000,
-    bgColor: '#f897aa'
   },{
     startTime: 1651829533000,
     endTime: 1651832533000,
@@ -53,9 +53,12 @@ timeline.on('dragged', (timestamp) => {
   <script src="https://unpkg.com/@losting/timeline@5.2.0/dist/timeline.iife.js"></script>
 </head>
 <body>
-  <canvas id="Timeline"></canvas>
+  <canvas id="Timeline" height="68"></canvas>
   <script>
-    const timeline = new window['$timeline'].default('#Timeline');
+    const timeline = new window['$timeline'].default('#Timeline', {
+      fill: false,
+      theme: 'modern',
+    });
     // ....
   </script>
 </body>
@@ -66,6 +69,7 @@ timeline.on('dragged', (timestamp) => {
 ### Config
 | Property | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
+| theme | string | No | - | Visual theme. Use `'modern'` for a dark surveillance-style look with amber pointer, monospace font, and dark-red areas |
 | fill | boolean | No | false | Whether to fit the parent container width and height. If false, you need to manually set the width and height of the canvas |
 | width | number | No | 1000 | The width of the canvas |
 | height | number | No | 60 | The height of the canvas |

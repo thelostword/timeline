@@ -19,7 +19,8 @@ import Timeline from '@losting/timeline';
 const timeline = new Timeline('#Timeline', {
   fill: false,
   width: 1000,
-  height: 60,
+  height: 68,
+  theme: 'modern',
 });
 
 // 自定义绘制
@@ -28,7 +29,6 @@ timeline.draw({
   areas: [{
     startTime: 1651827433000,
     endTime: 1651829413000,
-    bgColor: '#f897aa'
   },{
     startTime: 1651829533000,
     endTime: 1651832533000,
@@ -53,9 +53,12 @@ timeline.on('dragged', (timestamp) => {
   <script src="https://unpkg.com/@losting/timeline@5.2.0/dist/timeline.iife.js"></script>
 </head>
 <body>
-  <canvas id="Timeline"></canvas>
+  <canvas id="Timeline" height="68"></canvas>
   <script>
-    const timeline = new window['$timeline'].default('#Timeline');
+    const timeline = new window['$timeline'].default('#Timeline', {
+      fill: false,
+      theme: 'modern',
+    });
     // ....
   </script>
 </body>
@@ -66,6 +69,7 @@ timeline.on('dragged', (timestamp) => {
 ### Config
 | 属性 | 类型 | 是否必填 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
+| theme | string | 否 | - | 视觉主题。使用 `'modern'` 启用深色监控风格（琥珀色指针、等宽字体、深红色区域） |
 | fill | boolean | 否 | true | 是否适应父容器宽高，若为false则需要手动设定canvas宽高 |
 | width | number | 否 | 1000 | canvas宽度 |
 | height | number | 否 | 60 | canvas高度 |
