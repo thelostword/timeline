@@ -73,16 +73,33 @@ export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpa
       const x = i * cfg.scaleSpacing - xOffset - cfg.pointerWidth / 2;
       const time = startTime + i * timeSpacing - timeOffset;
       if (time % (timeSpacing * space) === 0) {
-        drawLine({ x, y: scaleHeight.long });
-        drawText({
-          x,
-          y: $canvas.height - scaleHeight.long - 5,
-          text: format(time, scaleTimeFormat, timezone),
-          baseLine: 'bottom',
-        });
+        if (cfg.theme === 'modern') {
+          // full-height major tick line
+          drawLine({ x, y: $canvas.height, width: 1, color: cfg.scaleColor });
+          drawText({
+            x,
+            y: $canvas.height - 8,
+            text: format(time, scaleTimeFormat, timezone),
+            baseLine: 'bottom',
+            fontSize: '10px',
+          });
+        } else {
+          drawLine({ x, y: scaleHeight.long });
+          drawText({
+            x,
+            y: $canvas.height - scaleHeight.long - 5,
+            text: format(time, scaleTimeFormat, timezone),
+            baseLine: 'bottom',
+          });
+        }
         continue;
       }
-      drawLine({ x, y: scaleHeight.short });
+      if (cfg.theme === 'modern') {
+        // full-height minor tick line (very subtle)
+        drawLine({ x, y: $canvas.height, width: 1, color: 'rgba(255, 255, 255, 0.05)' });
+      } else {
+        drawLine({ x, y: scaleHeight.short });
+      }
     }
 
     // 当前时间指针
@@ -91,21 +108,45 @@ export const drawScale: IDrawScale = ({ xCenterPoint, cfg, timePerPixel, timeSpa
       y: $canvas.height,
       width: cfg.pointerWidth,
       color: cfg.pointerColor,
+      shadowBlur: cfg.theme === 'modern' ? 8 : 0,
+      shadowColor: cfg.theme === 'modern' ? cfg.pointerColor : 'transparent',
     });
-    drawArea({
-      startX: xCenterPoint - cfg.pointerDisplayWidth / 2,
-      startY: 4,
-      endX: xCenterPoint + cfg.pointerDisplayWidth / 2,
-      endY: 4 + cfg.pointerDisplayHeight,
-      bgColor: cfg.pointerColor,
-    });
-    drawText({
-      x: xCenterPoint,
-      y: cfg.pointerDisplayHeight / 2 + 5,
-      text: format(currentTime, pointerTimeFormat, timezone),
-      align: 'center',
-      baseLine: 'middle',
-    });
+
+    if (cfg.theme === 'modern') {
+      // label box to the RIGHT of the cursor, starting 4px below top and 4px from cursor
+      drawArea({
+        startX: xCenterPoint + 4,
+        startY: 4,
+        endX: xCenterPoint + 4 + cfg.pointerDisplayWidth,
+        endY: 4 + cfg.pointerDisplayHeight,
+        bgColor: cfg.pointerColor,
+      });
+      drawText({
+        x: xCenterPoint + 4 + cfg.pointerDisplayWidth / 2,
+        y: 4 + cfg.pointerDisplayHeight / 2,
+        text: format(currentTime, pointerTimeFormat, timezone),
+        align: 'center',
+        baseLine: 'middle',
+        color: cfg.pointerTextColor || cfg.textColor,
+        fontSize: 'bold 10px',
+      });
+    } else {
+      drawArea({
+        startX: xCenterPoint - cfg.pointerDisplayWidth / 2,
+        startY: 4,
+        endX: xCenterPoint + cfg.pointerDisplayWidth / 2,
+        endY: 4 + cfg.pointerDisplayHeight,
+        bgColor: cfg.pointerColor,
+      });
+      drawText({
+        x: xCenterPoint,
+        y: cfg.pointerDisplayHeight / 2 + 5,
+        text: format(currentTime, pointerTimeFormat, timezone),
+        align: 'center',
+        baseLine: 'middle',
+        color: cfg.pointerTextColor || cfg.textColor,
+      });
+    }
   }
 
   // const formatThresholds: number[] = Object.keys(cfg.formats).map(Number).sort((a, b) => a - b);

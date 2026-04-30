@@ -11,7 +11,7 @@ import type {
 import type { Handler } from 'mitt';
 import mitt from 'mitt';
 import { throttle, drawScale, setAlpha, format, getPinchDistance } from './utils';
-import { defaultConfig } from './config';
+import { defaultConfig, modernThemeOverrides } from './config';
 
 class TimeLine {
   $canvas: HTMLCanvasElement;
@@ -36,7 +36,8 @@ class TimeLine {
     this.ctx = this.$canvas.getContext('2d')!;
 
     // 获取配置项
-    this.cfg = { ...defaultConfig, ...cfg };
+    const themeOverrides = cfg?.theme === 'modern' ? modernThemeOverrides : {};
+    this.cfg = { ...defaultConfig, ...themeOverrides, ...cfg };
 
     // 兼容
     if (cfg?.pointColor) this.cfg.pointerColor = cfg.pointColor;
@@ -344,26 +345,63 @@ class TimeLine {
       if (this.#timeSpacing < 604800000) return `${Math.round(this.#timeSpacing / 100 / 60 / 60 / 24) / 10}days`;
       return `${Math.round(this.#timeSpacing / 100 / 60 / 60 / 24 / 7) / 10}weeks`;
     };
-    this.#drawText({
-      x: this.cfg.scaleSpacing + 12,
-      y: 9,
-      text: genPixelText(),
-      align: 'left',
-      baseLine: 'middle',
-    });
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(5, 6);
-    this.ctx.lineTo(5, 10);
-    this.ctx.lineTo(this.cfg.scaleSpacing + 6, 10);
-    this.ctx.lineTo(this.cfg.scaleSpacing + 6, 6);
-    this.ctx.strokeStyle = this.cfg.scaleColor;
-    this.ctx.lineWidth = 1.5;
-    this.ctx.stroke();
+    if (this.cfg.theme === 'modern') {
+      const genModernScaleText = () => {
+        if (this.#timeSpacing < 1000) return `${this.#timeSpacing}MS`;
+        if (this.#timeSpacing < 60000) return `${Math.round(this.#timeSpacing / 100) / 10}SEC`;
+        if (this.#timeSpacing < 3600000) return `${Math.round(this.#timeSpacing / 100 / 60) / 10}MIN`;
+        if (this.#timeSpacing < 86400000) return `${Math.round(this.#timeSpacing / 100 / 60 / 60) / 10}HR`;
+        if (this.#timeSpacing < 604800000) return `${Math.round(this.#timeSpacing / 100 / 60 / 60 / 24) / 10}DAY`;
+        return `${Math.round(this.#timeSpacing / 100 / 60 / 60 / 24 / 7) / 10}WK`;
+      };
+
+      const label = `[—] ${genModernScaleText()}`;
+      this.ctx.font = `10px ${this.cfg.fontFamily}`;
+      const textW = this.ctx.measureText(label).width;
+      const padX = 7, padY = 3, bx = 8, by = 6;
+      const bw = textW + padX * 2, bh = 10 + padY * 2;
+
+      // background fill
+      this.ctx.fillStyle = '#151a20';
+      this.ctx.fillRect(bx, by, bw, bh);
+      // border
+      this.ctx.strokeStyle = '#232c36';
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
+      // label text
+      this.#drawText({
+        x: bx + padX,
+        y: by + padY,
+        text: label,
+        align: 'left',
+        baseLine: 'top',
+        fontSize: '10px',
+      });
+    } else {
+      this.#drawText({
+        x: this.cfg.scaleSpacing + 12,
+        y: 9,
+        text: genPixelText(),
+        align: 'left',
+        baseLine: 'middle',
+      });
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(5, 6);
+      this.ctx.lineTo(5, 10);
+      this.ctx.lineTo(this.cfg.scaleSpacing + 6, 10);
+      this.ctx.lineTo(this.cfg.scaleSpacing + 6, 6);
+      this.ctx.strokeStyle = this.cfg.scaleColor;
+      this.ctx.lineWidth = 1.5;
+      this.ctx.stroke();
+    }
   }
 
   // 绘制线条
-  #drawLine: IDrawLine = ({ x, y, width = 1, color = this.cfg.scaleColor }) => {
+  #drawLine: IDrawLine = ({ x, y, width = 1, color = this.cfg.scaleColor, shadowBlur = 0, shadowColor = 'transparent' }) => {
+    this.ctx.shadowBlur = shadowBlur;
+    this.ctx.shadowColor = shadowColor;
     this.ctx.beginPath();
     this.ctx.moveTo(x, this.$canvas.height);
     this.ctx.lineTo(x, this.$canvas.height - y);
@@ -371,6 +409,8 @@ class TimeLine {
     this.ctx.strokeStyle = color;
     this.ctx.lineWidth = width;
     this.ctx.stroke();
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowColor = 'transparent';
   }
 
   // 绘制文字

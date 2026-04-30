@@ -40,6 +40,7 @@ declare namespace TL {
     minimumTime?: number,
     // 允许的最大时间
     maximumTime?: number,
+    theme?: string,
   }
 
   export type ConfigMap<T extends number> = (CommonType & {
