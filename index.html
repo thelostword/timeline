@@ -12,14 +12,17 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #050505; display: flex; flex-direction: column; gap: 24px; padding: 24px; font-family: 'Courier New', monospace; color: #7a7a7a; }
-    canvas { display: block; width: 100%; }
+    /* canvas { display: block; width: 100%; } */
     .info { font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
     .info strong { color: #a0a060; }
     h3 { font-size: 11px; color: #555; margin-bottom: 8px; letter-spacing: 0.08em; }
+    .canvas-wrap { width: 100%; height: 70px;}
   </style>
 </head>
 <body>
-  <canvas id="TimelineModern" height="64"></canvas>
+  <div class="canvas-wrap">
+    <canvas id="TimelineModern" height="64"></canvas>
+  </div>
 
   <div class="info">
     <div>current time: <strong id="TimeValue"></strong></div>
@@ -28,19 +31,21 @@
   </div>
 
   <h3>DEFAULT THEME</h3>
-  <canvas id="TimelineDefault"></canvas>
+  <div>
+    <canvas id="TimelineDefault"></canvas>
+  </div>
 
   <script type="module">
     import TimeLine, { format } from './dist/timeline.es.js';
 
     // --- Modern theme demo ---
-    const modernCanvas = document.querySelector('#TimelineModern');
-    modernCanvas.width = modernCanvas.parentElement.clientWidth;
+    // const modernCanvas = document.querySelector('#TimelineModern');
+    // modernCanvas.width = modernCanvas.parentElement.clientWidth;
 
     const currentTime = new Date('2025-08-28T21:44:03').getTime();
 
     const modern = new TimeLine('#TimelineModern', {
-      fill: false,
+      fill: true,
       zoom: 4,
       theme: 'modern',
     });
